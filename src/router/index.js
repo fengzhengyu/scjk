@@ -13,11 +13,15 @@ import GoodsDetail from 'components/Goods/GoodsDetail'
 import OrderWrite from 'components/Order/OrderWrite'
 import OrderDetail from 'components/Order/OrderDetail'
 import Login from 'components/Member/Login'
+import Register from 'components/Member/Register'
 import Search from 'components/Index/Search'
+import  NotFoundComponent from 'page/NotFoundComponent'
 
 Vue.use(Router)
 
 export default new Router({
+   mode: 'history',
+   base: '/ceshi',
   routes: [
     {
       path: '/',
@@ -27,13 +31,6 @@ export default new Router({
       path: '/index',
       name: 'index',
       component: Index,
-      // children: [
-      //   {
-      //     path: ':goodsId',
-      //     name: 'id',
-      //     component: GoodsDetail
-      //   }
-      // ]
     },
     {
       path: '/cart',
@@ -102,10 +99,17 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login
-    },{
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
+    },
+    {
       path: '/search',
       name: 'search',
       component: Search
-    }
+    },
+    { path: '*', component: NotFoundComponent }
   ]
 })

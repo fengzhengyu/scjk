@@ -158,7 +158,7 @@
                 }
             },
             //头像改变
-            changePhoto(e){
+            changePhoto(e){;
                 let img1=e.target.files[0];
                 let form = new FormData();
                 if(img1.size>(200*1024)){
@@ -197,9 +197,12 @@
                 }).catch(err =>console.log(err));
             },
             exit(){
-                this.delCookie ('userCode')
-                this.isLogin = false
-                this.$router.go(0)
+              
+                this.delCookie ('userCode');
+                this.isLogin = false;
+                this.$router.push({
+                    name: 'login'
+                })
             },
             login(){
                  this.$router.push({

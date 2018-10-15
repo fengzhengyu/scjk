@@ -11,7 +11,7 @@
             <i class="iconfont icon-iconfontzhizuobiaozhun023132"></i>
             温馨提示：发票为必填项，请确认相关商品信息后提交订单
         </div>
-        <div class="address" @click="addressFlag=!addressFlag">
+        <div class="address" @click=" goAddress">
             <div class="come-door">上门自提</div>
             <div class="text">四川省广汉市东莞路二段10号内一号市场二层<br/><span>上午9:00—下午17:00</span> 咨询电话：<a href="javascript:;">13658050467</a> 王</div>
         </div>
@@ -48,7 +48,8 @@
         </div>
         <div class="invoice-wrap">
             <h3 class="name">发票</h3>
-            <div class="desc" @click=" invoiceFlag = !invoiceFlag">
+            <!-- invoiceFlag = !invoiceFlag -->
+            <div class="desc" @click=" goInvoice">  
                 <span class="red">纸质</span>(商品明细--{{invoiceType}}) 
                 <span class="go">〉</span>
             </div>
@@ -59,8 +60,8 @@
                 <div class="next-btn"  @click="submitOrder">提交订单</div>
             </div>
         </div>
-        <OrderInvoice v-show="invoiceFlag" v-on:listenToChild= "getBackMsg" v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
-        <Address v-show="addressFlag" @addressInfo="getAddressBack"></Address>
+        <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
+        <Address v-show="$route.hash == '#address'" @addressInfo="getAddressInfo"></Address>
         <router-view></router-view>
     </div>
 </template>
@@ -201,25 +202,40 @@
                 })
                 
             },
-            getBackMsg(data){
-                this.invoiceFlag = data.boole;
-                // this.invoiceType = data.type;
-               
-            },
+                //    得到发票信息
             getSaveMsg(data){
+               console.log(data);
                
                 this.invoiceFlag = data.boole;
                 this.invoiceType = data.type;
                 this.invoiceName = data.name;
                 this.taxpayerNumber = data.number;
             },
+            // 得到地址信息
+            getAddressInfo(){
+
+            },
+            // 去地址页
             goAddress(){
+               console.log(this.$route.hash)
+                 let  id =this.$route.query.id;
                 this.$router.push({
-                    name: 'address'
+                    name: 'order',
+                    query: {id:id},
+                    hash: '#address'
+
                 })
             },
-            getAddressBack(){
-              this.addressFlag = false;
+            //  去发票页面
+            goInvoice(){
+                let  id =this.$route.query.id;
+                this.$router.push({
+                    name: 'order',
+                    query: {id:id},
+                    hash: '#invoice'
+
+                })
+                 console.log(this.$route.hash)
             }
         },
         components: {

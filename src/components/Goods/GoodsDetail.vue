@@ -275,16 +275,11 @@
 .slide-enter, .slide-leave-to
     transform: translate3d(100%, 0, 0)
 .detail
-    margin 0 auto
+   
     width 6.4rem
-    position absolute
-    top 0
-    left 0
-    right 0
-    bottom 0
+    position relative
     padding-bottom .8rem
     background #fff
-    z-index 2
     overflow-y auto
     // -webkit-overflow-scrolling: touch;
    
