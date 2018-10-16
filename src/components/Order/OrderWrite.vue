@@ -62,12 +62,14 @@
         </div>
         <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
         <Address v-show="$route.hash == '#address'" @addressInfo="getAddressInfo"></Address>
+        <AddressEdit v-show="$route.hash == '#addressEdit'" ></AddressEdit>
         <router-view></router-view>
     </div>
 </template>
 <script>
     import OrderInvoice from 'components/Order/OrderInvoice'
     import Address from 'components/Order/Address'
+    import AddressEdit from 'components/Order/AddressEdit'
     export default {
         data(){
             return {
@@ -240,7 +242,8 @@
         },
         components: {
             OrderInvoice,
-            Address
+            Address,
+            AddressEdit
         }
     }
 </script>
