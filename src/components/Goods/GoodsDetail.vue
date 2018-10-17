@@ -8,16 +8,17 @@
                     </mt-button>
                 </span>        
             </mt-header>
-            <div class="img-wrap">
-                <img :src="goodsDetailPhotos" alt="">
-            </div>
-            <h1 class="goods-name">{{goods.goodsName}}</h1>
+            <!-- <div class="img-wrap"> -->
+            <Swiper :sliders=" goodsDetailPhotos" class="img-wrap"></Swiper>
+                <!-- <img :src="goodsDetailPhotos" alt=""> -->
+            <!-- </div> -->
+            <h1 class="goods-name">{{ goods.goodsName }}</h1>
             <p class="info">{{goods.goodsSpecification}}</p>
             <p class="info">{{goods.goodsRetailPrice}}</p>
             <p class="info">
                 <span  v-if="userCode" class="price">{{goods.goodsProcurementPrice}}</span>
-                <span class="show" v-else @click="show($event)">查看采购价</span>
-                <span class="repertory"> 库存:{{goods.goodsInventory}}</span>
+                <span class="show" v-else @click.prevent="show">查看采购价</span>
+                <span class="repertory"> 库存:{{goods.goodsInventory || 0}}</span>
             </p>
             <div class="mumber">
                 数量
@@ -62,11 +63,13 @@
     
 </template>
 <script>
+    import { getGoodsDetailData, getAddCartData , getNowBuyData, getCollectData } from 'common/api'
+    import Swiper from 'components/common/Swiper'
     export default {
         data() {
             return {
                 goods: {},
-                goodsDetailPhotos: '',
+                goodsDetailPhotos: [],
                 userCode: '',
                 goodsQuantity: 1,
                 active: false
@@ -78,35 +81,28 @@
            this.getData();
         },
         methods: {
-            getData(){
-                this.$http.post('Goods/goodsDetail',{goodsId: this.$route.params.goodsId,userCode: this.userCode},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    //    console.log(res)
-                    this.goods =  res.goodsDetail[0]
-                    if(res.goodsDetailPhotos){
-                        this.goodsDetailPhotos = res.goodsDetailPhotos[0]
-                    }else{
-                        this.goodsDetailPhotos = ''
-                    }
-                     
-                })
+            async getData(){
+                let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
+                console.log(res);
+                if(res){
+                    this.goodsDetailPhotos = res.goodsDetailPhotos;
+                    this.goods =  res.goodsDetail[0];
+                    this.$indicator.close()
+                }else{
+                    this.$indicator.open({
+                        text: 'Loading...',
+                        spinnerType: 'fading-circle'
+                    });
+                }
+                
+                
             },
             show(ev){
-                 ev.preventDefault();
-
                 this.$toast({
-                            message: '登陆后才可以查看哦！',
-                            position:'middle',
-                            duration: 2000
-                        });
+                    message: '登陆后才可以查看哦！',
+                    position:'middle',
+                    duration: 2000
+                });
             },
             back(){
                 this.$router.back()
@@ -128,7 +124,7 @@
                 
             },
             //加入购物车
-            addCart(){
+            async addCart(){
                 if(!this.userCode){
                     this.$toast({
                         message: '请登录',
@@ -137,72 +133,44 @@
                     });
                     return;
                 }
-                this.$http.post('Cart/addCart',{userCode:this.userCode,goodsId:this.goods.goodsId,shopId:this.goods.shopId,goodsCount:this.goodsQuantity},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response =>{
-                    let res =response.data;
-                  //  console.log(res)
-                    if(res.flag == 'success'){
-                         this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });
-                    }else{
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });
-                    }
-
-                }).catch(err=>{
-                     console.log(err)
-                })
+                let {data:res} = await getAddCartData({userCode:this.userCode,goodsId:this.goods.goodsId,shopId:this.goods.shopId,goodsCount:this.goodsQuantity});
+                
+                this.$toast({
+                    message: res.info,
+                    position:'middle',
+                    duration: 2000
+                });
+               
+               
             },
             //立即购买
-            nowBuy(){
-                 if(!this.userCode){
+            async nowBuy(){
+                if(!this.userCode){
+                this.$toast({
+                    message: '请登陆',
+                    position: 'middle',
+                    duration: 2000
+                });
+                return;
+                }
+                let {data:res} = await getNowBuyData({goodsId: this.$route.params.goodsId,userCode: this.userCode,goodsCount:this.goodsQuantity});
+               
+                if(res.flag == 'success'){
+                    let goods =  JSON.stringify(res.data)
+                    sessionStorage.setItem('goods',goods)
+                    this.$router.push({
+                        name: 'order',
+                        query: {id:0}
+                    })          
+                }else{       
                     this.$toast({
-                        message: '请登陆',
-                        position: 'middle',
+                        message: res.info,
+                        position:'middle',
                         duration: 2000
                     });
-                    return;
-                 }
-                 this.$http.post('Order/orderPay',{goodsId: this.$route.params.goodsId,userCode: this.userCode,goodsCount:this.goodsQuantity},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    // console.log(res)
-                    if(res.flag == 'success'){
-                        let goods =  JSON.stringify(res.data)
-                        sessionStorage.setItem('goods',goods)
-                        this.$router.push({
-                            name: 'order',
-                            query: {id:0}
-                        })          
-                    }else{       
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });
-                        return
-                    }
-                })
+                    
+                }
+
             },
             //去购物车
             goCart(){
@@ -237,34 +205,17 @@
                 })
             },
             //去收藏
-            goCollect(){
-                this.$http.post('Collect/addCollect',{goodsId: this.$route.params.goodsId,userCode: this.userCode},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    if(res.flag == 'success'){
-                        
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });     
-                    }else{       
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });
-                        return
-                    }
-                })
+            async goCollect(){
+                let {data:res} = await getCollectData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
+                this.$toast({
+                    message: res.info,
+                    position:'middle',
+                    duration: 2000
+                });
             }
+        },
+        components: {
+            Swiper
         }
     }
 </script>
@@ -297,7 +248,7 @@
     .img-wrap
         width 6.4rem
         height 4rem
-        padding-top 40px
+        margin-top 40px
         img 
             width 100%
             height 100%

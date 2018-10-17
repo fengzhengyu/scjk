@@ -19,7 +19,7 @@
                 </div>
                 <div class="group-detail" >
                     <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsId}})">
-                        <img :src="goods.goodsPhoto" alt="">
+                        <img v-lazy="goods.goodsPhoto" >
                     </div>
                     <div class="item-info">
                        
@@ -57,6 +57,7 @@
     
 </template>
 <script>
+    import {getCartData , getCartCount, getCartPay , getCartDelete } from 'common/api'
     export default {
         props: ['deleteStatus'],
         data() {
@@ -102,32 +103,18 @@
             }
         },
          methods:{
-            getCartList(){
-                this.$http.post('Cart/index',{userCode:this.userCode},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;
-                    if(res.flag == 'success'){
-                         this.cartList  = res.data;
-                        //  
-                    }else{
-                         this.cartList  = [];
-                    }
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    
-                })
+            async getCartList(){
+                let {data:res} = await getCartData({userCode:this.userCode});
+                console.log(res)
+                if(res.flag == 'success'){
+                    this.cartList  = res.data;
+                }else{
+                    console.log(res.info)
+                }
+                
             },
             //数量加减
-            cheangeQuantity(item,status){
+            async cheangeQuantity(item,status){
                 if(status>0){
                     item.goodsCount++;
                     if(item.goodsCount >= item.goodsInventory){
@@ -140,27 +127,13 @@
                         item.goodsCount = 1
                     }
                 }
-                 this.$http.post('Cart/numberCart',{userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;              
-                    if(res.flag == 'success'){
-                    //    console.log(res)                       
-                    }else{
-                         console.log(res.flag)
-                    }
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    
-                })
+                let {data:res} = await getCartCount({userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount});
+                if(res.flag == 'success'){
+                  
+                }else{
+                     console.log(res.infn)
+        
+                }
             },
             //商品单选
             selectedProduct(goods,goodsList,items){
@@ -234,7 +207,7 @@
                 })
             },
             //结账
-            nextStep(){
+            async nextStep(){
                 if(this.countTotalPrice<=0){
                     this.$toast({
                         message: '请选择商品哦！',
@@ -264,44 +237,25 @@
                     })            
                     this.orderStr = this.orderArr.join(',')
                     //结算数据
-                    this.$http.post('Cart/cartPay',{userCode:this.userCode,orderId:this.orderStr},{
-                        transformRequest:[function(data){
-                            let params = '';
-                            for(let key in data){
-                                params += key +'='+data[key]+'&'
-                            }
-                            return params
-                        }]
-                        
-                    }).then(response=>{
-                        let res =response.data;
-                
-                        if(res.flag == 'success'){
-                           let goods =  JSON.stringify(res.data)
-                           sessionStorage.setItem('goods',goods)
-                            this.$router.push({
-                                name: 'order',
-                                 query: {id:1}
-                            })
-                             
-                        }else{       
-                            this.$toast({
-                                message: res.info,
-                                position:'middle',
-                                duration: 2000
-                            });
-                            return
-                        }
-
-                        
-                    }).catch(err=>{
-                        console.log(err)
-                        
-                    })
+                    let {data:res} = await getCartPay({userCode:this.userCode,orderId:this.orderStr});
+                    if(res.flag == 'success'){
+                        let goods =  JSON.stringify(res.data)
+                        sessionStorage.setItem('goods',goods)
+                        this.$router.push({
+                            name: 'order',
+                                query: {id:1}
+                        })
+                    }else{       
+                        this.$toast({
+                            message: res.info,
+                            position:'middle',
+                            duration: 2000
+                        });  
+                    }
                 }
             },
             //删除
-            deleteGoods(){
+            async deleteGoods(){
                  if(this.countTotalPrice<=0){
                     this.$toast({
                         message: '请选择删除的商品！',
@@ -329,7 +283,45 @@
                     
                     })    
                     let  orderStr = this.orderArr.join(',')    
-                    this.$http.post('Cart/delCart',{userCode:this.userCode,orderId:orderStr},{
+
+                    let {data:res} = await getCartDelete({userCode:this.userCode,orderId:orderStr});
+                    console.log(res)
+                     if(res.flag == 'success'){
+                        //  this.cartList.forEach((item,i) => {
+                        //      item.shopList.filter((ele)=>{
+                        //         for(let i=0;i<this.orderArr.length;i++){
+                        //             let cur = this.orderArr[i];
+                        //             console.log( cur)
+                        //             if(ele.goodsId !== this.orderArr[i] ){
+                        //                 return ele
+                        //             }
+                        //         }
+                                    
+                        //      })
+                            
+                             
+                         
+                        //      return
+                        //  })
+                            // this.$toast({
+                            //     message: res.info,
+                            //     position:'middle',
+                            //     duration: 2000
+                            // });
+                            // setTimeout(()=>{
+                            //      this.getCartList();
+                            // },2000)
+                            
+                        }else{       
+                            this.$toast({
+                                message: res.info,
+                                position:'middle',
+                                duration: 2000
+                            });
+                          
+                        }
+                    return
+                    this.$http.post('Cart/delCart',{},{
                         transformRequest:[function(data){
                             let params = '';
                             for(let key in data){
@@ -341,24 +333,7 @@
                     }).then(response=>{
                         let res =response.data;
                 
-                        if(res.flag == 'success'){
-                            this.$toast({
-                                message: res.info,
-                                position:'middle',
-                                duration: 2000
-                            });
-                            setTimeout(()=>{
-                                 this.getCartList();
-                            },2000)
-                            
-                        }else{       
-                            this.$toast({
-                                message: res.info,
-                                position:'middle',
-                                duration: 2000
-                            });
-                          
-                        }
+                       
 
                     }).catch(err=>{console.log(err)})
                 }

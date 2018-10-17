@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-         <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
+         <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad">
              <shopList :goodsList=" goodsList"></shopList>   
          </mt-loadmore>
         
@@ -25,7 +25,8 @@
     </div>
 </template>
 <script>
-    import shopList from 'components/Shop/ShopList'
+    import {getShopData} from 'common/api'
+    import shopList from 'components/Index/GoodsList'
     export default {
         data(){
             return {
@@ -37,6 +38,7 @@
                 value: '',
                 isAutoFill:false,//是否自动检测，并调用loadBottom
                 allLoaded:true,//数据是否全部加载完毕，如果是，禁止函数调用
+                isLoad: false
                
             }
         },
@@ -59,50 +61,29 @@
             }
         },
         methods: {
-            getShopList(value){
-              
-                this.$http.post('shop/shopDetail',{userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:value},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response=>{
-                    let res  = response.data;
-                    if(res.flag == 'success'){
-                        this.shopData = res.shopData[0];
-                        this.goodsList = res.goodsData;
-                        this.page++
-                    }else{
-                         this.shopData = null
-                         this.goodsList = []
-                    }
-                  
-                }).catch(err=>{
-                    console.log(err)
-
-                })
+            async getShopList(value){
+                let {data:res} = await getShopData({userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:value})
+                if(res.flag == 'success'){
+                    this.shopData = res.shopData[0];
+                    this.goodsList = res.goodsData;
+                    this.page++;
+                    this.isLoad = true;
+                    this.$indicator.close();
+                }else{
+                    this.$indicator.open({
+                        text: 'Loading...',
+                        spinnerType: 'fading-circle'
+                    })
+                }
+                
             },
             goSearch(){
                  this.getShopList(this.keyword)
             },
             //上啦加载
-             loadBottom(){
-                 this.$http.post('shop/shopDetail',{userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:this.keyword},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response=>{
-                     let res =response.data
-                 
-                       
-                    
+            async loadBottom(){
+                 let {data:res} = await getShopData({userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:this.keyword})
+                  if(res.flag == 'success'){
                     this.goodsList = res.goodsData;
                     this.page++
                     this.$refs.loadmore.onBottomLoaded();
@@ -116,12 +97,7 @@
                         });
                         
                     }
-                    
-                   
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsList =[];
-                })
+                }
             }
         },
         components: {

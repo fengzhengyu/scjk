@@ -15,40 +15,25 @@
   </div>
 </template>
 <script>
+
     export default {
+        props: {
+            goodsTypeList: {
+                tpye:Array,
+                default: []
+            }
+        },
         data() {
             return {
-                goodsTypeList: [],
                 imgList: [
                     'img1','img2','img3','img4','img5','img6','img7','img8',
                 ]
             }
         },
         created() {
-
-            this.getGoodsTypeList()
         },
         methods: {
-            getGoodsTypeList(){
-                this.$http.post('Goods/index',{},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data
-                    this.goodsTypeList = res.goodsTypeList;
-                    
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsTypeList =[];
-                })
-            }
+
         }
     }
 </script>

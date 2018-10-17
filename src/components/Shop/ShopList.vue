@@ -4,7 +4,7 @@
             <li class="goods-list" v-for="(item,index) in goodsList" :key="index">
                 <router-link class="link" :to="{name:'id',params:{goodsId:item.goodsId}}">
                     <div class="list-img">
-                        <img v-lazy="item.goodsPhoto" alt="">
+                        <img v-lazy="item.goodsPhoto" >
                     </div>
                     <div class="list-desc">
                         <h3 class="title">{{item.goodsName}}</h3>

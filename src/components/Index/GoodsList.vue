@@ -1,6 +1,6 @@
 <template>
   <div class="goods">
-    <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
+   
         <ul class="load-more-wrap">
             <li class="goods-list" v-for="(item,index) in goodsList" :key="index">
                 <router-link class="link" :to="{name:'id',params:{goodsId:item.goodsId}}">
@@ -13,7 +13,7 @@
                         <p>{{item.goodsRetailPrice}}<!--<span class="price"> ￥150.00</span>--></p>
                         <p> 
                             <span class="price" v-if="userCode">{{item.goodsProcurementPrice}}</span>  
-                            <span class="show" v-else @click="show($event)">查看采购价</span>
+                            <span class="show" v-else @click.prevent="show()">查看采购价</span>
                             <span class="repertory"> 库存:{{item.goodsInventory}}</span>
                             
                         </p>
@@ -23,94 +23,39 @@
             </li>
             
         </ul>
-     </mt-loadmore>   
+        
+    
      <!-- <router-view></router-view> -->
   </div>  
 </template>
 <script>
     export default {
+        props: {
+            goodsList:{
+                type: Array,
+                default: []
+            }
+        },
         data(){
             return {
-                goodsList: [],
-                userCode: '',
-                page: 1,
-                isAutoFill:false,//是否自动检测，并调用loadBottom
-                allLoaded:false,//数据是否全部加载完毕，如果是，禁止函数调用
+                
             }
         },
         created(){
-            // this.$nextTick(()=>{
-                this.userCode = this.getCookie('userCode')
-                this.getDataList()
-                
-           // })
+           
+            this.userCode = this.getCookie('userCode')  
+          
         },
         methods: {
-            getDataList(){
-                this.$http.post('Goods/index',{page:this.page,userCode:this.userCode},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;
-                     if(res.goodsList){
-                        this.goodsList = res.goodsList;
-                        this.page++
-                     }else{
-                         this.goodsList = [];
-                     }
-                   
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsList =[];
-                })
-
-            },
+           
             show(ev){
-                 ev.preventDefault();
-
                 this.$toast({
-                            message: '登陆后才可以查看哦！',
-                            position:'middle',
-                            duration: 2000
-                        });
+                    message: '登陆后才可以查看哦！',
+                    position:'middle',
+                    duration: 2000
+                });
             },
-            //上啦加载
-             loadBottom(){
-                 this.$http.post('Goods/index',{page:this.page,userCode:this.userCode},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response=>{
-                    let res =response.data;
             
-                    this.goodsList = res.goodsList;
-                    this.page++
-                    this.$refs.loadmore.onBottomLoaded();
-                    if(res.info == '已到底部'){
-                        this.allLoaded = true;
-                        this.$toast({
-                            message: '没有更多数据了',
-                            position:'middle',
-                            duration: 3000
-                        });
-                        return;
-                    }
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsList =[];
-                })
-            }
         }
     }
 </script>
@@ -119,7 +64,7 @@
     // padding-bottom .9rem;
     height atuo
     background #fff
-    margin-bottom 55px
+    // margin-bottom 55px
     .load-more-wrap 
         width 100%;
         overflow hidden
@@ -164,7 +109,7 @@
                    .repertory
                        float right     
                        margin-right .05rem
-        
+    
     
 
 </style>

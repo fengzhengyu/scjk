@@ -18,7 +18,7 @@
                         </div>
                         <div class="group-detail" >
                             <div class="item-img" >
-                                <img v-lazy="item.goodsPhoto" alt="图片已丢失">
+                                <img v-lazy="item.goodsPhoto" >
                             </div>
                             <div class="item-info" @click="goDetail(item)">
                             
@@ -86,7 +86,7 @@
                     }]
                 }).then(response => {
                     let res = response.data;
-                  
+                  console.log(res)
                     if(res.data){
                         this.collectList = res.data
                         this.page++
@@ -184,7 +184,7 @@
                         }).then(response => {
                             let res = response.data;
                                 
-                        
+                            
                             if(res.flag == 'success'){
                                this.$toast({
                                     message: res.info,
@@ -239,7 +239,7 @@
         top 0
         bottom 0
         width 6.4rem
-        margin 0 auto
+        // margin 0 auto
         background #fff
         overflow-y auto
         z-index 999

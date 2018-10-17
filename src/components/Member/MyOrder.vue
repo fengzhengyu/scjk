@@ -38,7 +38,7 @@
                 <div class="group" v-for="goods in item.orderList">
                     <div class="group-detail" @click="goOrderDetail(goods)">
                         <div class="item-img" >
-                            <img v-lazy="goods.goodsPhoto" alt="">
+                            <img v-lazy="goods.goodsPhoto" >
                         </div>
                         <div class="item-info">
                         

@@ -9,15 +9,21 @@ import 'common/js/base'
 import 'common/stylus/index.styl'
 Vue.config.productionTip = false
 
+Vue.use(VueLazyload, {
+  preLoad: 1.3,
+  error: require('./common/img/default.jpg'),
+  loading:  require('./common/img/default.jpg'),//'http://img3.imgtn.bdimg.com/it/u=3958473360,317897763&fm=11&gp=0.jpg',
+  // attempt: 1
+})
+
+
 //引入 mint-ui
 import Mint from 'mint-ui'
 import 'mint-ui/lib/style.css';
 Vue.use(Mint)
 
-Vue.use(VueLazyload, {
-  loading: require('common/img/default.jpg')
-})
-//
+
+
 //引 axios
 import  Axios from 'axios';
 Vue.prototype.$http = Axios;
@@ -27,8 +33,10 @@ Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 
 /* eslint-disable no-new */
 
-
-
+// 轮播图
+import VueAwesomeSwiper from 'vue-awesome-swiper'
+import 'swiper/dist/css/swiper.css'
+Vue.use(VueAwesomeSwiper)
 
 //获取cookie、
 function getCookie(name) {
