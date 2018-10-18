@@ -128,7 +128,7 @@ export default {
         getFinishData(){
             this.page =1;  
             this.allLoaded = false;
-           this.$http.post('Order/index',{userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page},{
+            this.$http.post('Order/index',{userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page},{
                         transformRequest:[function(data){
                         let params = '';
                         for(let key in data){

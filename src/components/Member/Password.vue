@@ -30,6 +30,7 @@
     </transition>
 </template>
 <script>
+    import {  getUpdatePassword } from 'common/api'
     export default {
         data() {
             return {
@@ -43,18 +44,9 @@
         },
         methods: {
             save(){
-                this.$http.post('User/savePass',{userCode: this.userCode,userOldPass:this.oldPswd,userNewPass:this.newPswd,userNewPassTwo:this.verifyPswd},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    //    console.log(res)
-                
+                 getUpdatePassword({userCode: this.userCode,userOldPass:this.oldPswd,userNewPass:this.newPswd,userNewPassTwo:this.verifyPswd}).then(response=>{
+                  
+                     let res = response.data;
                     if(res.flag =='success'){
                         this.$toast({
                             message: res.info,
@@ -70,10 +62,9 @@
                             position:'middle',
                             duration: 2000
                         });
-
                     }
-                     
-                })
+                     return
+                 },err=>console.log(err))
             }
         }
     }

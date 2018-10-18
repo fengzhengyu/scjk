@@ -90,7 +90,18 @@
                     
              }
 
-        }
+        },
+        beforeRouteLeave(to, from, next) {
+          console.log(to)
+          console.log(from)
+          if(to.name == 'cart'){
+              to.meta.keepAlive = true;
+              next();
+          }
+          next()
+                
+            
+         },
     }
     
 </script>

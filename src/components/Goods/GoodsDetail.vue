@@ -83,7 +83,7 @@
         methods: {
             async getData(){
                 let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
-                console.log(res);
+                // console.log(res);
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
@@ -214,6 +214,15 @@
                 });
             }
         },
+        beforeRouteLeave(to, from, next) {
+           
+             if(to.name =='cart'){
+                  to.meta.keepAlive = true;  
+                next();
+             }
+             next();
+            
+         },
         components: {
             Swiper
         }

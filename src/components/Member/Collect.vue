@@ -8,7 +8,7 @@
                     </mt-button>
                     
                 </span>   
-                <mt-button icon="" slot="right" @click="edit">{{isShow==true?'完成':'编辑'}}</mt-button>     
+                <mt-button icon="" slot="right" v-show="collectList.length>0" @click="edit">{{isShow==true?'完成':'编辑'}}</mt-button>     
             </mt-header>
             <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
                 <div class="collect-goods" >
@@ -18,7 +18,7 @@
                         </div>
                         <div class="group-detail" >
                             <div class="item-img" >
-                                <img v-lazy="item.goodsPhoto" >
+                                <img v-lazy="item.goodsPhoto" :key="item.goodsPhoto">
                             </div>
                             <div class="item-info" @click="goDetail(item)">
                             
@@ -30,7 +30,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collect-empty" v-show="collectList.length<=0">
+                    <div class="collect-empty" v-show="collectList.length<=0 && isLoad">
                         您还没有收藏商品！
                     </div>
                     
@@ -52,6 +52,7 @@
     
 </template>
 <script>
+    import { getMemberCollect, delMemberCollect } from 'common/api'
     export default {
         data(){
             return {
@@ -59,6 +60,7 @@
                 collectList: [],
                 isShow: false,
                 checkAllFlag: false,
+                isLoad:false,
                 goodsArr: [],
                 page: 1,
                 isAutoFill:false,//是否自动检测，并调用loadBottom
@@ -67,26 +69,17 @@
         },
         created(){
             this.userCode = this.getCookie('userCode');
-            if(this.userCode){
-                this.getCollectData();
+            if(this.userCode){           
+                this.getCollectData();              
             }
            
 
         },
         methods: {
             //取数据
-            getCollectData(){
-                 this.$http.post('Collect/index',{userCode: this.userCode,page:this.page},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                  console.log(res)
+            async getCollectData(){
+                    let {data:res} = await getMemberCollect({userCode: this.userCode,page:this.page});
+                    this.isLoad =true ;      
                     if(res.data){
                         this.collectList = res.data
                         this.page++
@@ -94,11 +87,7 @@
                         this.collectList = []
 
                     }
-                     
-                }).catch(err=>{
-                    console.log(err);
-
-                })
+                 
             },
               //上拉刷新
             loadBottom(){
@@ -119,6 +108,7 @@
                     this.$refs.loadmore.onBottomLoaded();
                     if(res.msg== '已到底部'){
                         this.allLoaded = true;
+                      
                         this.$toast({
                             
                             message: '没有更多数据了',
@@ -161,7 +151,7 @@
                  this.isShow = !this.isShow;
             },
             //删除
-            deleteCollect(){
+            deleteCollect(){;
                 this.goodsArr = []
                 this.collectList.forEach((item,index)=>{
                     if(item.checked){
@@ -169,41 +159,31 @@
                     } 
                 })
                 let str = this.goodsArr.join(',');
-               
                 if(this.goodsArr.length>0){
                     
                     this.$messagebox.confirm('确定执行此操作?').then(action => { 
-                        this.$http.post('Collect/delCollect',{userCode: this.userCode,collectId:str},{
-                            transformRequest:[function(data){
-                                let params = '';
-                                for(let key in data){
-                                    params += key +'='+data[key]+'&'
-                                }
-                                return params
-                            }]
-                        }).then(response => {
-                            let res = response.data;
-                                
-                            
+                        delMemberCollect({userCode: this.userCode,collectId:str}).then(response=>{
+                            let res = response.data; 
+                                       
                             if(res.flag == 'success'){
                                this.$toast({
                                     message: res.info,
                                     position:'middle',
                                     duration: 2000
                                 });
-                                setTimeout(()=>{
-                                     this.getCollectData();
-                                },2000)
+                              
+                                this.getCollectData();
                             }else{
                                 this.$toast({
                                     message: res.info,
                                     position:'middle',
                                     duration: 1000
                                 });
-
                             }
-                            
-                        }).catch(err=>{console.log(err);})
+                        },(err)=>{
+                            console.log(err)
+                        })
+                       
                     }).catch(err=>{})
                 }else{
                     this.$toast({

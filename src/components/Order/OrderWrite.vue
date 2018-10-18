@@ -240,6 +240,7 @@
                  console.log(this.$route.hash)
             }
         },
+        
         components: {
             OrderInvoice,
             Address,

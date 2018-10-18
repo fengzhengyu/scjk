@@ -22,6 +22,7 @@
     </div>
 </template>
 <script>
+    import {getLoginData} from 'common/api'
     export default {
         data(){
             return {
@@ -33,19 +34,9 @@
            
         },
         methods: {
-            goLogin(){
-                 this.$http.post('Login/login',{userName:this.userName,passWord:this.userPass},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key+'='+ data[key]+'&'
-                        }
-                        return params;
-                    }]
-                }).then(response =>{
-                    let res = response.data
+            async goLogin(){
+                let {data: res} = await getLoginData({userName:this.userName,passWord:this.userPass});     
                     if(res.message.flag == 'success'){
-
                         let userCode = res.message.userCode
                         this.setCookie('userCode',userCode,1);
                         this.$toast({
@@ -65,10 +56,7 @@
                             duration: 2000
                         });
                     }
-                   // 
-
-
-                })
+         
             },
             signIn(){
                  this.$router.push({

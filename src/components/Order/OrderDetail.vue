@@ -146,7 +146,7 @@
     .slide-enter, .slide-leave-to
         transform: translate3d(100%, 0, 0)
     .order-detail
-        position absolute
+        position fixed
         top:0
         left 0
         right 0

@@ -10,7 +10,7 @@
             <mt-button icon="" slot="right" v-show="userCode" @click="deleteFlag = !deleteFlag">{{deleteFlag == true?'完成':'编辑'}}</mt-button>
         </mt-header>
 
-        <CartList :deleteStatus="deleteFlag" v-show="userCode"></CartList>  
+        <CartList :deleteStatus="deleteFlag" v-show="userCode" :goodsList="cartList" :checkAllState="checkAllFlag" :isLoad="isLoad" :userCode="userCode" @deleteSucceed="getDeleteMsg"></CartList>  
         
 
         <div class="empty-cart" v-show="!userCode">
@@ -26,22 +26,60 @@
     </div>
 </template>
 <script>
-
+ import {getCartData} from 'common/api'
  import Footer from 'components/common/Footer.vue'
  import CartList from 'components/Cart/CartList.vue'
  export default {
      data(){
          return {
              deleteFlag:false,
-             userCode: ''
+             userCode: '',
+             cartList:[],
+             isLoad: false,
+             checkAllFlag: false,
          }
      },
      created(){
-          this.userCode = this.getCookie('userCode');
-            // if(this.userCode){
-               
-            // }
+        //   this.userCode = this.getCookie('userCode');
+           this.userCode = this.getCookie('userCode')
+            this.$indicator.open({
+                text: 'Loading...',
+                spinnerType: 'fading-circle'
+            })
+             this.getCartList();
+           
      },
+     methods: {
+            async getCartList(){
+                let {data:res} = await getCartData({userCode:this.userCode});
+              
+                this.$indicator.close();
+                 this.isLoad = true
+                if(res.flag == 'success'){
+                    this.cartList  = res.data;
+                  
+                }else{
+                     this.cartList = []
+                }
+                
+            },
+            getDeleteMsg(){
+                  this.getCartList();
+            }
+     },
+      beforeRouteLeave(to, from, next) {
+          console.log(to)
+          console.log(from)
+          if(to.name == 'index'){
+              from.meta.keepAlive = false;
+               this.getCartList();
+               this.checkAllFlag = true;
+              next();
+          }
+         next()
+                
+            
+         },
      components: {
          CartList,
          Footer

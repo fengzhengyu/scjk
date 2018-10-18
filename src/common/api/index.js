@@ -12,6 +12,81 @@ axios.defaults.baseURL= 'http://www.scjksm.com/scjkSvn/Home/'
 //   return res.data;
 // })
 
+
+// 登录接口
+export  let getLoginData = (data) => {
+  return axios.post('Login/login',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 注册接口
+
+// 验证码接口
+
+// 会员页信息接口
+export let getMemberData = (data) => {
+  return axios.post('User/index',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 上传头像接口
+export let getLoadPhotoData = (data) => {
+  return axios.post('User/saveUser',data,{
+    headers:{'Content-Type':'multipart/form-data'}
+  })
+}
+
+// 会员修改密码
+export let getUpdatePassword = (data) => {
+  return axios.post('User/savePass',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 会员收藏数据
+export let getMemberCollect = (data) => {
+  return axios.post('Collect/index',data,{
+    transformRequest:[function(data){
+        let params = '';
+        for(let key in data){
+            params += key +'='+data[key]+'&'
+        }
+        return params
+    }]
+    
+  })
+}
+// 会员收藏删除
+export let delMemberCollect = (data) => {
+  return axios.post('Collect/delCollect',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+
+
 // 获取主页数据
 export let getIndexData = (data) => {
   return axios.post('Goods/index',data,{
@@ -151,3 +226,4 @@ export let getCartDelete = (data) => {
     }]
   })
 }
+

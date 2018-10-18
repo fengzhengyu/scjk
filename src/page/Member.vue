@@ -65,14 +65,15 @@
     </div>
 </template>
 <script>
+    import { getMemberData, getLoadPhotoData } from 'common/api'
     import Footer from 'components/common/Footer.vue'
     export default {
         data(){
             return {
                 isLogin: false,
-                photoImg: '',
-                phone: '',
-                userName: '您未登录',
+                photoImg: '', //头像
+                phone: '', //手机号
+                userName: '您未登录', //与户名
                 popupVisible: false 
             }
         },
@@ -85,25 +86,15 @@
            
         },
         methods: {
-            getUserMessage(){
-                this.$http.post('User/index',{userCode:this.userCode},{
-                     transformRequest:[function(data){
-                            let params = '';
-                            for(let key in data){
-                                params += key +'='+data[key]+'&'
-                            }
-                            return params
-                        }]
-                }).then(response=>{
-                    let res= response.data;
-                    //console.log(res)
-                    if(res.flag == 'success'){
-                        let data = res.data.userList;
-                        this.photoImg = data.headPhoto;
-                        this.phone =data.phoneOne;
-                        this.userName = data.userName
-                    }
-                })
+            async getUserMessage(){
+                let {data:res} = await getMemberData({userCode:this.userCode})
+                if(res.flag == 'success'){
+                    let data = res.data.userList;
+                    this.photoImg = data.headPhoto;
+                    this.phone =data.phoneOne;
+                    this.userName = data.userName;
+                }
+               
             },
             goMyOrder(id){
                 if(this.userCode){
@@ -172,29 +163,29 @@
                 }
                 form.append('headPhoto',img1,img1.name);
                 form.append('userCode',this.userCode);
-                this.$http.post('User/saveUser',form,{
-                     headers:{'Content-Type':'multipart/form-data'}
-                }).then(response => {
-                let res = response.data;
-                if(res.flag == 'success'){
-                    let photo = res.returnData;
-                    this.photoImg = photo
-                    this.$toast({
-                        message: '修改成功',
+                getLoadPhotoData(form).then((response)=>{
+                    let res = response.data;
+                    if(res.flag == 'success'){
+                        let photo = res.returnData;
+                        this.photoImg = photo
+                        this.$toast({
+                            message: '修改成功',
+                            position: 'middle',
+                            duration: 2000
+                        });
+                        this.popupVisible =false;
+
+                    }else{
+                        this.$toast({
+                        message: res.info,
                         position: 'middle',
                         duration: 2000
-                    });
-                    this.popupVisible =false;
-
-                }else{
-                    this.$toast({
-                    message: res.info,
-                    position: 'middle',
-                    duration: 2000
-                    });
-                 }
-
-                }).catch(err =>console.log(err));
+                        });
+                    }
+                },(err)=>{
+                    console.log(err)
+                })
+                
             },
             exit(){
               

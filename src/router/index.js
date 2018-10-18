@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+
 import Index from 'page/Index.vue'
 import Cart from 'page/Cart.vue'
 import Member from 'page/Member.vue'
@@ -35,7 +35,10 @@ export default new Router({
     {
       path: '/cart',
       name: 'cart',
-      component: Cart
+      component: Cart,
+      meta: {
+        keepAlive:false
+      }
     },
     {
       path: '/member',
