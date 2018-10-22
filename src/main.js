@@ -36,6 +36,7 @@ Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 // 轮播图
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import 'swiper/dist/css/swiper.css'
+import { format } from 'path';
 Vue.use(VueAwesomeSwiper)
 
 //获取cookie、
@@ -74,6 +75,39 @@ Vue.directive('focus', {
   },
 })  
 
+// 购物车 第一次今日缓存，其余刷新
+router.afterEach((to, from) => {
+  // console.log(to)
+  // console.log(from)
+  let isRefresh =  sessionStorage.getItem('Refresh')
+  if(to.name== 'cart' && from.name == 'index') { 
+   
+    if(isRefresh == '1'){
+     router.go(0)
+      // window.location.reload()
+    }else{
+      sessionStorage.setItem('Refresh',1);
+    }
+  }else if(to.name== 'cart' && from.name == 'id'){
+    if(isRefresh == '1'){
+      router.go(0)
+    }else{
+      sessionStorage.setItem('Refresh',1);
+    }
+  }else if(to.name== 'cart' && from.name == 'login'){
+    sessionStorage.setItem('isRefresh',1);
+    if(isRefresh == '1'){
+      router.go(0)
+    }
+  }else if(to.name== 'cart' && from.name == 'member'){
+    if(isRefresh == '1'){
+      router.go(0)
+    }else{
+      sessionStorage.setItem('Refresh',1);
+    }
+  }
+  // ...
+})
 
 new Vue({
   el: '#app',

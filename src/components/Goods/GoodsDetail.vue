@@ -214,15 +214,7 @@
                 });
             }
         },
-        beforeRouteLeave(to, from, next) {
-           
-             if(to.name =='cart'){
-                  to.meta.keepAlive = true;  
-                next();
-             }
-             next();
-            
-         },
+       
         components: {
             Swiper
         }

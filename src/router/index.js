@@ -37,7 +37,7 @@ export default new Router({
       name: 'cart',
       component: Cart,
       meta: {
-        keepAlive:false
+        keepAlive:true
       }
     },
     {

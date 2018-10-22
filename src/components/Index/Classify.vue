@@ -40,6 +40,7 @@
 <style lang="stylus" scoped>
 .classify 
     width 100%
+    background #fff
     .classify-wrap 
         overflow hidden
         padding-bottom .15rem

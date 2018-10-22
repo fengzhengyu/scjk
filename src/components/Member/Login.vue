@@ -27,15 +27,19 @@
         data(){
             return {
                 userName: '',
-                userPass: ''
+                userPass: '',
+                routerName: ''
             }
         },
-        mounted() {
-           
+        created() {
+            
         },
         methods: {
+           
             async goLogin(){
+                this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,passWord:this.userPass});     
+             
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode
                         this.setCookie('userCode',userCode,1);
@@ -44,10 +48,17 @@
                             position: 'middle',
                             duration: 2000
                         });
+
                         setTimeout(()=>{
-                            this.$router.push({
-                                name:'member'
-                            });
+                            if(this.routerName){
+                                this.$router.push({
+                                    name: this.routerName
+                                });
+                            } if(this.routerName == 'null'){
+                                this.$router.go(-1)
+                            }
+                            sessionStorage.setItem('routerName',null)
+                            
                         },2000)
                     }else{
                         this.$toast({
@@ -63,7 +74,12 @@
                     name: 'register'
                 })
             }
-        }
+        },
+        beforeRouteEnter (to, from, next) {
+        
+            sessionStorage.setItem('routerName',from.name)
+            next();
+        },
     }
 </script>
 

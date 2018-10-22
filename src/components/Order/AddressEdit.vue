@@ -1,5 +1,5 @@
 <template>
-  <transition name="slide">
+  <transition name="slide" >
    <div class="address-page">
 
       <mt-header title="新增收货地址">
@@ -13,13 +13,13 @@
         <li>
           <label>收货人</label>
           <div class="form-input ">
-            <input type="text" placeholder="收货人姓名" class="input-text ">
+            <input type="text" placeholder="收货人姓名" class="input-text " v-model="addressName">
           </div>
         </li>
         <li>
           <label>联系方式</label>
           <div class="form-input ">
-            <input type="text" placeholder="收货人手机号" class="input-text ">
+            <input type="text" placeholder="收货人手机号" class="input-text " v-model=" addressPhone">
           </div>
         </li>
         <li>
@@ -62,6 +62,7 @@
 <script>
   import Address from 'common/js/address.json'
   import { Picker } from 'mint-ui';
+  import EventBus from 'common/js/eventBus.js'
   
   export default {
     components: {
@@ -69,6 +70,12 @@
     },
     data(){
       return {
+        addressName: '',
+        addressPhone: '',
+        defaultStatus: false,
+        province: '',//省
+        city: '',//市
+        county: '',//县
         myAddressSlots: [
           {
             flex: 1,
@@ -85,7 +92,7 @@
           },
           {
             flex: 1,
-            values: this.getCityArr("北京市"),
+            values:this.getCityArr('北京市'),
             // values: [],
 
             className: 'slot3',
@@ -98,22 +105,43 @@
           },
           {
             flex: 1,
-            values:this.getCountyArr("北京市","市辖区"),
+            values: this.getCountyArr( '北京市','市辖区'),
             //  values: [],
             className: 'slot5',
            
           }
         ],
-        myAddressProvince:'省',
-        myAddressCity:'市',
-        myAddresscounty:'区/县',
+       
+        myAddressProvince: '省',
+        myAddressCity: '市',
+        myAddresscounty: '区/县',
       
         popupVisible: false,
         regionInit: false,
-        province:'',//省
-        city:'',//市
-        county:'',//县
        
+       
+      }
+    },
+    created(){
+      // 接受编辑信息 
+      // but ,接受的参数是打印多次的，因为不会自动销毁事件，需要手动消除，在beforeDestroy组件销毁前移除事件
+        
+        EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
+　　
+      
+     
+    },
+    watch: {
+      'province'(){
+        this.getProvinceArr(this.province)
+      },
+      'city'(){
+       
+         this.getCityArr(this.province,this.city)
+      },
+      'county'(){
+         console.log(this.province,this.city,this.county)
+         this.getCountyArr(this.province,this.city,this.county)
       }
     },
     methods: {
@@ -121,43 +149,64 @@
          this.popupVisible = true
         
       },
-     onMyAddressChange(picker, values) {
-      //  console.log(Address[0].name)
-       if(this.regionInit){
-          // console.log(values[0].children[0].children instanceof Array)
-          // picker.setSlotValues(1,values[0].children); // Object.keys()会返回一个数组，当前省的数组
-          // picker.setSlotValues(2,values[0].children[0].children); // 区/县数据就是一个数组
-          picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
-          picker.setSlotValues(2, this.getCountyArr(values[0]["name"], values[1]["name"]))
-          this.myAddressProvince = values[0]["name"];
-          this.myAddressCity = values[1]["name"];
-          this.myAddresscounty = values[2]["name"];
+      onMyAddressChange(picker, values) {
+        //  console.log(Address[0].name)
+        if(this.regionInit){
+            // console.log(values[0].children[0].children instanceof Array)
+            // picker.setSlotValues(1,values[0].children); // Object.keys()会返回一个数组，当前省的数组
+            // picker.setSlotValues(2,values[0].children[0].children); // 区/县数据就是一个数组
+            picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
+            picker.setSlotValues(2, this.getCountyArr(values[0]["name"], values[1]["name"]))
+            this.myAddressProvince = values[0]["name"];
+            this.myAddressCity = values[1]["name"];
+            this.myAddresscounty = values[2]["name"];
 
-       }else{
-         this.regionInit = true;
-       }
+        }else{
+          this.regionInit = true;
+        }
       
       },
-      getProvinceArr(){
+      getProvinceArr(provinceName){
+      
         let provinceArr = [];
-        Address.forEach(function (item) {
-          let obj = {};
-          obj.name = item.name;
-          obj.code = item.code;
-          provinceArr.push(obj);
-        });
-        return provinceArr;
+
+         Address.forEach( (item,i) => {
+            let obj = {};
+           if(item.name ==  provinceName){
+             obj.name = item.name;
+             obj.code = item.code;
+          　this.myAddressSlots[0].defaultIndex = i;
+           }else{
+              obj.name = item.name;
+              obj.code = item.code;
+           }
+            provinceArr.push(obj);
+          });
+
+        return  provinceArr;
+        
+        
+       
+
+
+       
 
       },
-      getCityArr(province) {
-        // console.log("省：" + province);
+      getCityArr(province,cityName) {
+        
         let cityArr = [];
-        Address.forEach(function (item) {
+        Address.forEach((item,i)=> {
           if (item.name === province) {
-            item.children.forEach(function (args) {
+            item.children.forEach( (args,i) => {
               let obj = {};
-              obj.name = args.name;
-              obj.code = args.code;
+            
+                if(args.name == cityName){
+                  this.myAddressSlots[2].defaultIndex = i
+                }
+                obj.name = args.name;
+                obj.code = args.code;
+             
+              
               cityArr.push(obj);
             });
           }
@@ -165,7 +214,7 @@
         return cityArr;
       },
       //
-     getCountyArr(province,city){
+      getCountyArr(province,city,countyName){
       
         let countyArr = [];
         Address.forEach(function(item){
@@ -185,19 +234,55 @@
         // console.log(countyArr);
         return countyArr;
       },
+      getEditAddressMsg(data){
+        console.log(data)
+        if(data){
+
+          this.addressName = data.name ;
+          this.addressPhone = data.phone ;
+          this.defaultStatus = data.selected;
+          this.province= data.province;
+          this.city = data.city;
+          this.county = data.county;
+          this.myAddressProvince =  this.province || '省';
+          this.myAddressCity =  this.city  || '市';
+          this.myAddresscounty = this.county || '区/县' ;
+        }else{
+          // this.addressName = data.name ;
+
+        // this.addressPhone = '' ;
+        // this.defaultStatus ='';
+        // this.province= data.province;
+        // this.city = data.city;
+        // this.county = data.county;
+        // this.myAddressProvince = '省';
+        // this.myAddressCity = '市';
+        // this.myAddresscounty = '区/县' ;
+        }
+        
+
+        // console.log(this.myAddressProvince)
+        
+      }
 
     },
-    created(){
-    
-      
-    },
+   
+   
     mounted(){
-//       
-　　　　this.$nextTick(() => { //vue里面全部加载好了再执行的函数 （类似于setTimeout）
-  
-// 　　　　　this.myAddressSlots[0].defaultIndex = 1
+　　　　this.$nextTick(() => { //vue里面全部加载好了再执行的函数 （类似于setTimeout）     
+       
+// 　　　　
 　　　　});
-　　}
+
+           
+
+      
+　　},
+    // 在beforeDestroy组件销毁前移除事件
+    beforeDestroy () {
+       EventBus.$off('changeEditAddressMsg');
+    }
+    
   }
 </script>
 <style lang="stylus" scoped>

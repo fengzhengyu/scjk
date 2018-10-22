@@ -190,6 +190,7 @@
             exit(){
               
                 this.delCookie ('userCode');
+                // sessionStorage.clear();
                 this.isLogin = false;
                 this.$router.push({
                     name: 'login'

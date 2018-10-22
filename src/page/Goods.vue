@@ -17,7 +17,7 @@
             <GoodsList :goodsList="goodsList"></GoodsList>    
         </mt-loadmore>
        
-        <div v-if="goodsList.length<=0" class="no-goods">
+        <div v-if="goodsList.length<=0 && isLoad" class="no-goods">
             暂无商品！
         </div>
         

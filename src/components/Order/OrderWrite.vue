@@ -61,8 +61,8 @@
             </div>
         </div>
         <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
-        <Address v-show="$route.hash == '#address'" @addressInfo="getAddressInfo"></Address>
-        <AddressEdit v-show="$route.hash == '#addressEdit'" ></AddressEdit>
+        <Address v-if="$route.hash == '#address'"  @changeAddressMsg="getChangeAddress"></Address>
+        <AddressEdit v-if="$route.hash == '#addressEdit'"></AddressEdit>
         <router-view></router-view>
     </div>
 </template>
@@ -214,12 +214,12 @@
                 this.taxpayerNumber = data.number;
             },
             // 得到地址信息
-            getAddressInfo(){
-
+            getChangeAddress(data){
+                console.log(data)
             },
             // 去地址页
             goAddress(){
-               console.log(this.$route.hash)
+             
                  let  id =this.$route.query.id;
                 this.$router.push({
                     name: 'order',

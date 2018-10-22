@@ -10,7 +10,7 @@
             <mt-button icon="" slot="right" v-show="userCode" @click="deleteFlag = !deleteFlag">{{deleteFlag == true?'完成':'编辑'}}</mt-button>
         </mt-header>
 
-        <CartList :deleteStatus="deleteFlag" v-show="userCode" :goodsList="cartList" :checkAllState="checkAllFlag" :isLoad="isLoad" :userCode="userCode" @deleteSucceed="getDeleteMsg"></CartList>  
+        <CartList :deleteStatus="deleteFlag" v-show="userCode" :goodsList="cartList"  :isLoad="isLoad" :userCode="userCode" @deleteSucceed="getDeleteMsg"></CartList>  
         
 
         <div class="empty-cart" v-show="!userCode">
@@ -36,18 +36,25 @@
              userCode: '',
              cartList:[],
              isLoad: false,
-             checkAllFlag: false,
          }
      },
+  
      created(){
-        //   this.userCode = this.getCookie('userCode');
            this.userCode = this.getCookie('userCode')
-            this.$indicator.open({
+           if( this.userCode){
+               this.$indicator.open({
                 text: 'Loading...',
                 spinnerType: 'fading-circle'
             })
-             this.getCartList();
+            this.getCartList();
+           }
+            
            
+     },
+     watch: {
+        random(){
+           this.getCartList(); 
+        }
      },
      methods: {
             async getCartList(){
@@ -67,19 +74,8 @@
                   this.getCartList();
             }
      },
-      beforeRouteLeave(to, from, next) {
-          console.log(to)
-          console.log(from)
-          if(to.name == 'index'){
-              from.meta.keepAlive = false;
-               this.getCartList();
-               this.checkAllFlag = true;
-              next();
-          }
-         next()
-                
-            
-         },
+   
+    
      components: {
          CartList,
          Footer
@@ -89,8 +85,13 @@
 </script>
 <style lang="stylus" scoped>
 .cart-home
-    
+    position absolute
+    top 0
+    // left 0
+    bottom 0
+    width 6.4rem
     background #fff
+    margin 0 auto
     .mint-header
         width 6.4rem
         margin 0 auto

@@ -72,9 +72,7 @@
             isLoad: {
                  type:Boolean
             },
-            checkAllState: {
-                 type:Boolean
-            }
+          
         },
         data() {
             return {
@@ -89,9 +87,7 @@
            
         },
         watch: {
-            checkAllState(){
-                this.checkAllFlag = false
-            }
+           
         },
        
         computed:{
