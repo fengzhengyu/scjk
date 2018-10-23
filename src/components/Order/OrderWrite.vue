@@ -90,6 +90,7 @@
             this.userCode = this.getCookie('userCode')
             let goodsStr = sessionStorage.getItem('goods');
             this.goodsList = JSON.parse(goodsStr)
+            this.getAddressData()
         },
         computed: {
             totalMoney(){
@@ -111,6 +112,20 @@
             }
         },
         methods: {
+            getAddressData(){
+                 this.$http.post('Address/index',{userCode:  this.userCode},{
+                transformRequest:[function(data){
+                    let params = '';
+                    for(let key in data){
+                        params += key +'='+data[key]+'&'
+                    }
+                    return params
+                }]
+                }).then( (response)=>{
+                    let res =response.data;
+                    console.log(res)
+                })
+            },
             submitOrder(){
                 
                 if(!this.invoiceName){

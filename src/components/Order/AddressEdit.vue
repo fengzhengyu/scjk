@@ -47,7 +47,12 @@
       </div>
       <!-- <div class="picker-wrap" > -->
         <mt-popup position="bottom" v-model="popupVisible" class="region-popup">
-           <mt-picker :slots="myAddressSlots" @change="onMyAddressChange" value-key="name" ></mt-picker>
+           <mt-picker :slots="myAddressSlots" @change="onMyAddressChange" value-key="name"  :showToolbar="true" ref="addressSlot">
+            
+
+              <mt-button  class="sure" style="float:left;" @click="changenAddressCancel">取消</mt-button>
+              <mt-button  class="sure" style="float:right;" @click="changenAddressConfirm">确认</mt-button>
+           </mt-picker>
         </mt-popup>
         
       <!-- </div> -->
@@ -76,14 +81,52 @@
         province: '',//省
         city: '',//市
         county: '',//县
-        myAddressSlots: [
+        
+        myAddressProvince: '省',
+        myAddressCity: '市',
+        myAddresscounty: '区/县',
+      
+        popupVisible: false,
+        isChange: false,
+        getEditdata: {},
+        cancel: 1,
+       
+      }
+    },
+    created(){
+      // 初始化三级联动
+       this.pickerInit();
+
+      // 接受编辑信息 
+      // but ,接受的参数是打印多次的，因为不会自动销毁事件，需要手动消除，在beforeDestroy组件销毁前移除事件
+        EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
+　　
+      
+     
+    },
+    watch: {
+      'getEditdata'(val){
+        
+       if(val.name){ //有值 说明点编辑进入的 
+      //  console.log(this.$refs.addressSlot)
+       
+        this.getProvinceArr(val.province)
+        this.getCityArr(val.province,val.city)
+        this.getCountyArr(val.province,val.city,val.county)
+       }
+      },
+      
+    },
+    computed: {
+      // 徐动态创建数据
+      myAddressSlots(){
+        let slots =  [
           {
             flex: 1,
-            defaultIndex: 0,    
-            values:this.getProvinceArr(),  //省份数组Object.keys(myaddress)
-            //  values:Address,
+            defaultIndex: 1,    
+            values: this.getProvinceArr(),  //省份数组Object.keys(myaddress)
             className: 'slot1',
-            textAlign: 'center'
+            textAlign: 'left'
           },
           {
             divider: true,
@@ -93,9 +136,8 @@
           {
             flex: 1,
             values:this.getCityArr('北京市'),
-            // values: [],
-
             className: 'slot3',
+            textAlign: 'center'
           
           },
           {
@@ -106,66 +148,39 @@
           {
             flex: 1,
             values: this.getCountyArr( '北京市','市辖区'),
-            //  values: [],
             className: 'slot5',
+            textAlign: 'right'
            
           }
-        ],
+        ];
+        return slots;
        
-        myAddressProvince: '省',
-        myAddressCity: '市',
-        myAddresscounty: '区/县',
-      
-        popupVisible: false,
-        regionInit: false,
-       
-       
-      }
-    },
-    created(){
-      // 接受编辑信息 
-      // but ,接受的参数是打印多次的，因为不会自动销毁事件，需要手动消除，在beforeDestroy组件销毁前移除事件
-        
-        EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
-　　
-      
-     
-    },
-    watch: {
-      'province'(){
-        this.getProvinceArr(this.province)
-      },
-      'city'(){
-       
-         this.getCityArr(this.province,this.city)
-      },
-      'county'(){
-         console.log(this.province,this.city,this.county)
-         this.getCountyArr(this.province,this.city,this.county)
       }
     },
     methods: {
+      // 初始化三级联动
+      pickerInit(){
+        this.getProvinceArr();
+        this.getCityArr();
+        this.getCountyArr();
+      },
       showAddressPicker(){
          this.popupVisible = true
-        
+         
       },
       onMyAddressChange(picker, values) {
-        //  console.log(Address[0].name)
-        if(this.regionInit){
-            // console.log(values[0].children[0].children instanceof Array)
-            // picker.setSlotValues(1,values[0].children); // Object.keys()会返回一个数组，当前省的数组
-            // picker.setSlotValues(2,values[0].children[0].children); // 区/县数据就是一个数组
-            picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
-            picker.setSlotValues(2, this.getCountyArr(values[0]["name"], values[1]["name"]))
-            this.myAddressProvince = values[0]["name"];
-            this.myAddressCity = values[1]["name"];
-            this.myAddresscounty = values[2]["name"];
-
-        }else{
-          this.regionInit = true;
+        if(values[0]) {
+        
+              picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
+              picker.setSlotValues(2, this.getCountyArr(values[0]["name"],values[1]["name"]));
+           
         }
-      
+       
+    
+            
+        
       },
+    
       getProvinceArr(provinceName){
       
         let provinceArr = [];
@@ -173,24 +188,15 @@
          Address.forEach( (item,i) => {
             let obj = {};
            if(item.name ==  provinceName){
-             obj.name = item.name;
-             obj.code = item.code;
+        
           　this.myAddressSlots[0].defaultIndex = i;
-           }else{
-              obj.name = item.name;
-              obj.code = item.code;
            }
+            obj.name = item.name;
+            obj.code = item.code;
             provinceArr.push(obj);
           });
-
         return  provinceArr;
-        
-        
-       
-
-
-       
-
+      
       },
       getCityArr(province,cityName) {
         
@@ -211,18 +217,22 @@
             });
           }
         });
+     
         return cityArr;
       },
       //
       getCountyArr(province,city,countyName){
       
         let countyArr = [];
-        Address.forEach(function(item){
+        Address.forEach((item) => {
           if (item.name === province){
-            item.children.forEach(function (args) {
+            item.children.forEach((args) => {
               if (args.name === city){
-                args.children.forEach(function (param) {
+                args.children.forEach( (param,i) => {
                   let obj = {};
+                   if(param.name == countyName){
+                      this.myAddressSlots[4].defaultIndex = i
+                    }
                   obj.name=param.name;
                   obj.code=param.code;
                   countyArr.push(obj);
@@ -231,39 +241,46 @@
             });
           }
         });
-        // console.log(countyArr);
+        
         return countyArr;
       },
       getEditAddressMsg(data){
-        console.log(data)
-        if(data){
-
+        this.getEditdata = data
+        if(data.name){
           this.addressName = data.name ;
           this.addressPhone = data.phone ;
           this.defaultStatus = data.selected;
           this.province= data.province;
           this.city = data.city;
           this.county = data.county;
-          this.myAddressProvince =  this.province || '省';
-          this.myAddressCity =  this.city  || '市';
-          this.myAddresscounty = this.county || '区/县' ;
-        }else{
-          // this.addressName = data.name ;
-
-        // this.addressPhone = '' ;
-        // this.defaultStatus ='';
-        // this.province= data.province;
-        // this.city = data.city;
-        // this.county = data.county;
-        // this.myAddressProvince = '省';
-        // this.myAddressCity = '市';
-        // this.myAddresscounty = '区/县' ;
+          this.myAddressProvince =  this.province ;
+          this.myAddressCity =  this.city;
+          this.myAddresscounty = this.county ;
         }
         
 
-        // console.log(this.myAddressProvince)
         
-      }
+      },
+      // 取消
+      changenAddressCancel(){
+        this.popupVisible =false;
+        if(this.getEditdata.name){
+
+        
+          
+        }else{
+          this.myAddressSlots[0].defaultIndex = 0;
+        }
+      },
+      //确定
+       changenAddressConfirm(){
+         let vals =this.$refs.addressSlot.getValues();
+         this.myAddressProvince = vals[0].name;
+         this.myAddressCity = vals[1].name;
+         this.myAddresscounty = vals[2].name;
+          this.popupVisible =false;
+
+       }
 
     },
    

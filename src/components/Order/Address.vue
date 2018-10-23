@@ -74,7 +74,7 @@
                   address: '山西省忻州市忻府区奇村',
                   province: '山西省',
                   city: '忻州市',
-                  county: '忻府区',
+                  county: '偏关县',
                   isdefault: true,
                    isdefault: false
               },
