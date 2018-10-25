@@ -2,7 +2,7 @@
   <transition name="slide" >
    <div class="address-page">
 
-      <mt-header title="新增收货地址">
+      <mt-header :title="addressId ? '修改收货地址' : '新增收货地址'">
           <span to="" slot="left" @click="$router.go(-1)">
               <mt-button icon="">
                   <i class="iconfont icon-fanhui"></i>
@@ -25,24 +25,24 @@
         <li>
           <label>所在区域</label>
           <div class="form-input area " >
-            <div @click="showAddressPicker ">{{myAddressProvince}} {{ myAddressCity}} {{myAddresscounty}}</div>
+            <div @click="showAddressPicker ">{{ address }}</div>
             
           </div>
         </li>
         <li>
           <label>详细地址</label>
           <div class="form-input ">
-            <input type="text" placeholder="街道详细地址" class="input-text ">
+            <input type="text" placeholder="街道详细地址" class="input-text " v-model="addressDetail">
           </div>
         </li>
         <li>
           <label>设为默认地址</label>
           <div class="form-input ">
-            <input type="checkbox" class="check">
+            <input type="checkbox" class="check" v-model="defaultStatus">
           </div>
         </li>
       </ul>
-      <div class="save-btn">
+      <div class="save-btn" @click="saveAddressInfo">
         保存并使用
       </div>
       <!-- <div class="picker-wrap" > -->
@@ -70,6 +70,11 @@
   import EventBus from 'common/js/eventBus.js'
   
   export default {
+    props: {
+          userCode: {
+              type: String
+          }
+      },
     components: {
       // 'mt-picker': Picker
     },
@@ -77,14 +82,13 @@
       return {
         addressName: '',
         addressPhone: '',
+        addressDetail: '',
         defaultStatus: false,
         province: '',//省
         city: '',//市
         county: '',//县
-        
-        myAddressProvince: '省',
-        myAddressCity: '市',
-        myAddresscounty: '区/县',
+        address: '省 市 区/县',
+        addressId: '',
       
         popupVisible: false,
         isChange: false,
@@ -105,11 +109,11 @@
      
     },
     watch: {
+      // 暂无用
       'getEditdata'(val){
         
        if(val.name){ //有值 说明点编辑进入的 
       //  console.log(this.$refs.addressSlot)
-       
         this.getProvinceArr(val.province)
         this.getCityArr(val.province,val.city)
         this.getCountyArr(val.province,val.city,val.county)
@@ -246,40 +250,116 @@
       },
       getEditAddressMsg(data){
         this.getEditdata = data
-        if(data.name){
-          this.addressName = data.name ;
-          this.addressPhone = data.phone ;
+
+        if(data.consigneeName){
+          this.addressName = data.consigneeName ;
+          this.addressPhone = data.consigneePhone ;
           this.defaultStatus = data.selected;
           this.province= data.province;
           this.city = data.city;
           this.county = data.county;
-          this.myAddressProvince =  this.province ;
-          this.myAddressCity =  this.city;
-          this.myAddresscounty = this.county ;
+          this.address = data.addressRegion ;
+          this.addressDetail =  data.addressDetail
+          this.addressId = data.addressId;
         }
         
 
         
       },
-      // 取消
+      // 取消三级联动
       changenAddressCancel(){
         this.popupVisible =false;
         if(this.getEditdata.name){
 
-        
-          
         }else{
           this.myAddressSlots[0].defaultIndex = 0;
         }
       },
-      //确定
+      //确定三级联动
        changenAddressConfirm(){
          let vals =this.$refs.addressSlot.getValues();
-         this.myAddressProvince = vals[0].name;
-         this.myAddressCity = vals[1].name;
-         this.myAddresscounty = vals[2].name;
+        //  this.myAddressProvince = vals[0].name;
+        //  this.myAddressCity = vals[1].name;
+        //  this.myAddresscounty = vals[2].name;
+         this.address = vals[0].name+vals[1].name+vals[2].name;
           this.popupVisible =false;
 
+       },
+      //  保存地址
+       saveAddressInfo(){
+          if(!this.addressId){
+            let data = {
+              userCode: this.userCode,
+              consigneeName: this.addressName,
+              consigneePhone: this.addressPhone,
+              addressRegion: this.address,
+              addressDetail: this.addressDetail,
+              addressStatus: this.defaultStatus ? 0: 1
+          }
+          this.$http.post('Address/addressAdd', data,{
+                transformRequest:[function(data){
+                    let params = '';
+                    for(let key in data){
+                        params += key +'='+data[key]+'&'
+                    }
+                    return params
+                }]
+                }).then( (response)=>{
+                    let res =response.data;
+                    if(res.flag == 'success'){
+                       let  id =this.$route.query.id;
+                      this.$router.push({
+                          name: 'order',
+                          query: {id:id},
+                          hash: '#address'
+
+                      })
+                    }else{
+                       this.$toast({
+                        message: res.info,
+                        position:'middle',
+                        duration: 2000
+                    });   
+                    }
+                    
+                    console.log(res)
+                   
+                })
+          }else{
+             let data = {
+            userCode: this.userCode,
+            consigneeName: this.addressName,
+            consigneePhone: this.addressPhone,
+            addressRegion: this.address,
+            addressDetail: this.addressDetail,
+             addressStatus: this.defaultStatus ? 0: 1,
+            addressId: this.addressId
+          }
+          console.log(data)
+         
+          this.$http.post('Address/addressSave', data,{
+                transformRequest:[function(data){
+                    let params = '';
+                    for(let key in data){
+                        params += key +'='+data[key]+'&'
+                    }
+                    return params
+                }]
+                }).then( (response)=>{
+                    let res =response.data;
+                     let  id =this.$route.query.id;
+                    this.$router.push({
+                        name: 'order',
+                        query: {id:id},
+                        hash: '#address'
+
+                    })
+                    console.log(res)
+                   
+                })
+
+          }
+         
        }
 
     },

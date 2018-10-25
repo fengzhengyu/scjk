@@ -11,10 +11,25 @@
             <i class="iconfont icon-iconfontzhizuobiaozhun023132"></i>
             温馨提示：发票为必填项，请确认相关商品信息后提交订单
         </div>
-        <div class="address" @click=" goAddress">
+        <div class="address" v-show=" active == '上门自提'">
             <div class="come-door">上门自提</div>
             <div class="text">四川省广汉市东莞路二段10号内一号市场二层<br/><span>上午9:00—下午17:00</span> 咨询电话：<a href="javascript:;">13658050467</a> 王</div>
         </div>
+         <div class="address" @click=" goAddress" v-show=" active == '快递运输'">
+             <template v-if="addressData">
+                <h2 class="address-name"> {{addressData.consigneeName}} <span> {{addressData.consigneePhone}}</span>   </h2>
+                <p class="address-desc">
+                    <i class="iconfont icon-icon2"></i>
+                    {{addressData.addressRegion}}{{addressData.addressDetail}}
+                </p>
+             </template>
+           
+            <p class="change-address" v-else>请设置收货地址</p>
+            <div class="next">
+                <i class="iconfont icon-qianjin1"></i>
+            </div>
+        </div>
+        
         <div  class="goods-wrap">
             <div class="cart-wrap" v-for="item in goodsList">
                 <div class="shop">
@@ -46,6 +61,21 @@
             
             </div>
         </div>
+        <div class="tabs-btn">
+            <h3>配送</h3> 
+            <div>
+                <span class="btn" @click="active ='快递运输'">
+                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':active=='快递运输'}"></i>
+                    快递运输
+                </span>
+                <span class="btn"  @click="active = '上门自提'">
+                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':active== '上门自提'}"></i>
+                    上门自提
+                </span>
+            </div>
+            
+            
+        </div>
         <div class="invoice-wrap">
             <h3 class="name">发票</h3>
             <!-- invoiceFlag = !invoiceFlag -->
@@ -61,8 +91,8 @@
             </div>
         </div>
         <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
-        <Address v-if="$route.hash == '#address'"  @changeAddressMsg="getChangeAddress"></Address>
-        <AddressEdit v-if="$route.hash == '#addressEdit'"></AddressEdit>
+        <Address :userCode="userCode" v-if="$route.hash == '#address'"  @changeAddressMsg="getChangeAddress"></Address>
+        <AddressEdit :userCode="userCode" v-if="$route.hash == '#addressEdit'"></AddressEdit>
         <router-view></router-view>
     </div>
 </template>
@@ -73,6 +103,7 @@
     export default {
         data(){
             return {
+                userCode: '',
                 goodsList: [],
                 goodsIdArr: [],
                 orderIdArr:[],
@@ -82,7 +113,9 @@
                 taxpayerNumber: '',
                 invoiceFlag: false,
                 count: '',
-                addressFlag: false
+                addressFlag: false,
+                addressData: {},
+                active: '快递运输'
               
             }
         },
@@ -113,7 +146,7 @@
         },
         methods: {
             getAddressData(){
-                 this.$http.post('Address/index',{userCode:  this.userCode},{
+                 this.$http.post('Address/index',{userCode: this.userCode},{
                 transformRequest:[function(data){
                     let params = '';
                     for(let key in data){
@@ -123,7 +156,14 @@
                 }]
                 }).then( (response)=>{
                     let res =response.data;
-                    console.log(res)
+                    let arr =   res.data.filter((item,i) =>{
+                          return  item.addressStatus == 0 ;
+                           
+                     })
+                     this.addressData = arr[0];
+                    
+                   
+                   
                 })
             },
             submitOrder(){
@@ -162,8 +202,8 @@
                         invoiceType:this.invoiceType,
                         invoiceName:this.invoiceName,
                         taxpayerNumber:this.taxpayerNumber,
-                        addressId:'',
-                        receiverType:'上门自提',
+                        addressId:this.addressData.addressId,
+                        receiverType:this.active,
                         goodsId:goodsStr,
                         shopId:shopStr,
                         goodsPriceTotal:this.totalMoney,
@@ -176,14 +216,16 @@
                         invoiceType:this.invoiceType,
                         invoiceName:this.invoiceName,
                         taxpayerNumber:this.taxpayerNumber,
-                        addressId:'',
-                        receiverType:'上门自提',
+                        addressId:this.addressData.addressId,
+                        receiverType:this.active,  //收货方式
                         orderId:orderStr,
                         shopId:shopStr,
                         goodsPriceTotal:this.totalMoney,
                     }
 
                  }
+                 console.log(data)
+                
                 this.$http.post('Order/addOrder',data,{
                 transformRequest:[function(data){
                     let params = '';
@@ -219,10 +261,9 @@
                 })
                 
             },
-                //    得到发票信息
+            //    得到发票信息
             getSaveMsg(data){
-               console.log(data);
-               
+            //    console.log(data);
                 this.invoiceFlag = data.boole;
                 this.invoiceType = data.type;
                 this.invoiceName = data.name;
@@ -230,7 +271,11 @@
             },
             // 得到地址信息
             getChangeAddress(data){
-                console.log(data)
+                this.addressData.consigneeName = data.consigneeName;
+                this.addressData.consigneePhone = data.consigneePhone;
+                this.addressData.addressRegion = data.addressRegion;
+                this.addressData.addressDetail = data.addressDetail;
+                this.addressData.addressId = data.addressId;
             },
             // 去地址页
             goAddress(){
@@ -295,6 +340,7 @@
         .address 
             padding .2rem .15rem
             overflow hidden
+            position relative
             div
                 float left
                 font-size .2rem
@@ -310,6 +356,51 @@
                 span
                     color #ff2d2d
                     padding  0 .05rem
+            .change-address
+                font-size .28rem
+                padding-left .3rem
+                line-height .76rem
+            .address-name
+                font-size .26rem
+                padding-left .3rem
+                line-height .38rem
+                span    
+                    padding-left .2rem
+            .address-desc
+                font-size .2rem
+                line-height .38rem
+                color #999
+                i 
+                    font-size .22rem
+                    padding-right 0.05rem
+            .next
+                position absolute 
+                right .2rem     
+                top: 50%;
+                transform translateY(-50%)
+                i 
+                    font-size .3rem
+                    color #7D7D7D
+        .tabs-btn
+            padding  .2rem
+            line-height .5rem
+            overflow hidden
+            h3  
+                float left
+                font-size .24rem
+            div
+                float right
+                .btn 
+                    font-size .22rem
+                    color #000
+                    padding .1rem .3rem .1rem 0
+                    i 
+                        font-size .36rem
+                        vertical-align middle
+                        color #a2a2a2
+                        &.icon-xuanzhong
+                            color #cc3e2e        
+                   
         .goods-wrap            
             .cart-wrap
                 .shop
@@ -381,10 +472,11 @@
             line-height .5rem
             font-size .2rem
             padding-bottom .8rem
-            margin .3rem 0
+            margin .2rem 0
             .name{
                 float left
                 padding  0 .2rem
+                font-size .24rem
             }
             .desc
                 float right 

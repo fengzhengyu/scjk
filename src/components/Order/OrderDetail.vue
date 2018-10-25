@@ -112,7 +112,7 @@
                         }]
                      }).then(response=>{
                          let res = response.data;
-                      
+                        console.log(res)
                          if(res.flag == 'success'){
                             this.numberData = res.data.numberData[0];
                             this.orderData = res.data.orderData;

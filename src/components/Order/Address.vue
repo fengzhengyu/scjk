@@ -3,7 +3,10 @@
    <div class="address-page">
 
       <mt-header title="选择地址">
-          <span to="" slot="left" @click="$router.go(-1)">
+          <span to="" slot="left" @click="$router.push({
+              name: 'order',
+               query: {id: $route.query.id}
+          })">
               <mt-button icon="">
                   <i class="iconfont icon-fanhui"></i>
               </mt-button>
@@ -12,22 +15,22 @@
       <div class="address-content">
           <h1>
             配送地址
-            <p @click="goAddressEdit">+增加配送地址</p>  
+            <p @click="goAddressEdit">+增加收货地址</p>  
           </h1>
           <ul class="address-list">
               <li v-for="(item,index) in addressList" :key="index">
                   <div class="info">
-                      <div class="cur" @click="changeAddress(item)">
+                      <!-- <div class="cur" @click="changeAddress(item)">
                           <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':item.selected}"></i>
-                      </div>
-                      <div class="msg ">
+                      </div> -->
+                      <div class="msg" @click="changeAddress(item)">
                           <h2>
-                              <span class="name">{{item.name}}</span>
-                              <span>{{ item.phone }}</span>
+                              <span class="name">{{item.consigneeName}}</span>
+                              <span>{{ item.consigneePhone }}</span>
                           </h2>   
                            <p>
-                               <span v-if="item.isdefault">默认</span>
-                               {{ item.address }}
+                               <span v-if="item.addressStatus == 0">默认</span>
+                               {{ item.addressRegion }} {{item.addressDetail}}
                             </p> 
                       </div>
                   </div>
@@ -36,7 +39,7 @@
                       <div @click=" EditAddress(item,index)">
                           <i class="iconfont icon-bianji"></i>
                       </div>
-                      <div>
+                      <div @click="delAddress(item)">
                            <i class="iconfont icon-shanchu"></i>
                       </div>
                   </div>
@@ -46,6 +49,7 @@
               
              
           </ul>
+          <div class="not-address" v-if="addressList.length<=0">暂无地址，请添加地址</div>
       </div>
     </div>
  </transition>
@@ -54,59 +58,20 @@
 <script>
     import EventBus from 'common/js/eventBus.js'
   export default {
+      props: {
+          userCode: {
+              type: String
+          }
+      },
     data(){
       return {
-          addressList: [
-              {
-                  name: '张三',
-                  phone: 15188886666,
-                  selected: false,
-                  address: '北京市北京市房山区全区世茂维拉21号楼二单元202',
-                  province: '北京市',
-                  city: '市辖区',
-                  county: '房山区',
-                  isdefault: false
-              },
-              {
-                  name: '张四',
-                  phone: 15188886666,
-                  selected: true,
-                  address: '山西省忻州市忻府区奇村',
-                  province: '山西省',
-                  city: '忻州市',
-                  county: '偏关县',
-                  isdefault: true,
-                   isdefault: false
-              },
-              {
-                  name: '张五',
-                  phone: 15188886666,
-                  selected: false,
-                  address: '北京市北京市海淀区区全区世茂维拉21号楼二单元202',
-                  isdefault: false,
-                  province: '北京市',
-                  city: '市辖区',
-                  county: '海淀区',
-              },
-              {
-                  name: '张六',
-                  phone: 15188886666,
-                  selected: false,
-                  address: '北京市北京市东城区全区世茂维拉21号楼二单元202',
-                  isdefault: false,
-                  province: '北京市',
-                  city: '市辖区',
-                  county: '东城区',
-                 
-              }
-
-          ],
+          addressList: [],
           addressItem: {}
       }
     },
-    // created(){
-      
-    // },
+    created(){
+      this. getAddressList()
+   },
     //  beforeCreate () {
     // console.group('%c%s', 'color:red', 'beforeCreate 创建前状态===============组件2》')
     // },
@@ -132,6 +97,24 @@
     // console.group('%c%s', 'color:red', 'destroyed 破坏状态===============组件2》')
     // }    
     methods: {
+        getAddressList(){
+             this.$http.post('Address/index',{userCode:  this.userCode},{
+                transformRequest:[function(data){
+                    let params = '';
+                    for(let key in data){
+                        params += key +'='+data[key]+'&'
+                    }
+                    return params
+                }]
+                }).then( (response)=>{
+                    let res =response.data;
+                  
+                    // console.log(res)
+                     this.addressList = res.data;
+                })
+           
+
+        },
         goAddressEdit(){
               let  id =this.$route.query.id;
                 this.$router.push({
@@ -158,6 +141,28 @@
 
             })
 
+        },
+        delAddress(item){
+
+            this.$http.post('Address/delAddress',{userCode:  this.userCode,addressId: item.addressId},{
+                transformRequest:[function(data){
+                    let params = '';
+                    for(let key in data){
+                        params += key +'='+data[key]+'&'
+                    }
+                    return params
+                }]
+                }).then( (response)=>{
+                    let res =response.data;
+                    this.$toast({
+                            message: res.info,
+                            position:'middle',
+                            duration: 2000
+                        });   
+                        this.getAddressList()
+                  
+                    
+                })
         }
     },
     // 只有在组件销毁前，bus页面created 才能接受eventBus$on
@@ -261,7 +266,11 @@
                             i 
                              font-size .36rem
                              color #666
-
+            .not-address
+                line-height 1rem
+                text-align center
+                font-size .22rem
+                color #999
 
 
 
