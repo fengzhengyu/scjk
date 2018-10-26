@@ -1,7 +1,7 @@
 <template>
     <div class="order-write">
         <mt-header title="填写订单" >
-            <span to="" slot="left" @click="$router.go(-1)">
+            <span to="" slot="left" @click="goBack">
                 <mt-button icon="">
                     <i class="iconfont icon-fanhui"></i>
                 </mt-button>
@@ -16,7 +16,7 @@
             <div class="text">四川省广汉市东莞路二段10号内一号市场二层<br/><span>上午9:00—下午17:00</span> 咨询电话：<a href="javascript:;">13658050467</a> 王</div>
         </div>
          <div class="address" @click=" goAddress" v-show=" active == '快递运输'">
-             <template v-if="addressData">
+             <template v-if="addressData.consigneeName">
                 <h2 class="address-name"> {{addressData.consigneeName}} <span> {{addressData.consigneePhone}}</span>   </h2>
                 <p class="address-desc">
                     <i class="iconfont icon-icon2"></i>
@@ -100,6 +100,7 @@
     import OrderInvoice from 'components/Order/OrderInvoice'
     import Address from 'components/Order/Address'
     import AddressEdit from 'components/Order/AddressEdit'
+    import { submitOrderData , getAddressData   } from 'common/api'
     export default {
         data(){
             return {
@@ -115,6 +116,7 @@
                 count: '',
                 addressFlag: false,
                 addressData: {},
+             
                 active: '快递运输'
               
             }
@@ -124,6 +126,7 @@
             let goodsStr = sessionStorage.getItem('goods');
             this.goodsList = JSON.parse(goodsStr)
             this.getAddressData()
+
         },
         computed: {
             totalMoney(){
@@ -144,29 +147,17 @@
                 return totalPrice.toFixed(2)
             }
         },
+       
         methods: {
-            getAddressData(){
-                 this.$http.post('Address/index',{userCode: this.userCode},{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-                }).then( (response)=>{
-                    let res =response.data;
-                    let arr =   res.data.filter((item,i) =>{
-                          return  item.addressStatus == 0 ;
-                           
-                     })
-                     this.addressData = arr[0];
-                    
-                   
-                   
-                })
+          
+            // 获取地址
+           async getAddressData(){
+                let{data:res} = await getAddressData({userCode: this.userCode});
+                if(res.flag == 'success'){
+                    this.addressData = res.data[0]
+                }
             },
-            submitOrder(){
+            async submitOrder(){
                 
                 if(!this.invoiceName){
                     this.$toast({
@@ -194,10 +185,10 @@
                 let goodsStr = this.goodsIdArr.join(',');
                 let orderStr = this.orderIdArr.join(',')
                 let shopStr = this.shopArr.join(',');
-                let data = {}
+                let params = {}
                 if(this.$route.query.id == 0){
 
-                    data = {
+                    params = {
                         userCode:this.userCode,
                         invoiceType:this.invoiceType,
                         invoiceName:this.invoiceName,
@@ -210,8 +201,8 @@
                         goodsCount:this.count
                     }
 
-                 }else{
-                      data = {
+                }else{
+                    params = {
                         userCode:this.userCode,
                         invoiceType:this.invoiceType,
                         invoiceName:this.invoiceName,
@@ -223,22 +214,10 @@
                         goodsPriceTotal:this.totalMoney,
                     }
 
-                 }
-                 console.log(data)
-                
-                this.$http.post('Order/addOrder',data,{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-                }).then(response=>{
-                    let res = response.data;
-                    if(res.flag == 'success'){
-                    //   let id =res.orderNumber     
-                    sessionStorage.clear() 
+                }
+               let {data:res} = await submitOrderData( params );
+               if(res.flag == 'success'){
+                    sessionStorage.setItem('goods',null)
                     this.$toast({
                         message: res.info,
                         position:'middle',
@@ -249,21 +228,19 @@
                             name: 'myorder',
                             params: {id:1}
                         })
-                    },2000)  
-                    
-                    }else{
+                    },1000)  
+               }else{
                     this.$toast({
                         message: res.info,
                         position:'middle',
                         duration: 2000
                     });
-                    }
-                })
+               }
+              
                 
             },
             //    得到发票信息
             getSaveMsg(data){
-            //    console.log(data);
                 this.invoiceFlag = data.boole;
                 this.invoiceType = data.type;
                 this.invoiceName = data.name;
@@ -279,7 +256,6 @@
             },
             // 去地址页
             goAddress(){
-             
                  let  id =this.$route.query.id;
                 this.$router.push({
                     name: 'order',
@@ -297,7 +273,26 @@
                     hash: '#invoice'
 
                 })
-                 console.log(this.$route.hash)
+                
+            },
+            goBack(){
+                let id = this.$route.query.id
+                if(id ==   1){
+                     this.$router.push({
+                        name: 'cart',
+                     })
+                }else{
+
+                    let goods = sessionStorage.getItem('goods');
+                    let id =  JSON.parse(goods)[0].shopList[0].goodsId;
+                    this.$router.push({
+                        name: 'id',
+                        params: {
+                            goodsId: id
+                        }
+                     })
+                   
+                }
             }
         },
         

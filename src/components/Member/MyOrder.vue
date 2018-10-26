@@ -11,7 +11,7 @@
                 </span>   
             </mt-header>    
             <div class="tabs">
-                <div class="tab-list" :class="{'active':$route.params.id ==1}" @click="goJump(1),getPaymentData()">
+                <div class="tab-list" :class="{'active':$route.params.id ==1}" @click="goJump(1),getPayList()">
                     <span class="line">已支付</span>
                 </div>
                 <div class="tab-list"  :class="{'active':$route.params.id == 2}" @click="goJump(2), getFinishData()">
@@ -35,10 +35,10 @@
                         <i class="iconfont icon-shanchu"></i>
                     </div>
                 </div>
-                <div class="group" v-for="goods in item.orderList">
+                <div class="group" v-for="goods in item.orderList" :key="goods.goodsId">
                     <div class="group-detail" @click="goOrderDetail(goods)">
                         <div class="item-img" >
-                            <img v-lazy="goods.goodsPhoto" >
+                            <img v-lazy="goods.goodsPhoto" :key="goods.goodsPhoto" >
                         </div>
                         <div class="item-info">
                         
@@ -56,7 +56,7 @@
                 </div>
                 <div class="price-total"  v-show="$route.params.id ==1">
                         <div class="total">
-                            实付款：<span class="color">￥{{item.goodsPrice}}</span>
+                            实付款：<span class="color">￥{{ item.orderList[item.orderList.length -1].goodsPriceTotal }}</span>
                         </div> 
                         <div class="btn" @click="confirmOrder(item)">
                             确认收货
@@ -71,6 +71,7 @@
     </div>
 </template>
 <script>
+import {getPayData , getConfirmOrder,delOrderData } from 'common/api'
 export default {
     data() {
         return {
@@ -78,7 +79,7 @@ export default {
             orderList: [],
             page:1,
             isAutoFill:false,//是否自动检测，并调用loadBottom
-            allLoaded:false,//数据是否全部加载完毕，如果是，禁止函数调用
+            allLoaded:true,//数据是否全部加载完毕，如果是，禁止函数调用
         }
     },
     created(){
@@ -86,12 +87,15 @@ export default {
         this.userCode = this.getCookie('userCode')
         if(this.userCode){
             if(this.$route.params.id == 1){
-                this.getPaymentData()
+                this.getPayList()
             }else{
                 this.getFinishData()
             }
         }
        
+    },
+    computed: {
+      
     },
     methods: {
         goJump(id){
@@ -101,81 +105,44 @@ export default {
             })
         },
         //已支付
-         getPaymentData(){
+        async getPayList(){
             this.page =1;  
-            this.allLoaded = false;
-            this.$http.post('Order/index',{userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                //    console.log(res)
-                  if(res.flag == 'success'){
-                        this.orderList = res.orderList;
-                        this.page++;
-                  }else{
-                      this.orderList = [];
-                  }
-                     
-                }).catch(err=>{console.log(err);})
+            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
+         
+            if(res.flag == 'success'){
+                this.orderList = res.orderList;
+                this.page++;
+                this.allLoaded = false;
+            }
+
         },
         //已完成
-        getFinishData(){
+        async getFinishData(){
             this.page =1;  
-            this.allLoaded = false;
-            this.$http.post('Order/index',{userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    if(res.flag == 'success'){
-                        this.orderList = res.orderList;
-                        this.page++;
-                    }else{
-                        this.orderList = [];
-                    }
-                     
-                }).catch(err=>{console.log(err);})
+            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
+             if(res.flag == 'success'){
+                this.orderList = res.orderList;
+                this.page++;
+                this.allLoaded = false;
+            }
         },
         //上啦加载
-        loadBottom(){
-            this.$http.post('Order/index',{page:this.page,userCode:this.userCode,orderStatus:this.$route.params.id},{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-            }).then(response=>{
-                let res =response.data;
-        
-                this.orderList = res.orderList;
-                this.page++
-                this.$refs.loadmore.onBottomLoaded();
-                if(res.msg == '已到底部'){
-                    this.allLoaded = true;
-                    this.$toast({
-                        message: '没有更多数据了',
-                        position:'middle',
-                        duration: 3000
-                    });
-                    return;
-                }
-                
-            }).catch(err=>{
-                console.log(err)
-            })
+         async loadBottom(){
+             console.log(this.page,this.$route.params.id)
+            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
+            this.orderList = res.orderList;
+            this.page++
+            this.$refs.loadmore.onBottomLoaded();
+            
+            if(res.msg == '已到底部'){
+                this.allLoaded = true;
+                this.$toast({
+                    message: '没有更多数据了',
+                    position:'middle',
+                    duration: 3000
+                });
+               
+            }
         },
         //查看详情
         goOrderDetail(goods){
@@ -186,25 +153,15 @@ export default {
         },
         //确认收货
         confirmOrder(item){
-           
-            this.$http.post('Order/confirmOrder',{userCode: this.userCode,orderNumber:item.orderNumber,shopId:item.shopId},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    console.log(res)
-                    if(res.flag == 'success'){
+            getConfirmOrder({userCode: this.userCode,orderNumber:item.orderNumber,shopId:item.shopId}).then((response) => {
+                let res = response.data;
+                if(res.flag == 'success'){
                         this.$toast({
                             message: res.info,
                             position:'middle',
                             duration: 3000
                         });
-                        this.getPaymentData()
+                        this.getPayList()
                     }else{
                         this.$toast({
                             message: res.info,
@@ -212,40 +169,28 @@ export default {
                             duration: 3000
                         });
                     }
-                     
-                }).catch(err=>{console.log(err);})
+            })
+            
         },
         //删除订单
         deleteOrder(item){
-             this.$messagebox.confirm('确定执行此操作?').then(action => { 
-                this.$http.post('Order/delOrder',{userCode: this.userCode,orderNumber:item.orderNumber,shopId:item.shopId},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                    if(res.flag == 'success'){
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 3000
-                        });
-                        this.getFinishData()
-                    }else{
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 3000
-                        });
-                    }
-                        
-                }).catch(err=>{console.log(err);})
-             }).catch(err=>{})
-            
+            delOrderData({userCode: this.userCode,orderNumber:item.orderNumber,shopId:item.shopId}).then((response) => {
+                let res = response.data;
+                if(res.flag == 'success'){
+                    this.$toast({
+                        message: res.info,
+                        position:'middle',
+                        duration: 3000
+                    });
+                    this.getFinishData()
+                }else{
+                    this.$toast({
+                        message: res.info,
+                        position:'middle',
+                        duration: 3000
+                    });
+                }
+            },(err)=>{console.log(err)})   
         }
        
     }

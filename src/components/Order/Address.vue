@@ -23,7 +23,7 @@
                       <!-- <div class="cur" @click="changeAddress(item)">
                           <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':item.selected}"></i>
                       </div> -->
-                      <div class="msg" @click="changeAddress(item)">
+                      <div class="msg" @click.stop="changeAddress(item)">
                           <h2>
                               <span class="name">{{item.consigneeName}}</span>
                               <span>{{ item.consigneePhone }}</span>
@@ -36,7 +36,7 @@
                   </div>
                   <div class="handle">
                       <p></p>
-                      <div @click=" EditAddress(item,index)">
+                      <div @click.stop=" EditAddress(item,index)">
                           <i class="iconfont icon-bianji"></i>
                       </div>
                       <div @click="delAddress(item)">
@@ -57,20 +57,23 @@
 </template>
 <script>
     import EventBus from 'common/js/eventBus.js'
+    import {  getAddressData, delAddressData } from 'common/api'
   export default {
       props: {
           userCode: {
               type: String
           }
+          
       },
     data(){
       return {
-          addressList: [],
-          addressItem: {}
+        addressList:[],
+        addressItem: {}
       }
     },
     created(){
-      this. getAddressList()
+        
+         this.getAddressList()
    },
     //  beforeCreate () {
     // console.group('%c%s', 'color:red', 'beforeCreate 创建前状态===============组件2》')
@@ -97,22 +100,10 @@
     // console.group('%c%s', 'color:red', 'destroyed 破坏状态===============组件2》')
     // }    
     methods: {
-        getAddressList(){
-             this.$http.post('Address/index',{userCode:  this.userCode},{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-                }).then( (response)=>{
-                    let res =response.data;
-                  
-                    // console.log(res)
-                     this.addressList = res.data;
-                })
-           
+        async getAddressList(){
+            let {data:res} = await getAddressData({userCode: this.userCode});
+         
+            this.addressList = res.data;
 
         },
         goAddressEdit(){
@@ -142,27 +133,18 @@
             })
 
         },
-        delAddress(item){
+        async delAddress(item){
 
-            this.$http.post('Address/delAddress',{userCode:  this.userCode,addressId: item.addressId},{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-                }).then( (response)=>{
-                    let res =response.data;
-                    this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });   
-                        this.getAddressList()
-                  
-                    
-                })
+            let {data:res} = await  delAddressData({userCode:  this.userCode,addressId: item.addressId});
+             this.$toast({
+                message: res.info,
+                position:'middle',
+                duration: 2000
+            });   
+            if(res.flag == 'success'){
+                this.getAddressList()
+            }        
+                      
         }
     },
     // 只有在组件销毁前，bus页面created 才能接受eventBus$on

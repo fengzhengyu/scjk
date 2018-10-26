@@ -227,3 +227,119 @@ export let getCartDelete = (data) => {
   })
 }
 
+//提交订单
+export let submitOrderData = (data) => {
+  return axios.post('Order/addOrder',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+
+// 获取地址list 
+export let getAddressData = (data) => {
+  return axios.post('Address/index',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 删除地址
+export let delAddressData = (data) => {
+  return axios.post('Address/delAddress',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 添加地址
+export let addressDataAdd = (data) => {
+  return axios.post('Address/addressAdd',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 保存地址
+export let addressDataSave = (data) => {
+  return axios.post('Address/addressSave',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+
+// 已支付
+
+export let getPayData = (data) => {
+  return axios.post('Order/index',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 确认收货
+
+export let getConfirmOrder = (data) => {
+  return axios.post('Order/confirmOrder',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+
+// 订单详情
+
+export let getOrderDetail = (data) => {
+  return axios.post('Order/orderDetail',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 删除订单
+
+
+export let delOrderData = (data) => {
+  return axios.post('Order/delOrder',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}

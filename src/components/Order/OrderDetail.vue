@@ -8,14 +8,23 @@
                 </mt-button>
             </span>        
         </mt-header>
-
-        <div class="content">
-            <div class="succeed">下单成功</div>
-            <div class="goods-type">
+         
+        <div class="content" >
+            <div class="succeed">{{$route.params.id == 1? '订单交易中': '订单完成'}}</div>
+            <div class="goods-type" v-if="addressData<=0">
                 收货方式
                 <span>上门自提</span>
             </div>
             
+        </div>
+        <div class="address" v-if=" addressData.length >0">
+          
+            <h2 class="address-name"> {{addressData[0].consigneeName}} <span> {{addressData[0].consigneePhone}}</span>   </h2>
+            <p class="address-desc">
+                <i class="iconfont icon-icon2"></i>
+                {{ addressData[0].addressRegion }}{{ addressData[0].addressDetail }}
+            </p>
+             
         </div>
         <div class="goods-wrap">
              <div class="cart-wrap" >
@@ -59,13 +68,14 @@
         </div>
         <div class="goods-total">
             商品总额：
-            <span>￥{{totalMoney}}</span>
+            <span>￥{{numberData.goodsPriceTotal}}</span>
         </div>
     </div>
   </transition>
     
 </template>
 <script>
+  import { getOrderDetail } from 'common/api'
      export default {
          data() {
              return {
@@ -74,7 +84,8 @@
                 orderData: [],
                 orderNumber: '',
                 orderTime:'',
-                isShow: false
+                isShow: false,
+                addressData: []
 
              }
          },
@@ -87,51 +98,33 @@
                     name: 'member'
                 })
             }
-         
+           
         },
          computed: {
-            totalMoney(){
-                let totalPrice = 0;
-                this.orderData.forEach((ele,i)=>{
-                    totalPrice += ele.goodsPrice * ele.goodsCount;
-                })     
-                
-                return totalPrice.toFixed(2)
-            }
         },
         methods: {
-            getDetailData(){
-               
-                this.$http.post('Order/orderDetail',{userCode:this.userCode,orderNumber:this.$route.query.order,shopId:this.$route.query.shopId},{
-                        transformRequest:[function(data){
-                            let params = '';
-                            for(let key in data){
-                                params += key +'='+data[key]+'&'
-                            }
-                            return params
-                        }]
-                     }).then(response=>{
-                         let res = response.data;
-                        console.log(res)
-                         if(res.flag == 'success'){
-                            this.numberData = res.data.numberData[0];
-                            this.orderData = res.data.orderData;
-                            this.shopData = res.data.shopData[0];
-                           
+            async getDetailData(){
+               let {data: res} = await getOrderDetail({userCode:this.userCode,orderNumber:this.$route.query.order,shopId:this.$route.query.shopId});
+             
+                if(res.flag == 'success'){
+                    this.numberData = res.data.numberData[0];
+                    this.orderData = res.data.orderData;
+                    this.shopData = res.data.shopData[0];
+                    if(res.data.addressData){
+                        this.addressData = res.data.addressData
+                    }
+                    if(this.$route.params.id == 1){
                             this.orderTime = this.orderData[0].addTime;
-                            if(this.numberData.taxpayerNumber === 'undefined'){
-                                this.isShow = false;
-                            }else{
-                                 this.isShow = true;
-                            }
-                         }else{
-                            this.$toast({
-                                message: res.info,
-                                position:'middle',
-                                duration: 2000
-                            });
-                         }
-                     })
+                    }else{
+                            this.orderTime = this.orderData[0].takeTime;
+                    }
+                    if(this.numberData.taxpayerNumber === 'undefined'){
+                        this.isShow = false;
+                    }else{
+                            this.isShow = true;
+                    }
+                }
+               
             },
             goBack(){
                 this.$router.go(-1)
@@ -166,7 +159,24 @@
                     font-size 20px
                 .mint-header-title
                         font-weight bold
-
+        .address 
+            padding .2rem .15rem
+            overflow hidden
+            position relative
+            font-size .2rem
+            .address-name
+                font-size .26rem
+                padding-left .3rem
+                line-height .38rem
+                span    
+                    padding-left .2rem
+            .address-desc
+                font-size .2rem
+                line-height .38rem
+                color #999
+                i 
+                    font-size .22rem
+                    padding-right 0.05rem
         .content
             color #000
             .succeed

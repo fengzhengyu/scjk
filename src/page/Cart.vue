@@ -52,9 +52,7 @@
            
      },
      watch: {
-        random(){
-           this.getCartList(); 
-        }
+      
      },
      methods: {
             async getCartList(){

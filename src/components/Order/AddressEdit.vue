@@ -68,7 +68,7 @@
   import Address from 'common/js/address.json'
   import { Picker } from 'mint-ui';
   import EventBus from 'common/js/eventBus.js'
-  
+  import { addressDataAdd , addressDataSave } from 'common/api'
   export default {
     props: {
           userCode: {
@@ -286,7 +286,7 @@
 
        },
       //  保存地址
-       saveAddressInfo(){
+        saveAddressInfo(){
           if(!this.addressId){
             let data = {
               userCode: this.userCode,
@@ -295,66 +295,43 @@
               addressRegion: this.address,
               addressDetail: this.addressDetail,
               addressStatus: this.defaultStatus ? 0: 1
-          }
-          this.$http.post('Address/addressAdd', data,{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-                }).then( (response)=>{
-                    let res =response.data;
-                    if(res.flag == 'success'){
-                       let  id =this.$route.query.id;
-                      this.$router.push({
-                          name: 'order',
-                          query: {id:id},
-                          hash: '#address'
-
-                      })
-                    }else{
-                       this.$toast({
-                        message: res.info,
-                        position:'middle',
-                        duration: 2000
-                    });   
-                    }
-                    
-                    console.log(res)
-                   
-                })
-          }else{
-             let data = {
-            userCode: this.userCode,
-            consigneeName: this.addressName,
-            consigneePhone: this.addressPhone,
-            addressRegion: this.address,
-            addressDetail: this.addressDetail,
-             addressStatus: this.defaultStatus ? 0: 1,
-            addressId: this.addressId
-          }
-          console.log(data)
+            }
+            addressDataAdd(data).then((response)=>{
+              let res = response.data;
+                if(res.flag == 'success'){
+                  this.$router.go(-1)
+                }else{
+                  this.$toast({
+                    message: res.info,
+                    position:'middle',
+                    duration: 2000
+                  });   
+                }
+            
+              },(err)=>{console.log(err)})
+  
+            }else{
+              let data = {
+              userCode: this.userCode,
+              consigneeName: this.addressName,
+              consigneePhone: this.addressPhone,
+              addressRegion: this.address,
+              addressDetail: this.addressDetail,
+              addressStatus: this.defaultStatus ? 0: 1,
+              addressId: this.addressId
+            }
+       
          
-          this.$http.post('Address/addressSave', data,{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-                }).then( (response)=>{
+          addressDataSave(data).then( (response)=>{
                     let res =response.data;
-                     let  id =this.$route.query.id;
-                    this.$router.push({
-                        name: 'order',
-                        query: {id:id},
-                        hash: '#address'
-
-                    })
-                    console.log(res)
+                    let  id =this.$route.query.id;
+                     this.$toast({
+                      message: res.info,
+                      position:'middle',
+                      duration: 2000
+                    });   
+                    this.$router.go(-1)
+                   
                    
                 })
 
