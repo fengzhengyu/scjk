@@ -27,7 +27,9 @@
         </div>
         <div class="menu-list" @click="goPassword">
             设置登录密码
-            <span class="right">></span>
+            <span class="right">
+                <i class="iconfont icon-qianjin1"></i>
+            </span>
         </div>
         <div class="menu-list">
             手机号
@@ -40,7 +42,7 @@
             登录
         </div>
         <p class="client">
-            客服电话：<span>13658050467</span> 王
+            客服电话：<a href="tel:13658050467">13658050467</a> 王
         </p>
         <mt-popup
             v-model="popupVisible"
@@ -275,7 +277,8 @@
             line-height .6rem
             font-size .24rem
             color #000
-            padding-left .15rem
+            // padding-left .15rem
+            padding .15rem 0 .15rem .15rem;
             .right,.phone 
                float right 
                color #a1a1a1

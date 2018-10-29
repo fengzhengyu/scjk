@@ -18,6 +18,14 @@
             <!-- <p class="btn-wrap"> 
                 <span class="btn " @click="signIn">注册新账号</span>
             </p> -->
+           
+        </div>
+        <div class="text-wrap"> 
+            <p class="info-text">
+                    1、请登陆后操作。<br/>2、如您是采购商，请使用聚康采购商专用账号。<br>3、若想申请成为采购商，请拨打咨询电话，<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="tel://15208368809" ><b>15208368809</b>曹先生</a> ，<a href="tel://18628056545" ><b>18628056545</b>金女士</a>
+            </p>
+            
+
         </div>
     </div>
 </template>
@@ -94,6 +102,7 @@
         left 0
         right 0
         bottom 0
+        overflow-y auto
         .header 
             position relative
             height 4.5rem
@@ -141,6 +150,17 @@
                            color #1969b2
                            background #fff
                            border 1px solid #1969b2
-                       
+                    
+        .text-wrap
+            padding .3rem .2rem
+            background rgba(0,0,0,.5)
+           
+            .info-text
+                text-align left 
+                font-size .25rem
+                color #fff;
+                line-height 130%
+                a 
+                    color #fff;
 
 </style>    

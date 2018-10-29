@@ -13,9 +13,17 @@
             <div :class="{'active': active==2}" @click="active=2 ,tabStatus =!tabStatus,getGoodsTypeList(tabStatus ==true?1:0)">价格<i class="iconfont icon-xiaosanjiaodown" :class="{'icon-xiaosanjiaoup': tabStatus==1}"></i></div>
             <div :class="{'active': active==3}" @click="active=3,getGoodsTypeList('salesVolume')">销量</div>
         </div>
-        <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad">
-            <GoodsList :goodsList="goodsList"></GoodsList>    
-        </mt-loadmore>
+        <!-- <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad"> -->
+            <GoodsList 
+                :goodsList="goodsList"
+                :loading="end"
+                v-if="isLoad"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="loading"
+                infinite-scroll-distance="10"
+                class="goods-list"
+            ></GoodsList>    
+        <!-- </mt-loadmore> -->
        
         <div v-if="goodsList.length<=0 && isLoad" class="no-goods">
             暂无商品！
@@ -38,8 +46,8 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 title: '分类页面',
                 goodsList: [],
                 page: 1,
-                isAutoFill:false,//是否自动检测，并调用loadBottom
-                allLoaded:false,//数据是否全部加载完毕，如果是，禁止函数调用
+                loading: true,  //true为禁止，false 为启动
+                end: false, //true  加载到底了
                 isLoad:false
             }
         },
@@ -79,19 +87,22 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
             async getGoodsTypeList(value){
                 this.page =1;
                 let {data:res} = await getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page});
+
                 if(res.flag == 'success'){
+
                     this.goodsList = res.typeGoodsList;
                     this.isLoad = true;
-                    this.page++;
+                    this.loading = false;
+                   
                 }
-                this.$indicator.close()
                
+                this.$indicator.close()
                
                 
 
             },
                //上拉刷新
-            async loadBottom(){
+            loadMore(){
                 let value = ''
                 if(this.active == 1){
                    value = 'recommend';
@@ -100,18 +111,36 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 }else if(this.active == 3){
                     value = 'salesVolume';
                 }
-                let {data:data} = await getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page});
-                this.goodsList  = data.typeGoodsList
-                this.page ++;
-                this.$refs.loadmore.onBottomLoaded();
-                if(res.msg== '已到底部'){
-                    this.allLoaded = true;
-                    this.$toast({
-                        message: '没有更多数据了',
-                        position:'middle',
-                        duration: 2000
-                    });
-                }
+
+                this.loading = true;
+
+                setTimeout(()=>{
+                    this.page++
+                   getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page}).then((response)=>{
+                       let res = response.data;
+                        if(res.flag == 'success'){
+                            this.goodsList  = res.typeGoodsList;
+                            if(res.msg== '已到底部'){
+                                this.loading = true;
+                                this.end = true;
+                                this.$toast({
+                                    message: '没有更多数据了',
+                                    position:'middle',
+                                    duration: 2000
+                                });
+                                
+                            }else{
+                                this.loading = false;
+                            }
+                        }
+                    },(err)=>{console.log(err)});
+                   
+
+                },300)
+
+               
+            
+                
                 
             },
 
@@ -153,8 +182,8 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 &.active 
                     color #ff0000
                     border-bottom 2px solid #ff0000
-        .mint-loadmore
-            padding-bottom 55px;   
+        .goods-list
+            padding-bottom 55px;     
         .no-goods
             text-align center
             line-height 3rem

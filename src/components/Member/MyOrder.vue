@@ -22,8 +22,13 @@
            
         </div>
          <div class="line"></div>
-         <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
-            <div class="content-list" v-for="(item,index) in orderList" :key="index" v-show="orderList.length>0">
+         <div 
+             v-if="isLoad"
+            v-infinite-scroll="loadMore"
+            infinite-scroll-disabled="loading"
+            infinite-scroll-distance="10"
+         >
+            <div class="content-list" v-for="(item,index) in orderList" :key="index" >
                 <div class="shop">
                     <div class="shop-icon list">
                         <i class="iconfont icon-guanzhudianpu"></i>
@@ -64,22 +69,31 @@
 
                     </div>
             </div>
-         </mt-loadmore>
+         </div>
         
-        <div class="no-order" v-show="orderList.length<=0">暂无订单！</div>
+        <div class="no-order" v-if="orderList.length<=0">暂无订单！</div>
+        <div v-else>
+            <div class="ladding" v-if="!loading">
+                <img src="../../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
+            </div>
+            <div class="ladding" v-else>
+                您已经到底了
+            </div>
+        </div>
         <router-view></router-view>
     </div>
 </template>
 <script>
-import {getPayData , getConfirmOrder,delOrderData } from 'common/api'
+import {getPayData , getConfirmOrder, delOrderData } from 'common/api'
 export default {
     data() {
         return {
             userCode : '',
             orderList: [],
             page:1,
-            isAutoFill:false,//是否自动检测，并调用loadBottom
-            allLoaded:true,//数据是否全部加载完毕，如果是，禁止函数调用
+            isLoad: false,
+            end:false,//
+            loading:true,
         }
     },
     created(){
@@ -107,43 +121,68 @@ export default {
         //已支付
         async getPayList(){
             this.page =1;  
+            
             let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
-         
             if(res.flag == 'success'){
                 this.orderList = res.orderList;
-                this.page++;
-                this.allLoaded = false;
+                this.isLoad = true;
+                if(res.msg == '已到底部'){
+                    this.loading = true;
+                    this.end = true;
+                }else{
+                    this.loading = false;
+                }
+                
+               
             }
 
         },
         //已完成
         async getFinishData(){
             this.page =1;  
+            
             let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
              if(res.flag == 'success'){
                 this.orderList = res.orderList;
-                this.page++;
-                this.allLoaded = false;
+                this.isLoad = true;
+                if(res.msg == '已到底部'){
+                    this.loading = true;
+                    this.end = true;
+                }else{
+                    this.loading = false;
+                }
             }
         },
         //上啦加载
-         async loadBottom(){
-             console.log(this.page,this.$route.params.id)
-            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
-            this.orderList = res.orderList;
-            this.page++
-            this.$refs.loadmore.onBottomLoaded();
-            
-            if(res.msg == '已到底部'){
-                this.allLoaded = true;
-                this.$toast({
-                    message: '没有更多数据了',
-                    position:'middle',
-                    duration: 3000
+        loadMore(){
+            this.loading = true;
+            alert(1)
+            setTimeout(()=>{
+                this.page++;
+               
+                getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page}).then((response)=>{
+                    let res = response.data;
+                    console.log(res)
+                    if(res.flag == 'success'){
+                        this.orderList = res.orderList;
+                    
+                        if(res.msg == '已到底部'){
+                            this.end = true;
+                            this.loading = true;
+                            
+                        }else{
+                            this.loading = false;
+                        }
+                    }
+                    
                 });
                
-            }
+
+
+            },300)
+
         },
+        
         //查看详情
         goOrderDetail(goods){
             this.$router.push({
@@ -349,6 +388,15 @@ export default {
             color #000
             height 3rem
             line-height 3rem
+        .ladding
+            text-align center
+            line-height .6rem
+            height .6rem
+            font-size .24rem
+            margin .15rem 0
+            img 
+                display inline-block
+                vertical-align middle
 
 
 </style>    

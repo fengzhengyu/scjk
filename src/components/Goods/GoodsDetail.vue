@@ -113,7 +113,7 @@
                     this.$router.push({
                         name: 'login'
                     });
-                },2000)
+                },500)
             },
             back(){
                 this.$router.back()
@@ -146,7 +146,7 @@
                         this.$router.push({
                             name: 'login'
                         });
-                    },2000)
+                    },500)
                     return;
                 }
                 let {data:res} = await getAddCartData({userCode:this.userCode,goodsId:this.goods.goodsId,shopId:this.goods.shopId,goodsCount:this.goodsQuantity});
@@ -171,7 +171,7 @@
                         this.$router.push({
                             name: 'login'
                         });
-                    },2000)
+                    },500)
                     return;
                 }
                 let {data:res} = await getNowBuyData({goodsId: this.$route.params.goodsId,userCode: this.userCode,goodsCount:this.goodsQuantity});
@@ -205,7 +205,7 @@
                         this.$router.push({
                             name: 'login'
                         });
-                    },2000)
+                    },500)
                     return;
                  }
                  this.$router.push({
@@ -225,7 +225,7 @@
                         this.$router.push({
                             name: 'login'
                         });
-                    },2000)
+                    },500)
                     return;
                  }
                 this.$router.push({
@@ -247,7 +247,7 @@
                         this.$router.push({
                             name: 'login'
                         });
-                    },2000)
+                    },500)
                     return;
                  }
                 let {data:res} = await getCollectData({goodsId: this.$route.params.goodsId,userCode: this.userCode});

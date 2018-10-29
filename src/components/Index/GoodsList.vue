@@ -23,6 +23,15 @@
             </li>
             
         </ul>
+        <div v-if="goodsList.length>0">
+            <div class="ladding" v-if="!loading">
+                <img src="../../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
+            </div>
+            <div class="ladding" v-else>
+                您已经到底了
+            </div>
+        </div>
+        
         
     
      <!-- <router-view></router-view> -->
@@ -34,6 +43,10 @@
             goodsList:{
                 type: Array,
                 default: []
+            },
+            loading:{
+                type:Boolean,
+                default: false
             }
         },
         data(){
@@ -50,7 +63,7 @@
            
             show(ev){
                 this.$toast({
-                    message: '登陆后才可以查看哦！',
+                    message: '请登陆后查看！',
                     position:'middle',
                     duration: 2000
                 });
@@ -58,7 +71,7 @@
                     this.$router.push({
                         name: 'login'
                     });
-                },2000)
+                },500)
             },
             
         }
@@ -114,7 +127,14 @@
                    .repertory
                        float right     
                        margin-right .05rem
-    
-    
+    .ladding
+        text-align center
+        line-height .6rem
+        height .6rem
+        font-size .24rem
+        margin .15rem 0
+        img 
+            display inline-block
+            vertical-align middle
 
 </style>

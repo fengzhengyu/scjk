@@ -100,6 +100,7 @@ export let getIndexData = (data) => {
     
   })
 }
+
 // 获取分类页数据
 export let getGoodsTypeData = (data) => {
   return axios.post('Goods/typeGoodsList',data,{

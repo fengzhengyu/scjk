@@ -17,9 +17,16 @@
                 </div>
             </div>
         </div>
-         <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad">
-             <shopList :goodsList=" goodsList"></shopList>   
-         </mt-loadmore>
+             <shopList
+                :goodsList=" goodsList" 
+                :loading="end"
+                v-if="isLoad"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="loading"
+                infinite-scroll-distance="10"
+                class="goods-list"
+             ></shopList>   
+       
         
         
     </div>
@@ -36,8 +43,8 @@
                 userCode: '',
                 page: 1,
                 value: '',
-                isAutoFill:false,//是否自动检测，并调用loadBottom
-                allLoaded:true,//数据是否全部加载完毕，如果是，禁止函数调用
+                end:true,// 到底了
+                loading:true,// 默认直接加载
                 isLoad: false
                
             }
@@ -53,6 +60,11 @@
         created(){
             this.userCode = this.getCookie('userCode');
             if(this.userCode){
+                 // loading...
+                this.$indicator.open({
+                    text: 'Loading...',
+                    spinnerType: 'fading-circle'
+                });
                 this.getShopList('');
             }else{
                 this.$router.push({
@@ -61,14 +73,33 @@
             }
         },
         methods: {
-            async getShopList(value){
-                let {data:res} = await getShopData({userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:value})
+            async getShopList(value,flag){
+                let {data:res} = await getShopData({userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:value,page:this.page})
+                this.$indicator.close();   
+                
                 if(res.flag == 'success'){
-                    this.shopData = res.shopData[0];
-                    this.goodsList = res.goodsData;
-                    this.page++;
-                    this.isLoad = true;
-                    this.$indicator.close();
+
+                    if(flag){
+                        if(res.info == '已到底部'){
+                            this.goodsList = res.goodsList;
+                            this.loading = true;
+                            this.end= true;
+                            this.$toast({
+                                message: '没有更多数据了',
+                                position:'middle',
+                                duration: 2000
+                            });
+                        
+                        }else{
+                              this.loading = false;
+                        }
+
+                    }else{
+                        this.shopData = res.shopData[0];
+                        this.goodsList = res.goodsData;
+                        this.isLoad = true;
+                        this.loading = true;
+                    }
                 }else{
                     this.$indicator.open({
                         text: 'Loading...',
@@ -80,25 +111,17 @@
             goSearch(){
                  this.getShopList(this.keyword)
             },
+
             //上啦加载
-            async loadBottom(){
-                 let {data:res} = await getShopData({userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:this.keyword})
-                  if(res.flag == 'success'){
-                    this.goodsList = res.goodsData;
-                    this.page++
-                    this.$refs.loadmore.onBottomLoaded();
-                    if(res.info == '已到底部'){
-                        this.goodsList = res.goodsList;
-                        this.allLoaded = true;
-                        this.$toast({
-                            message: '没有更多数据了',
-                            position:'middle',
-                            duration: 2000
-                        });
-                        
-                    }
-                }
-            }
+            loadMore(){
+                this.loading = true;
+                setTimeout(() => {
+                    this.page++;
+                    this.getShopList(this.keyword,flag)
+                }, 300);
+
+            },
+            
         },
         components: {
             shopList
