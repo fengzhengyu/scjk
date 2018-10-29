@@ -6,7 +6,13 @@
                     <mt-button icon="">
                         <i class="iconfont icon-fanhui"></i>
                     </mt-button>
-                </span>        
+
+                </span>   
+                <span slot="right" @click="$router.push({path: '/'})">
+                    <mt-button icon="">
+                        <i class="iconfont icon-icon-test"></i>
+                    </mt-button>
+                </span>     
             </mt-header>
             <!-- <div class="img-wrap"> -->
             <Swiper :sliders=" goodsDetailPhotos" class="img-wrap"></Swiper>
@@ -83,7 +89,7 @@
         methods: {
             async getData(){
                 let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
-                // console.log(res);
+                
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
@@ -103,6 +109,11 @@
                     position:'middle',
                     duration: 2000
                 });
+                setTimeout(()=>{
+                    this.$router.push({
+                        name: 'login'
+                    });
+                },2000)
             },
             back(){
                 this.$router.back()
@@ -131,6 +142,11 @@
                         position:'middle',
                         duration: 2000
                     });
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login'
+                        });
+                    },2000)
                     return;
                 }
                 let {data:res} = await getAddCartData({userCode:this.userCode,goodsId:this.goods.goodsId,shopId:this.goods.shopId,goodsCount:this.goodsQuantity});
@@ -146,15 +162,20 @@
             //立即购买
             async nowBuy(){
                 if(!this.userCode){
-                this.$toast({
-                    message: '请登陆',
-                    position: 'middle',
-                    duration: 2000
-                });
-                return;
+                    this.$toast({
+                        message: '请登陆',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login'
+                        });
+                    },2000)
+                    return;
                 }
                 let {data:res} = await getNowBuyData({goodsId: this.$route.params.goodsId,userCode: this.userCode,goodsCount:this.goodsQuantity});
-               
+            
                 if(res.flag == 'success'){
                     let goods =  JSON.stringify(res.data)
                     sessionStorage.setItem('goods',goods)
@@ -180,6 +201,11 @@
                         position: 'middle',
                         duration: 2000
                     });
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login'
+                        });
+                    },2000)
                     return;
                  }
                  this.$router.push({
@@ -195,6 +221,11 @@
                         position: 'middle',
                         duration: 2000
                     });
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login'
+                        });
+                    },2000)
                     return;
                  }
                 this.$router.push({
@@ -206,6 +237,19 @@
             },
             //去收藏
             async goCollect(){
+                if(!this.userCode){
+                    this.$toast({
+                        message: '请登录',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login'
+                        });
+                    },2000)
+                    return;
+                 }
                 let {data:res} = await getCollectData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
                 this.$toast({
                     message: res.info,

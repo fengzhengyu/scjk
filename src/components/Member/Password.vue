@@ -2,7 +2,7 @@
     <transition name="slide">
         <div class="password">
             <mt-header title="修改密码">
-                <span to="" slot="left" @click="$router.back()">
+                <span to="" slot="left" @click="$router.go(-1)">
                     <mt-button icon="">
                         <i class="iconfont icon-fanhui"></i>
                     </mt-button>

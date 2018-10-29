@@ -276,23 +276,24 @@
                 
             },
             goBack(){
-                let id = this.$route.query.id
-                if(id ==   1){
-                     this.$router.push({
-                        name: 'cart',
-                     })
-                }else{
+                // let id = this.$route.query.id
+                // if(id ==   1){
+                //      this.$router.push({
+                //         name: 'cart',
+                //      })
+                // }else{
 
-                    let goods = sessionStorage.getItem('goods');
-                    let id =  JSON.parse(goods)[0].shopList[0].goodsId;
-                    this.$router.push({
-                        name: 'id',
-                        params: {
-                            goodsId: id
-                        }
-                     })
+                //     let goods = sessionStorage.getItem('goods');
+                //     let id =  JSON.parse(goods)[0].shopList[0].goodsId;
+                //     this.$router.push({
+                //         name: 'id',
+                //         params: {
+                //             goodsId: id
+                //         }
+                //      })
                    
-                }
+                // }
+                      this.$router.go(-1)
             }
         },
         

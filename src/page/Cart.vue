@@ -2,11 +2,11 @@
     <div class="cart-home">
         
         <mt-header  title="购物车" fixed>
-            <router-link to="/" slot="left">
+            <span slot="left" @click="$router.go(-1)">
                 <mt-button icon="">
                     <i class="iconfont icon-fanhui"></i>
                 </mt-button>
-            </router-link>
+            </span>
             <mt-button icon="" slot="right" v-show="userCode" @click="deleteFlag = !deleteFlag">{{deleteFlag == true?'完成':'编辑'}}</mt-button>
         </mt-header>
 

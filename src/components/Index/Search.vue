@@ -7,7 +7,7 @@
             <div class="search">
                 <i class="iconfont icon-sousuo icon" @click="goSearch"></i>
                     <form action="javascript:void(0)">
-                        <input type="search" placeholder="搜索商品" v-model="keyword"  @keyup.enter="goSearch">
+                        <input type="search" placeholder="搜索商品" v-model="keyword"  @keyup.enter="goSearch" v-focus>
                     </form>
                 
             </div>
@@ -81,6 +81,7 @@ export default {
             if(this.keyword == ''){
                 return;
             }
+
              this.$http.post('Goods/index',{page:this.page,keyWord:this.keyword},{
                     transformRequest:[function(data){
                         let params = '';

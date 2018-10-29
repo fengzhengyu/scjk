@@ -7,7 +7,7 @@
             </div>
             <div class="nickname">
                 <p class="name">{{userName}}</p>
-                <p class="icon">聚康会员</p>
+                <p class="icon">聚康{{userLevelName}}</p>
             </div>
         </div>
         <div class="order-nav">
@@ -74,7 +74,8 @@
                 photoImg: '', //头像
                 phone: '', //手机号
                 userName: '您未登录', //与户名
-                popupVisible: false 
+                popupVisible: false ,
+                userLevelName: '会员'
             }
         },
         created(){
@@ -87,12 +88,14 @@
         },
         methods: {
             async getUserMessage(){
-                let {data:res} = await getMemberData({userCode:this.userCode})
+                let {data:res} = await getMemberData({userCode:this.userCode});
+                
                 if(res.flag == 'success'){
                     let data = res.data.userList;
                     this.photoImg = data.headPhoto;
                     this.phone =data.phoneOne;
                     this.userName = data.userName;
+                    this.userLevelName = data.userLevelName;
                 }
                
             },
@@ -244,7 +247,7 @@
                     color #ffffff
                 .icon
                     margin .1rem 0
-                    width 1rem
+                    padding 0 .1rem
                     height .3rem
                     background #ffffff
                     line-height .35rem

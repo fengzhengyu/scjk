@@ -3,10 +3,7 @@
    <div class="address-page">
 
       <mt-header title="选择地址">
-          <span to="" slot="left" @click="$router.push({
-              name: 'order',
-               query: {id: $route.query.id}
-          })">
+          <span to="" slot="left" @click="$router.go(-1)">
               <mt-button icon="">
                   <i class="iconfont icon-fanhui"></i>
               </mt-button>

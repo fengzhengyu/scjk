@@ -2,7 +2,7 @@
     <transition name="slide">
         <div class="collect">
             <mt-header title="我的收藏" fixed>
-                <span to="" slot="left" @click="$router.back()">
+                <span to="" slot="left" @click="$router.go(-1)">
                     <mt-button icon="">
                         <i class="iconfont icon-fanhui"></i>
                     </mt-button>

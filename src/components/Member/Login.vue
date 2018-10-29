@@ -1,7 +1,7 @@
 <template>
     <div class="login">
         <div class="header">
-            <i class="iconfont icon-guanbi-copy" @click="$router.back()"></i>
+            <i class="iconfont icon-guanbi-copy" @click="$router.go(-1)"></i>
         </div>
         <div class="login-wrap">
             <p>
@@ -15,9 +15,9 @@
             <p class="btn-wrap">
                 <span  @click="goLogin">登 录</span>
             </p>
-            <p class="btn-wrap"> 
+            <!-- <p class="btn-wrap"> 
                 <span class="btn " @click="signIn">注册新账号</span>
-            </p>
+            </p> -->
         </div>
     </div>
 </template>
@@ -39,7 +39,7 @@
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,passWord:this.userPass});     
-             
+                    
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode
                         this.setCookie('userCode',userCode,1);
@@ -48,16 +48,17 @@
                             position: 'middle',
                             duration: 2000
                         });
-
                         setTimeout(()=>{
                             if(this.routerName){
-                                this.$router.push({
-                                    name: this.routerName
-                                });
-                            } if(this.routerName == 'null'){
                                 this.$router.go(-1)
+                               
+                            } 
+                            if(this.routerName == 'null'){
+                               this.$router.push({
+                                    name: 'member'
+                                });
                             }
-                            sessionStorage.setItem('routerName',null)
+                            // sessionStorage.setItem('routerName',null)
                             
                         },2000)
                     }else{
