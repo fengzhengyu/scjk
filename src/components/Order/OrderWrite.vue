@@ -61,8 +61,16 @@
             
             </div>
         </div>
+        <div class="invoice-wrap">
+            <h3 class="name">发票信息</h3>
+            <!-- invoiceFlag = !invoiceFlag -->
+            <div class="desc" @click=" goInvoice">  
+                <span class="red">纸质</span>(商品明细--{{invoiceType}}) 
+                <span class="go">〉</span>
+            </div>
+        </div>   
         <div class="tabs-btn">
-            <h3>配送</h3> 
+            <h3>配送方式</h3> 
             <div>
                 <span class="btn" @click="active ='快递运输'">
                     <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':active=='快递运输'}"></i>
@@ -72,18 +80,38 @@
                     <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':active== '上门自提'}"></i>
                     上门自提
                 </span>
-            </div>
-            
-            
+            </div>            
         </div>
-        <div class="invoice-wrap">
-            <h3 class="name">发票</h3>
-            <!-- invoiceFlag = !invoiceFlag -->
-            <div class="desc" @click=" goInvoice">  
-                <span class="red">纸质</span>(商品明细--{{invoiceType}}) 
-                <span class="go">〉</span>
+       
+        <div class="tabs-btn">
+            <h3>支付方式</h3> 
+            <div>
+                <span class="btn" >
+                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong': payType =='微信支付'}"></i>
+                    微信支付
+                </span>
+                <span class="btn"  @click=" payType = '线下汇款'">
+                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong': payType == '线下汇款'}"></i>
+                    线下汇款
+                </span>
             </div>
+        
         </div>
+        <dir v-show="payType == '线下汇款'" class="offline-pay">
+            <!-- <p class="tips-title">通过网银在线转账，或者自行到银行进行汇款，汇款账号如下：</p> -->
+            <ul class="bank-info">
+                <li>开户名称：四川聚康商贸有限公司</li>
+                <li>开户银行：长城华西银行股份有限公司广汉支行</li>
+                <li>汇款账号：1107 1600 0000 0459</li>
+                <li>联系电话：<a href="tel:13658050467">13658050467</a></li>
+            </ul>
+            <div class="tips-content">
+                <p> 温馨提示：</p>
+                <p>1、<span>受银行处理时间影响，采用外汇或者线下汇款方式到账会有延误。</span></p>
+                <p>2、<span>线下汇款到账时间一般为：1-5天（具体到账时间以银行的实际到账时间为准）。</span></p>
+                <p>3、<span>请避免北京时间21：00-00：00进行汇款，否则受银行出账时间影响，可能出现延迟一天到账情况。</span></p>
+            </div>
+        </dir>
         <div class="footer-fiexd">
             <div class="total-wrap">
                 <div class="total">合计:￥{{totalMoney}}</div>
@@ -117,7 +145,8 @@
                 addressFlag: false,
                 addressData: {},
              
-                active: '快递运输'
+                active: '快递运输',
+                payType: '线下汇款'
               
             }
         },
@@ -198,7 +227,8 @@
                         goodsId:goodsStr,
                         shopId:shopStr,
                         goodsPriceTotal:this.totalMoney,
-                        goodsCount:this.count
+                        goodsCount:this.count,
+                        payType: this.payType
                     }
 
                 }else{
@@ -212,6 +242,7 @@
                         orderId:orderStr,
                         shopId:shopStr,
                         goodsPriceTotal:this.totalMoney,
+                        payType: this.payType
                     }
 
                 }
@@ -396,7 +427,40 @@
                         color #a2a2a2
                         &.icon-xuanzhong
                             color #cc3e2e        
-                   
+        .offline-pay
+            padding 0
+            font-size .22rem
+            margin-bottom 1rem
+            .tips-title
+                // font-size .2rem
+                color #666666
+            .bank-info
+
+                padding  0  .2rem  
+                li  
+                    color #000000;
+                    font-size .24rem
+                    font-weight: bold
+                    line-height 180%
+                    a   
+                        color #000000;
+                        text-decoration underline
+            .tips-content
+               
+                color #666666
+                padding 0.2rem
+                background #f9f9f9
+                line-height 130%
+                color: #545454
+                border 1px solid #efefef
+              
+                p   
+                    padding-bottom .08rem
+                    span    
+                        width 93%
+                        display inline-block
+                        vertical-align top
+
         .goods-wrap            
             .cart-wrap
                 .shop
@@ -467,7 +531,6 @@
             height .5rem
             line-height .5rem
             font-size .2rem
-            padding-bottom .8rem
             margin .2rem 0
             .name{
                 float left
@@ -489,7 +552,7 @@
             width 6.4rem
             height .8rem
             line-height  .8rem
-            background #f5f5f5
+            background #fff
             overflow hidden
             .total-wrap
                 float right 

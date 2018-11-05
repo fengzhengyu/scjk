@@ -13,7 +13,7 @@
                 <input type="password"  placeholder="请输入登录密码" v-model="userPass">
             </p>
             <p class="btn-wrap">
-                <span  @click="goLogin">登 录</span>
+                <span  @click="goLogin" @keyup.enter="goLogin">登 录</span>
             </p>
             <!-- <p class="btn-wrap"> 
                 <span class="btn " @click="signIn">注册新账号</span>

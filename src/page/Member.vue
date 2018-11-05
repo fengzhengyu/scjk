@@ -44,6 +44,9 @@
         <p class="client">
             客服电话：<a href="tel:13658050467">13658050467</a> 王
         </p>
+
+        <a href="https://m.kuaidi100.com/" target="_blank" class="expressage">快递查询</a>
+
         <mt-popup
             v-model="popupVisible"
             popup-transition="popup-fade" position="bottom">
@@ -321,4 +324,8 @@
                 .info
                     font-size: 20/@rem;
                     color: red;
+        .expressage
+            margin  .2rem 0
+            color #fff;
+
 </style>
