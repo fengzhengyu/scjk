@@ -46,8 +46,8 @@
         保存并使用
       </div>
       <!-- <div class="picker-wrap" > -->
-        <mt-popup position="bottom" v-model="popupVisible" class="region-popup">
-           <mt-picker :slots="myAddressSlots" @change="onMyAddressChange" value-key="name"  :showToolbar="true" ref="addressSlot">
+        <mt-popup position="bottom" v-model="popupVisible">
+           <mt-picker :slots="myAddressSlots" @change="onMyAddressChange" value-key="name" style="width: 6.4rem;"   :showToolbar="true" ref="addressSlot">
             
 
               <mt-button  class="sure" style="float:left;" @click="changenAddressCancel">取消</mt-button>
@@ -445,8 +445,7 @@
             background #e4393c
             color #fff
 
-        .region-popup
-          width 100%
+        
 
 </style>
 

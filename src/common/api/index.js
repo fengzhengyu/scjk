@@ -26,6 +26,17 @@ export  let getLoginData = (data) => {
   })
 }
 // 注册接口
+export let getRegisterData = (data) =>{
+  return axios.post('Register/register',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
 
 // 验证码接口
 

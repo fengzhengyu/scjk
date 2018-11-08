@@ -13,7 +13,7 @@ import GoodsDetail from 'components/Goods/GoodsDetail'
 import OrderWrite from 'components/Order/OrderWrite'
 import OrderDetail from 'components/Order/OrderDetail'
 import Login from 'components/Member/Login'
-// import Register from 'components/Member/Register'
+import Register from 'components/Member/Register'
 import Search from 'components/Index/Search'
 import  NotFoundComponent from 'page/NotFoundComponent'
 
@@ -97,11 +97,11 @@ export default new Router({
       name: 'login',
       component: Login
     },
-    // {
-    //   path: '/register',
-    //   name: 'register',
-    //   component: Register
-    // },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
+    },
     {
       path: '/search',
       name: 'search',

@@ -282,7 +282,7 @@
     .mint-header
         width 6.4rem
         margin 0 auto
-        background #ffffff;
+        background #ffffff
         color #000
         font-size 18px
         .mint-header-button 

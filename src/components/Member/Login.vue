@@ -15,9 +15,9 @@
             <p class="btn-wrap">
                 <span  @click="goLogin" @keyup.enter="goLogin">登 录</span>
             </p>
-            <!-- <p class="btn-wrap"> 
+            <p class="btn-wrap"> 
                 <span class="btn " @click="signIn">注册新账号</span>
-            </p> -->
+            </p>
            
         </div>
         <div class="text-wrap"> 
@@ -27,6 +27,7 @@
             
 
         </div>
+    
     </div>
 </template>
 <script>
@@ -57,15 +58,14 @@
                             duration: 2000
                         });
                         setTimeout(()=>{
-                            if(this.routerName){
-                                this.$router.go(-1)
-                               
-                            } 
-                            if(this.routerName == 'null'){
-                               this.$router.push({
+                            if(this.routerName == 'register' || this.routerName == 'null'){
+                                 this.$router.push({
                                     name: 'member'
                                 });
+                            }else {
+                                 this.$router.go(-1)
                             }
+                           
                             // sessionStorage.setItem('routerName',null)
                             
                         },2000)
@@ -116,6 +116,7 @@
         .login-wrap
             background #fff
             padding 0 .5rem
+           
             p 
                 margin .3rem 0
              
@@ -129,7 +130,7 @@
                    
                 input 
                     height 100%
-                    width 4.65rem    
+                    width 4.5rem    
                     outline none
                     background #e6e6e6
                     font-size .24rem
