@@ -57,7 +57,6 @@
      methods: {
             async getCartList(){
                 let {data:res} = await getCartData({userCode:this.userCode});
-              
                 this.$indicator.close();
                  this.isLoad = true
                 if(res.flag == 'success'){

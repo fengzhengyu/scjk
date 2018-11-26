@@ -175,7 +175,6 @@
                     return;
                 }
                 let {data:res} = await getNowBuyData({goodsId: this.$route.params.goodsId,userCode: this.userCode,goodsCount:this.goodsQuantity});
-            
                 if(res.flag == 'success'){
                     let goods =  JSON.stringify(res.data)
                     sessionStorage.setItem('goods',goods)

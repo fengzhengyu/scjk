@@ -84,7 +84,8 @@
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode')
+            this.userCode = this.getCookie('userCode');
+             
             if(this.userCode){
                 this.isLogin =true
                 this.getUserMessage()
@@ -94,7 +95,6 @@
         methods: {
             async getUserMessage(){
                 let {data:res} = await getMemberData({userCode:this.userCode});
-                
                 if(res.flag == 'success'){
                     let data = res.data.userList;
                     this.photoImg = data.headPhoto;

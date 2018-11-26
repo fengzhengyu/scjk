@@ -53,7 +53,7 @@
                                    x{{goods.goodsCount}}
                                 </span>
                             </p>
-                            <p class="price">采购价：￥{{goods.goodsPrice}} </p>
+                            <p class="price">{{userLevel == 5?"零售价":"采购价"}}：￥{{goods.goodsPrice}} </p>
                             
                         </div>
                     </div>
@@ -133,6 +133,7 @@
         data(){
             return {
                 userCode: '',
+                userLevel: '',
                 goodsList: [],
                 goodsIdArr: [],
                 orderIdArr:[],
@@ -151,10 +152,11 @@
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode')
+            this.userCode = this.getCookie('userCode');
+            this.userLevel = this.getCookie('userLevel');
             let goodsStr = sessionStorage.getItem('goods');
-            this.goodsList = JSON.parse(goodsStr)
-            this.getAddressData()
+            this.goodsList = JSON.parse(goodsStr);
+            this.getAddressData();
 
         },
         computed: {

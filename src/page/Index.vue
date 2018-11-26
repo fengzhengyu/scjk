@@ -63,6 +63,7 @@
                 // 以上写法一般，想要you逼格，用语法糖
 
                 let {data:res} = await getIndexData({page:this.page,userCode:this.userCode})  
+                 
                 if(flag){
                     this.goodsList = res.goodsList;
                     if(res.info == '已到底部'){

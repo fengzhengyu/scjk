@@ -58,7 +58,7 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 text: 'Loading...',
                 spinnerType: 'fading-circle'
             })
-            this.getGoodsTypeList();
+            this.getGoodsTypeList('recommend');
            
         },
        
@@ -86,8 +86,8 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
             },
             async getGoodsTypeList(value){
                 this.page =1;
+               
                 let {data:res} = await getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page});
-
                 if(res.flag == 'success'){
 
                     this.goodsList = res.typeGoodsList;

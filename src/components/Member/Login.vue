@@ -48,10 +48,13 @@
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,passWord:this.userPass});     
-                    
+                   
                     if(res.message.flag == 'success'){
-                        let userCode = res.message.userCode
+                        let userCode = res.message.userCode;
+                        let userLevel = res.message.userLevel;
                         this.setCookie('userCode',userCode,1);
+                        this.setCookie('userLevel',userLevel,1);
+            
                         this.$toast({
                             message: res.message.info,
                             position: 'middle',

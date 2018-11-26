@@ -30,7 +30,7 @@
                                <a href="javascript:;" @click=" cheangeQuantity(goods,0)">-</a><input type="text" disabled  v-model="goods.goodsCount"><a href="javascript:;"  @click=" cheangeQuantity(goods,1)">+</a>
                            </span>
                         </p>
-                        <p class="price">采购价：￥{{goods.goodsPrice}} <span class="store">库存：{{goods.goodsInventory}}</span></p>
+                        <p class="price">{{userLevel == 5? "零售价": "采购价"}}：￥{{goods.goodsPrice}} <span class="store">库存：{{goods.goodsInventory}}</span></p>
                         
                     </div>
                 </div>
@@ -76,6 +76,7 @@
         },
         data() {
             return {
+               userLevel: '', 
                checkAllFlag: false,
                orderArr: [],
                orderStr: '',
@@ -83,8 +84,7 @@
             }
         },
         created(){
-          
-           
+          this.userLevel = this.getCookie('userLevel');
         },
         watch: {
            
