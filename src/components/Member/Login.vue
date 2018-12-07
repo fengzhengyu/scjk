@@ -52,8 +52,8 @@
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode;
                         let userLevel = res.message.userLevel;
-                        this.setCookie('userCode',userCode,1);
-                        this.setCookie('userLevel',userLevel,1);
+                        this.setCookie('userCode',userCode,30);
+                        this.setCookie('userLevel',userLevel,30);
             
                         this.$toast({
                             message: res.message.info,
@@ -63,7 +63,7 @@
                         setTimeout(()=>{
                             if(this.routerName == 'register' || this.routerName == 'null'){
                                  this.$router.push({
-                                    name: 'member'
+                                    name: 'index'
                                 });
                             }else {
                                  this.$router.go(-1)

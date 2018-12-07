@@ -35,6 +35,12 @@
             手机号
            <span class="phone">{{phone}}</span>
         </div>
+         <div class="menu-list" @click="goPopularize">
+            我要推广
+           <span class="right">
+                <i class="iconfont icon-qianjin1"></i>
+            </span>
+        </div>
         <div class="exit" @click="exit" v-show="isLogin">
             退出
         </div>
@@ -87,10 +93,10 @@
             this.userCode = this.getCookie('userCode');
              
             if(this.userCode){
-                this.isLogin =true
+                this.isLogin =true;
                 this.getUserMessage()
             }
-           
+            
         },
         methods: {
             async getUserMessage(){
@@ -144,6 +150,19 @@
                     });
                 }
                 
+            },
+            goPopularize(){
+                if(this.userCode){
+                    this.$router.push({
+                        name: 'popularize'
+                    })
+                }else{
+                     this.$toast({
+                        message: '请先登录！',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                }
             },
             hanldePhoto(){
                  if(this.userCode){

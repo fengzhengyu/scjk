@@ -6,7 +6,6 @@
 import axios from 'axios';
 
 axios.defaults.baseURL= 'http://www.scjksm.com/scjkSvn/Home/'
-
 // 拦截器 同归返回数据
 // axios.interceptors.response.use((res)=>{
 //   return res.data;
@@ -354,4 +353,21 @@ export let delOrderData = (data) => {
       return params
     }]
   })
+}
+
+// 微信分享接口
+export let getShareData = (data) => {
+  return axios.post('Weixin/getsignature',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+        
+         params += encodeURIComponent(key) +'='+ encodeURIComponent(data[key])+'&';
+        //  防止url &会拆分多个对象
+      }
+      return params
+    }]
+  });
+  /*
+  post*/ 
 }

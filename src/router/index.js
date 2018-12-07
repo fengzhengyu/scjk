@@ -16,6 +16,7 @@ import Login from 'components/Member/Login'
 import Register from 'components/Member/Register'
 import Search from 'components/Index/Search'
 import  NotFoundComponent from 'page/NotFoundComponent'
+import Popularize from 'components/Member/Popularize'
 
 Vue.use(Router)
 
@@ -67,6 +68,7 @@ export default new Router({
             },
           ]
         }
+        
       ]
     },
     {
@@ -106,6 +108,11 @@ export default new Router({
       path: '/search',
       name: 'search',
       component: Search
+    },
+    {
+      path: '/popularize',
+      name: 'popularize',
+      component: Popularize
     },
     { path: '*', component: NotFoundComponent }
   ]
