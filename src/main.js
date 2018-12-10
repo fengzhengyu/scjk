@@ -7,8 +7,15 @@ import VueLazyload from 'vue-lazyload'
 import wx from 'weixin-js-sdk'
 import 'common/js/base'
 import 'common/stylus/index.styl'
+
+
+// 300ms 点击事件延迟
+import fastClick  from 'fastclick'
+fastClick.attach(document.body)
+
 Vue.config.productionTip = false
 
+// 图片懒加载
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: require('./common/img/default.jpg'),
@@ -25,11 +32,11 @@ Vue.use(Mint)
 
 
 //引 axios
-import  Axios from 'axios';
-Vue.prototype.$http = Axios;
-//设置默认URL请求基础路径
-Axios.defaults.baseURL = 'http://www.scjksm.com/scjkSvn/Home/';
-Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// import  Axios from 'axios';
+// Vue.prototype.$http = Axios;
+// //设置默认URL请求基础路径
+// Axios.defaults.baseURL = 'http://www.scjksm.com/scjkSvn/Home/';
+// Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 /* eslint-disable no-new */
 
@@ -74,6 +81,8 @@ Vue.directive('focus', {
     el.focus()
   },
 })  
+
+
 
 import {getShareData} from 'common/api'
 // 微信分享
@@ -149,8 +158,6 @@ router.afterEach((to, from) => {
 
   // 
   
-
-  // 
   let isRefresh =  sessionStorage.getItem('Refresh')
   if(to.name== 'cart' && from.name == 'index') { 
    

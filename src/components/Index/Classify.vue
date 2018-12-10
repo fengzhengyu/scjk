@@ -38,52 +38,59 @@
     }
 </script>
 <style lang="stylus" scoped>
+    @import "~common/stylus/variable.styl"
 .classify 
     width 100%
-    background #fff
     .classify-wrap 
         overflow hidden
-        padding-bottom .15rem
+        padding-bottom .35rem
         .item 
             float left
-            width 25%
-            margin-top .15rem
+            width 20%
+            margin-top .25rem
             span
                 display block
                 width 100%
                 text-align center
                 .box
-                    width 1rem
-                    height 1rem
+                    width .76rem
+                    height .76rem
                     display inline-block
                     &.img1
-                        background url('./1.png') no-repeat
+                        background url('./classify.png') no-repeat
                         background-size 100% 100%
                     &.img2
-                        background url('./2.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
                     &.img3
-                        background url('./3.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
                     &.img4
-                        background url('./4.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
                     &.img5
-                        background url('./5.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
                     &.img6
-                        background url('./6.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
                     &.img7
-                        background url('./7.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
                     &.img8
-                        background url('./8.png') no-repeat
+                        background url('./classify.png') no-repeat
+                        background-size 100% 100%
                         background-size 100% 100%
             .text
-                padding-top 0.15rem
-                font-size .22rem
-                color #7d7d7d
+                padding-top 0.1rem
+                font-size $font-highlight
+                color $color-highlight
 
             
         

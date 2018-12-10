@@ -1,6 +1,7 @@
 <template>
     <div class="index">
          <Header></Header>
+         <Swiper :sliders = "sliders"></Swiper>
          <Classify :goodsTypeList="goodsTypeList"></Classify>   
           <!-- <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad"> -->
             <GoodsList :goodsList="goodsList" 
@@ -9,7 +10,7 @@
                 v-infinite-scroll="loadMore"
                 infinite-scroll-disabled="loading"
                 infinite-scroll-distance="10"
-                class="goods-list"
+               
                 >
             </GoodsList>
           <!-- </mt-loadmore> -->
@@ -19,13 +20,15 @@
 <script>
     import { getIndexData } from 'common/api'
     import Header from 'components/Index/Header'
+    import Swiper from 'components/Index/Swiper'
     import Classify from 'components/Index/Classify'
     import GoodsList from 'components/Index/GoodsList'
-    import Footer from 'components/common/Footer'
+    import Footer from 'components/common/c-footer'
 
     export default {
         components: {
             Header,
+            Swiper,
             Classify,
             GoodsList,
            
@@ -34,6 +37,7 @@
         data(){
             return {
                 goodsTypeList:[],
+                sliders: [],
                 goodsList: [],
                 loading: true,
                 page: 1,
@@ -63,8 +67,9 @@
                 // 以上写法一般，想要you逼格，用语法糖
 
                 let {data:res} = await getIndexData({page:this.page,userCode:this.userCode})  
-                 
+              
                 if(flag){
+                   
                     this.goodsList = res.goodsList;
                     if(res.info == '已到底部'){
                         this.loading = true;
@@ -80,7 +85,7 @@
                 }else{
                     this.goodsTypeList = res.goodsTypeList
                     this.goodsList = res.goodsList;
-                    
+                    this.sliders = res.carouselList.length>0? res.carouselList: [require('../components/Index/banner.png')]; 
                     this.isLoad = true;
                     this.loading = false;
                     this.$indicator.close();
@@ -107,9 +112,6 @@
     
 </script>
 <style lang="stylus" scoped>
-    .index 
-       background #fff
-       .goods-list
-            padding-bottom 55px;     
+
 </style>
 

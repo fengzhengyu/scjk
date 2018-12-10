@@ -217,6 +217,7 @@
             exit(){
               
                 this.delCookie ('userCode');
+                 this.delCookie ('userLevel');
                 // sessionStorage.clear();
                 this.isLogin = false;
                 this.$router.push({
