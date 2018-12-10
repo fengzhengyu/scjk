@@ -46,6 +46,7 @@
         background #fff
         width 6.4rem
         display flex
+        left 0
         .item
             flex 1
             text-align center

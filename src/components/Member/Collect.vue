@@ -2,15 +2,20 @@
     <transition name="slide">
         <div class="collect">
             <mt-header title="我的收藏" fixed>
-                <span to="" slot="left" @click="$router.back()">
+                <span to="" slot="left" @click="$router.go(-1)">
                     <mt-button icon="">
                         <i class="iconfont icon-fanhui"></i>
                     </mt-button>
                     
                 </span>   
-                <mt-button icon="" slot="right" @click="edit">{{isShow==true?'完成':'编辑'}}</mt-button>     
+                <mt-button icon="" slot="right" v-show="collectList.length>0" @click="edit">{{isShow==true?'完成':'编辑'}}</mt-button>     
             </mt-header>
-            <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
+            <div 
+                v-if="isLoad"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="loading"
+                infinite-scroll-distance="10"
+            >
                 <div class="collect-goods" >
                     <div class="group" :class="{'active': isShow}" v-for="(item,index) in collectList" :key="index">
                         <div class="group-check" >
@@ -18,7 +23,7 @@
                         </div>
                         <div class="group-detail" >
                             <div class="item-img" >
-                                <img v-lazy="item.goodsPhoto" alt="图片已丢失">
+                                <img v-lazy="item.goodsPhoto" :key="item.goodsPhoto">
                             </div>
                             <div class="item-info" @click="goDetail(item)">
                             
@@ -30,12 +35,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collect-empty" v-show="collectList.length<=0">
+                    <div class="collect-empty" v-if="collectList.length<=0 && isLoad">
                         您还没有收藏商品！
+                    </div>
+                    <div v-else>
+                        <div class="ladding" v-if="!loading">
+                            <img src="../../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
+                        </div>
+                        <div class="ladding" v-else>
+                            您已经到底了
+                        </div>
                     </div>
                     
                 </div>
-            </mt-loadmore>
+
+            </div>
             
             <div class="footer-fiexd" v-show="isShow">
                 <div class="all-check" @click="checkAllFlag?checkAll(false):checkAll(true)">
@@ -52,6 +66,7 @@
     
 </template>
 <script>
+    import { getMemberCollect, delMemberCollect } from 'common/api'
     export default {
         data(){
             return {
@@ -61,75 +76,61 @@
                 checkAllFlag: false,
                 goodsArr: [],
                 page: 1,
-                isAutoFill:false,//是否自动检测，并调用loadBottom
-                allLoaded:false,//数据是否全部加载完毕，如果是，禁止函数调用
+                isLoad: false,
+                end:false,//到底
+                loading:true,//默认禁止函数调用
             }
         },
         created(){
             this.userCode = this.getCookie('userCode');
-            if(this.userCode){
-                this.getCollectData();
+            if(this.userCode){         
+            
+                this.getCollectData();              
             }
            
 
         },
         methods: {
             //取数据
-            getCollectData(){
-                 this.$http.post('Collect/index',{userCode: this.userCode,page:this.page},{
-                        transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response => {
-                    let res = response.data;
-                  
+            async getCollectData(flag){
+                    let {data:res} = await getMemberCollect({userCode: this.userCode,page:this.page});
+                    
                     if(res.data){
-                        this.collectList = res.data
-                        this.page++
-                    }else{
-                        this.collectList = []
+                        if(flag){
+                            if(res.msg== '已到底部'){
+                               this.loading = true;
+                               this.end = true;
+                            
+                                // this.$toast({
+                                    
+                                //     message: '没有更多数据了',
+                                //     position:'middle',
+                                //     duration: 2000
+                                // });
+                            }else{
+                                this.loading = false;
+                            }
 
+                        }else{
+                            this.collectList = res.data;
+                            this.isLoad =true ;    
+                            this.loading = false;
+                        }
+
+                       
+                      
                     }
-                     
-                }).catch(err=>{
-                    console.log(err);
-
-                })
+                 
             },
               //上拉刷新
-            loadBottom(){
-                this.$http.post('Collect/index',{userCode: this.userCode,page:this.page},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then((response) => {
-                    let res = response.data;
-                    // console.log(res)
-                  
-                    this.collectList =res.data;
-                    this.page ++;
-                    this.$refs.loadmore.onBottomLoaded();
-                    if(res.msg== '已到底部'){
-                        this.allLoaded = true;
-                        this.$toast({
-                            
-                            message: '没有更多数据了',
-                            position:'middle',
-                            duration: 2000
-                        });
-                    }
-                    
-                })
-                .catch(err=>console.log(err));
+            loadMore(){
+                this.loading = true;
+                setTimeout(()=>{
+                      this.page++;
+                       this.getCollectData(true);            
+                },300)
             },
+           
             //单选
             selectedProduct(item){
                 if(typeof item.checked == 'undefined'){
@@ -161,7 +162,7 @@
                  this.isShow = !this.isShow;
             },
             //删除
-            deleteCollect(){
+            deleteCollect(){;
                 this.goodsArr = []
                 this.collectList.forEach((item,index)=>{
                     if(item.checked){
@@ -169,41 +170,31 @@
                     } 
                 })
                 let str = this.goodsArr.join(',');
-               
                 if(this.goodsArr.length>0){
                     
                     this.$messagebox.confirm('确定执行此操作?').then(action => { 
-                        this.$http.post('Collect/delCollect',{userCode: this.userCode,collectId:str},{
-                            transformRequest:[function(data){
-                                let params = '';
-                                for(let key in data){
-                                    params += key +'='+data[key]+'&'
-                                }
-                                return params
-                            }]
-                        }).then(response => {
-                            let res = response.data;
-                                
-                        
+                        delMemberCollect({userCode: this.userCode,collectId:str}).then(response=>{
+                            let res = response.data; 
+                                       
                             if(res.flag == 'success'){
                                this.$toast({
                                     message: res.info,
                                     position:'middle',
                                     duration: 2000
                                 });
-                                setTimeout(()=>{
-                                     this.getCollectData();
-                                },2000)
+                              
+                                this.getCollectData();
                             }else{
                                 this.$toast({
                                     message: res.info,
                                     position:'middle',
                                     duration: 1000
                                 });
-
                             }
-                            
-                        }).catch(err=>{console.log(err);})
+                        },(err)=>{
+                            console.log(err)
+                        })
+                       
                     }).catch(err=>{})
                 }else{
                     this.$toast({
@@ -239,7 +230,7 @@
         top 0
         bottom 0
         width 6.4rem
-        margin 0 auto
+        // margin 0 auto
         background #fff
         overflow-y auto
         z-index 999
@@ -327,7 +318,15 @@
         font-weight bold
         color #222
 
-
+    .ladding
+        text-align center
+        line-height .6rem
+        height .6rem
+        font-size .24rem
+        margin .15rem 0
+        img 
+            display inline-block
+            vertical-align middle
     .footer-fiexd
         position fixed
         bottom 0

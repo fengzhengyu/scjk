@@ -7,7 +7,7 @@
             </div>
             <div class="nickname">
                 <p class="name">{{userName}}</p>
-                <p class="icon">聚康会员</p>
+                <p class="icon">聚康{{userLevelName}}</p>
             </div>
         </div>
         <div class="order-nav">
@@ -27,11 +27,19 @@
         </div>
         <div class="menu-list" @click="goPassword">
             设置登录密码
-            <span class="right">></span>
+            <span class="right">
+                <i class="iconfont icon-qianjin1"></i>
+            </span>
         </div>
         <div class="menu-list">
             手机号
            <span class="phone">{{phone}}</span>
+        </div>
+         <div class="menu-list" @click="goPopularize">
+            我要推广
+           <span class="right">
+                <i class="iconfont icon-qianjin1"></i>
+            </span>
         </div>
         <div class="exit" @click="exit" v-show="isLogin">
             退出
@@ -40,8 +48,11 @@
             登录
         </div>
         <p class="client">
-            客服电话：<span>13658050467</span> 王
+            客服电话：<a href="tel:13658050467">13658050467</a> 王
         </p>
+
+        <a href="https://m.kuaidi100.com/" target="_blank" class="expressage">快递查询</a>
+
         <mt-popup
             v-model="popupVisible"
             popup-transition="popup-fade" position="bottom">
@@ -65,45 +76,39 @@
     </div>
 </template>
 <script>
+    import { getMemberData, getLoadPhotoData } from 'common/api'
     import Footer from 'components/common/Footer.vue'
     export default {
         data(){
             return {
                 isLogin: false,
-                photoImg: '',
-                phone: '',
-                userName: '您未登录',
-                popupVisible: false 
+                photoImg: '', //头像
+                phone: '', //手机号
+                userName: '您未登录', //与户名
+                popupVisible: false ,
+                userLevelName: '会员'
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode')
+            this.userCode = this.getCookie('userCode');
+             
             if(this.userCode){
-                this.isLogin =true
+                this.isLogin =true;
                 this.getUserMessage()
             }
-           
+            
         },
         methods: {
-            getUserMessage(){
-                this.$http.post('User/index',{userCode:this.userCode},{
-                     transformRequest:[function(data){
-                            let params = '';
-                            for(let key in data){
-                                params += key +'='+data[key]+'&'
-                            }
-                            return params
-                        }]
-                }).then(response=>{
-                    let res= response.data;
-                    //console.log(res)
-                    if(res.flag == 'success'){
-                        let data = res.data.userList;
-                        this.photoImg = data.headPhoto;
-                        this.phone =data.phoneOne;
-                        this.userName = data.userName
-                    }
-                })
+            async getUserMessage(){
+                let {data:res} = await getMemberData({userCode:this.userCode});
+                if(res.flag == 'success'){
+                    let data = res.data.userList;
+                    this.photoImg = data.headPhoto;
+                    this.phone =data.phoneOne;
+                    this.userName = data.userName;
+                    this.userLevelName = data.userLevelName;
+                }
+               
             },
             goMyOrder(id){
                 if(this.userCode){
@@ -146,6 +151,19 @@
                 }
                 
             },
+            goPopularize(){
+                if(this.userCode){
+                    this.$router.push({
+                        name: 'popularize'
+                    })
+                }else{
+                     this.$toast({
+                        message: '请先登录！',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                }
+            },
             hanldePhoto(){
                  if(this.userCode){
                     this.popupVisible =true;
@@ -158,7 +176,7 @@
                 }
             },
             //头像改变
-            changePhoto(e){
+            changePhoto(e){;
                 let img1=e.target.files[0];
                 let form = new FormData();
                 if(img1.size>(200*1024)){
@@ -172,34 +190,38 @@
                 }
                 form.append('headPhoto',img1,img1.name);
                 form.append('userCode',this.userCode);
-                this.$http.post('User/saveUser',form,{
-                     headers:{'Content-Type':'multipart/form-data'}
-                }).then(response => {
-                let res = response.data;
-                if(res.flag == 'success'){
-                    let photo = res.returnData;
-                    this.photoImg = photo
-                    this.$toast({
-                        message: '修改成功',
+                getLoadPhotoData(form).then((response)=>{
+                    let res = response.data;
+                    if(res.flag == 'success'){
+                        let photo = res.returnData;
+                        this.photoImg = photo
+                        this.$toast({
+                            message: '修改成功',
+                            position: 'middle',
+                            duration: 2000
+                        });
+                        this.popupVisible =false;
+
+                    }else{
+                        this.$toast({
+                        message: res.info,
                         position: 'middle',
                         duration: 2000
-                    });
-                    this.popupVisible =false;
-
-                }else{
-                    this.$toast({
-                    message: res.info,
-                    position: 'middle',
-                    duration: 2000
-                    });
-                 }
-
-                }).catch(err =>console.log(err));
+                        });
+                    }
+                },(err)=>{
+                    console.log(err)
+                })
+                
             },
             exit(){
-                this.delCookie ('userCode')
-                this.isLogin = false
-                this.$router.go(0)
+              
+                this.delCookie ('userCode');
+                // sessionStorage.clear();
+                this.isLogin = false;
+                this.$router.push({
+                    name: 'login'
+                })
             },
             login(){
                  this.$router.push({
@@ -249,7 +271,7 @@
                     color #ffffff
                 .icon
                     margin .1rem 0
-                    width 1rem
+                    padding 0 .1rem
                     height .3rem
                     background #ffffff
                     line-height .35rem
@@ -277,7 +299,8 @@
             line-height .6rem
             font-size .24rem
             color #000
-            padding-left .15rem
+            // padding-left .15rem
+            padding .15rem 0 .15rem .15rem;
             .right,.phone 
                float right 
                color #a1a1a1
@@ -320,4 +343,8 @@
                 .info
                     font-size: 20/@rem;
                     color: red;
+        .expressage
+            margin  .2rem 0
+            color #fff;
+
 </style>

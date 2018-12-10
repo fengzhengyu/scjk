@@ -17,15 +17,23 @@
                 </div>
             </div>
         </div>
-         <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
-             <shopList :goodsList=" goodsList"></shopList>   
-         </mt-loadmore>
+             <shopList
+                :goodsList=" goodsList" 
+                :loading="end"
+                v-if="isLoad"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="loading"
+                infinite-scroll-distance="10"
+                class="goods-list"
+             ></shopList>   
+       
         
         
     </div>
 </template>
 <script>
-    import shopList from 'components/Shop/ShopList'
+    import {getShopData} from 'common/api'
+    import shopList from 'components/Index/GoodsList'
     export default {
         data(){
             return {
@@ -35,8 +43,9 @@
                 userCode: '',
                 page: 1,
                 value: '',
-                isAutoFill:false,//是否自动检测，并调用loadBottom
-                allLoaded:true,//数据是否全部加载完毕，如果是，禁止函数调用
+                end:true,// 到底了
+                loading:true,// 默认直接加载
+                isLoad: false
                
             }
         },
@@ -51,6 +60,11 @@
         created(){
             this.userCode = this.getCookie('userCode');
             if(this.userCode){
+                 // loading...
+                this.$indicator.open({
+                    text: 'Loading...',
+                    spinnerType: 'fading-circle'
+                });
                 this.getShopList('');
             }else{
                 this.$router.push({
@@ -59,70 +73,55 @@
             }
         },
         methods: {
-            getShopList(value){
-              
-                this.$http.post('shop/shopDetail',{userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:value},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
+            async getShopList(value,flag){
+                let {data:res} = await getShopData({userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:value,page:this.page})
+                this.$indicator.close();   
+                
+                if(res.flag == 'success'){
+
+                    if(flag){
+                        if(res.info == '已到底部'){
+                            this.goodsList = res.goodsList;
+                            this.loading = true;
+                            this.end= true;
+                            this.$toast({
+                                message: '没有更多数据了',
+                                position:'middle',
+                                duration: 2000
+                            });
+                        
+                        }else{
+                              this.loading = false;
                         }
-                        return params
-                    }]
-                }).then(response=>{
-                    let res  = response.data;
-                    if(res.flag == 'success'){
+
+                    }else{
                         this.shopData = res.shopData[0];
                         this.goodsList = res.goodsData;
-                        this.page++
-                    }else{
-                         this.shopData = null
-                         this.goodsList = []
+                        this.isLoad = true;
+                        this.loading = true;
                     }
-                  
-                }).catch(err=>{
-                    console.log(err)
-
-                })
+                }else{
+                    this.$indicator.open({
+                        text: 'Loading...',
+                        spinnerType: 'fading-circle'
+                    })
+                }
+                
             },
             goSearch(){
                  this.getShopList(this.keyword)
             },
+
             //上啦加载
-             loadBottom(){
-                 this.$http.post('shop/shopDetail',{userCode:this.userCode,shopId:this.$route.params.shopId,keyWord:this.keyword},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                }).then(response=>{
-                     let res =response.data
-                 
-                       
-                    
-                    this.goodsList = res.goodsData;
-                    this.page++
-                    this.$refs.loadmore.onBottomLoaded();
-                    if(res.info == '已到底部'){
-                        this.goodsList = res.goodsList;
-                        this.allLoaded = true;
-                        this.$toast({
-                            message: '没有更多数据了',
-                            position:'middle',
-                            duration: 2000
-                        });
-                        
-                    }
-                    
-                   
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsList =[];
-                })
-            }
+            loadMore(){
+                this.loading = true;
+                setTimeout(() => {
+                    this.page++;
+                    this.getShopList(this.keyword,flag)
+                }, 300);
+
+            },
+            
         },
         components: {
             shopList

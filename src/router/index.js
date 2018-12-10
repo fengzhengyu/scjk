@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+
 import Index from 'page/Index.vue'
 import Cart from 'page/Cart.vue'
 import Member from 'page/Member.vue'
@@ -13,11 +13,16 @@ import GoodsDetail from 'components/Goods/GoodsDetail'
 import OrderWrite from 'components/Order/OrderWrite'
 import OrderDetail from 'components/Order/OrderDetail'
 import Login from 'components/Member/Login'
+import Register from 'components/Member/Register'
 import Search from 'components/Index/Search'
+import  NotFoundComponent from 'page/NotFoundComponent'
+import Popularize from 'components/Member/Popularize'
 
 Vue.use(Router)
 
 export default new Router({
+   mode: 'history',
+   base: '/scjksm',
   routes: [
     {
       path: '/',
@@ -27,18 +32,14 @@ export default new Router({
       path: '/index',
       name: 'index',
       component: Index,
-      // children: [
-      //   {
-      //     path: ':goodsId',
-      //     name: 'id',
-      //     component: GoodsDetail
-      //   }
-      // ]
     },
     {
       path: '/cart',
       name: 'cart',
-      component: Cart
+      component: Cart,
+      meta: {
+        keepAlive:true
+      }
     },
     {
       path: '/member',
@@ -67,19 +68,14 @@ export default new Router({
             },
           ]
         }
+        
       ]
     },
     {
       path: '/goods/:id',
       name: 'goods',
       component: Goods,
-      // children: [
-      //   {
-      //     path: ':goodsId',
-      //     name: 'goodsId',
-      //     component: GoodsDetail
-      //   }
-      // ]
+      
     },
     {
       path: '/goodsId/:goodsId',
@@ -102,10 +98,22 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: Login
-    },{
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
+    },
+    {
       path: '/search',
       name: 'search',
       component: Search
-    }
+    },
+    {
+      path: '/popularize',
+      name: 'popularize',
+      component: Popularize
+    },
+    { path: '*', component: NotFoundComponent }
   ]
 })

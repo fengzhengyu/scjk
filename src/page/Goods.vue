@@ -13,18 +13,29 @@
             <div :class="{'active': active==2}" @click="active=2 ,tabStatus =!tabStatus,getGoodsTypeList(tabStatus ==true?1:0)">价格<i class="iconfont icon-xiaosanjiaodown" :class="{'icon-xiaosanjiaoup': tabStatus==1}"></i></div>
             <div :class="{'active': active==3}" @click="active=3,getGoodsTypeList('salesVolume')">销量</div>
         </div>
-        <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
-            <GoodsList :goodsList="goodsList"></GoodsList>    
-        </mt-loadmore>
+        <!-- <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad"> -->
+            <GoodsList 
+                :goodsList="goodsList"
+                :loading="end"
+                v-if="isLoad"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="loading"
+                infinite-scroll-distance="10"
+                class="goods-list"
+            ></GoodsList>    
+        <!-- </mt-loadmore> -->
        
-
+        <div v-if="goodsList.length<=0 && isLoad" class="no-goods">
+            暂无商品！
+        </div>
         
         <!-- <router-view></router-view> -->
         <Footer></Footer> 
     </div>
 </template>
 <script>
-    import GoodsList from 'components/Goods/GoodsList.vue'
+import { getGoodsTypeData, getIndexData } from 'common/api'
+    import GoodsList from 'components/Index/GoodsList.vue'
      import Footer from 'components/common/Footer'
     export default {
         data() {
@@ -32,35 +43,34 @@
                 active: 1,
                 tabStatus:0,
                 typeName: [],
-                title: '',
+                title: '分类页面',
                 goodsList: [],
                 page: 1,
-                isAutoFill:false,//是否自动检测，并调用loadBottom
-                allLoaded:false,//数据是否全部加载完毕，如果是，禁止函数调用
-                
+                loading: true,  //true为禁止，false 为启动
+                end: false, //true  加载到底了
+                isLoad:false
             }
         },
         created(){
             this.userCode = this.getCookie('userCode')
             this.getTypeName();
-            this.getGoodsTypeList();
+            this.$indicator.open({
+                text: 'Loading...',
+                spinnerType: 'fading-circle'
+            })
+            this.getGoodsTypeList('recommend');
            
         },
        
         methods:{
-            getTypeName(){
-                 this.$http.post('Goods/index').then(response=>{
-                    let res =response.data;
-                    if(res.goodsTypeList){
-                        this.typeName = res.goodsTypeList;   
-                    }
-                    this.getTitle();//获取分类名称
-                    
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    this.typeName =[];
-                })
+            async getTypeName(){
+                let {data:res} = await getIndexData();
+                if(res.goodsTypeList){
+                    this.typeName = res.goodsTypeList;  
+                  this.getTitle();//获取分类名称 
+                }
+                
+                 
             },
             getTitle(){
                 if(this.typeName){
@@ -74,34 +84,25 @@
                 }
                 
             },
-            getGoodsTypeList(value){
-                 this.page =1;
-                 this.$http.post('Goods/typeGoodsList',{typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;
-                    if(res.flag == 'success'){
-                        this.goodsList  = res.typeGoodsList
-                        this.page++;
-                    }else{
-                         this.goodsList  = [];
-                    }
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsList =[];
-                })
+            async getGoodsTypeList(value){
+                this.page =1;
+               
+                let {data:res} = await getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page});
+                if(res.flag == 'success'){
+
+                    this.goodsList = res.typeGoodsList;
+                    this.isLoad = true;
+                    this.loading = false;
+                   
+                }
+               
+                this.$indicator.close()
+               
+                
 
             },
                //上拉刷新
-            loadBottom(){
+            loadMore(){
                 let value = ''
                 if(this.active == 1){
                    value = 'recommend';
@@ -110,37 +111,42 @@
                 }else if(this.active == 3){
                     value = 'salesVolume';
                 }
-                this.$http.post('Goods/typeGoodsList',{typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
+
+                this.loading = true;
+
+                setTimeout(()=>{
+                    this.page++
+                   getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page}).then((response)=>{
+                       let res = response.data;
+                        if(res.flag == 'success'){
+                            this.goodsList  = res.typeGoodsList;
+                            if(res.msg== '已到底部'){
+                                this.loading = true;
+                                this.end = true;
+                                this.$toast({
+                                    message: '没有更多数据了',
+                                    position:'middle',
+                                    duration: 2000
+                                });
+                                
+                            }else{
+                                this.loading = false;
+                            }
                         }
-                        return params
-                    }]
-                }).then((response) => {
-                    let res = response.data;
-                    // console.log(res)
-                  
-                   this.goodsList  = res.typeGoodsList
-                    this.page ++;
-                    this.$refs.loadmore.onBottomLoaded();
-                    if(res.msg== '已到底部'){
-                        this.allLoaded = true;
-                        this.$toast({
-                            message: '没有更多数据了',
-                            position:'middle',
-                            duration: 2000
-                        });
-                    }
-                    
-                })
-                .catch(err=>console.log(err));
+                    },(err)=>{console.log(err)});
+                   
+
+                },300)
+
+               
+            
+                
+                
             },
 
         },
         components: {
-             GoodsList    ,
+             GoodsList,
              Footer 
         }
     }
@@ -176,8 +182,13 @@
                 &.active 
                     color #ff0000
                     border-bottom 2px solid #ff0000
-        .mint-loadmore
-            padding-bottom 55px;            
+        .goods-list
+            padding-bottom 55px;     
+        .no-goods
+            text-align center
+            line-height 3rem
+            font-size .22rem
+            color #666                   
 </style>
 
 

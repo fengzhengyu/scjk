@@ -1,19 +1,27 @@
 <template>
   <div id="app">
-    <!-- <keep-alive> -->
+    <keep-alive>
         <router-view class="view"
                   transition
-                  transition-mode="out-in">
-
+                  transition-mode="out-in"
+                   v-if="$route.meta.keepAlive"
+                  >
         </router-view>
-    <!-- </keep-alive> -->
+    </keep-alive>
+    <router-view class="view"
+                  transition
+                  transition-mode="out-in"
+                   v-if="!$route.meta.keepAlive"
+                  >
+    </router-view>
   </div>
 </template>
 
 <script>
  
   export default {
-    name: 'App'
+    name: 'App',
+   
     
   }
 </script>

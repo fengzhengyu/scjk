@@ -7,7 +7,7 @@
             <div class="search">
                 <i class="iconfont icon-sousuo icon" @click="goSearch"></i>
                     <form action="javascript:void(0)">
-                        <input type="search" placeholder="搜索商品" v-model="keyword"  @keyup.enter="goSearch">
+                        <input type="search" placeholder="搜索商品" v-model="keyword"  @keyup.enter="goSearch" v-focus>
                     </form>
                 
             </div>
@@ -20,8 +20,12 @@
             
         </div>
         <div class="goods">
-            <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded">
-                <ul class="load-more-wrap">
+         
+                <ul class="load-more-wrap"
+                    v-infinite-scroll="loadMore"
+                    infinite-scroll-disabled="loading"
+                    infinite-scroll-distance="10"
+                 >
                     <li class="goods-list" v-for="(item,index) in goodsList" :key="index">
                         <router-link class="link" :to="{name:'id',params:{goodsId:item.goodsId}}">
                             <div class="list-img">
@@ -33,7 +37,7 @@
                                 <p>{{item.goodsRetailPrice}}<!--<span class="price"> ￥150.00</span>--></p>
                                 <p> 
                                     <span class="price" v-if="userCode">{{item.goodsProcurementPrice}}</span>  
-                                    <span class="show" v-else @click="show($event)">查看采购价</span>
+                                    <span class="show" v-else @click.prevent="show()">查看采购价</span>
                                     <span class="repertory"> 库存:{{item.goodsInventory}}</span>
                                     
                                 </p>
@@ -43,13 +47,22 @@
                     </li>
                     
                 </ul>
-            </mt-loadmore>   
+                <div v-if="goodsList.length>0">
+                    <div class="ladding" v-if="!end ">
+                        <img src="../../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
+                    </div>
+                    <div class="ladding" v-else>
+                        您已经到底了
+                    </div>
+                </div >
+        
             <router-view></router-view>
         </div>  
        
     </div>
 </template>
 <script>
+     import { getIndexData } from 'common/api'
 export default {
     data() {
         return {
@@ -57,15 +70,15 @@ export default {
             goodsList: [],
             isShow: true,
             page:1,
-            isAutoFill:false,//是否自动检测，并调用loadBottom
-            allLoaded:false,//数据是否全部加载完毕，如果是，禁止函数调用
+            loading:false,//
+            end:false,//
         }
     },
      created(){
-            // this.$nextTick(()=>{
-                this.userCode = this.getCookie('userCode')
+           
+             this.userCode = this.getCookie('userCode')
                 
-           // })
+       
     },
      watch:{
       keyword(val){
@@ -77,70 +90,69 @@ export default {
 
     },
     methods: {
-        goSearch(){
+        async goSearch(flag){
             if(this.keyword == ''){
                 return;
             }
-             this.$http.post('Goods/index',{page:this.page,keyWord:this.keyword},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;
-                    
-                     if(res.goodsList.length>0){
-                        this.goodsList = res.goodsList;
-                        this.page++;
-                        this.isShow = false;
-                     }else{
-                         this.goodsList = [];
-                            this.$toast({
-                                message: '关键字有误！',
-                                position:'middle',
-                                duration: 2000
-                            });
-                     }
+              this.$indicator.open({
+                text: 'Loading...',
+                spinnerType: 'fading-circle'
+            });
+            let {data: res} = await getIndexData({userCode:this.userCode,page:this.page,keyWord:this.keyword});
+             this.$indicator.close();   
+
+            if(flag){
+                    this.goodsList = res.goodsList;
+                    if(res.info == '已到底部'){
+                        this.loading = true;
+                        this.end = true;
+                       
+                    }else{
+                          this.loading = false;
+                    }
+            }else{
+                if(res.goodsList.length>0){
+                    this.goodsList = res.goodsList;
+                    this.isShow = false;
+                    this.loading = false;
+                    // this.isLoad = true;
                    
-                }).catch(err=>{
-                    console.log(err)
-                    this.goodsList =[];
-                })
+                    
+                    }else{
+                        this.goodsList = [];
+                        this.$toast({
+                            message: '关键字有误！',
+                            position:'middle',
+                            duration: 2000
+                        });
+                    }
+                
+                
+            }  
+           
+             
+             
         },
         //上啦加载
-        loadBottom(){
-            this.$http.post('Goods/index',{page:this.page,keyWord:this.keyword},{
-                transformRequest:[function(data){
-                    let params = '';
-                    for(let key in data){
-                        params += key +'='+data[key]+'&'
-                    }
-                    return params
-                }]
-            }).then(response=>{
-                let res =response.data;
-        
-                this.goodsList = res.goodsList;
-                this.page++
-                this.$refs.loadmore.onBottomLoaded();
-                if(res.info == '已到底部'){
-                    this.allLoaded = true;
-                    this.$toast({
-                        message: '没有更多数据了',
-                        position:'middle',
-                        duration: 3000
+        loadMore(){
+            this.loading = true;
+             setTimeout(()=>{
+                    this.page++;
+                    this.goSearch(true)
+
+            },300)
+        },
+        show(){
+           this.$toast({
+                    message: '请登陆后查看！',
+                    position:'middle',
+                    duration: 2000
+                });
+                setTimeout(()=>{
+                    this.$router.push({
+                        name: 'login'
                     });
-                    return;
-                }
-                
-            }).catch(err=>{
-                console.log(err)
-                this.goodsList =[];
-            })
+                },500)
         },
         goBack(){
            this.$router.back()
@@ -262,6 +274,15 @@ export default {
                             .repertory
                                 float right     
                                 margin-right .05rem
+            .ladding
+                text-align center
+                line-height .6rem
+                height .6rem
+                font-size .24rem
+                margin .15rem 0
+                img 
+                    display inline-block
+                    vertical-align middle                
                   
 </style>
 

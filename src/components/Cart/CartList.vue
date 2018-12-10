@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="cart">
-        <div class="cart-wrap" v-for="(item,index) in cartList" :key="index"  v-show="cartList.length>0">
+        <div class="cart-wrap" v-for="(item,index) in  cartList" :key="index">
             <div class="shop">
                 <div class="check-btn list">
                     <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':item.checked}" @click=" selectedShop(item,item.shopList)"></i>
@@ -19,7 +19,7 @@
                 </div>
                 <div class="group-detail" >
                     <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsId}})">
-                        <img :src="goods.goodsPhoto" alt="">
+                        <img v-lazy="goods.goodsPhoto" :key="goods.goodsPhoto">
                     </div>
                     <div class="item-info">
                        
@@ -30,14 +30,14 @@
                                <a href="javascript:;" @click=" cheangeQuantity(goods,0)">-</a><input type="text" disabled  v-model="goods.goodsCount"><a href="javascript:;"  @click=" cheangeQuantity(goods,1)">+</a>
                            </span>
                         </p>
-                        <p class="price">采购价：￥{{goods.goodsPrice}} <span class="store">库存：{{goods.goodsInventory}}</span></p>
+                        <p class="price">{{userLevel == 5? "零售价": "采购价"}}：￥{{goods.goodsPrice}} <span class="store">库存：{{goods.goodsInventory}}</span></p>
                         
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="empty-goods" v-show="cartList.length<=0">
+    <div class="empty-goods" v-show="cartList.length<=0 && isLoad">
         购物车空空如也
     </div>
     <div class="footer-fiexd" v-show="cartList.length>0">
@@ -57,23 +57,43 @@
     
 </template>
 <script>
+    import {getCartData , getCartCount, getCartPay , getCartDelete } from 'common/api'
     export default {
-        props: ['deleteStatus'],
+        props: {
+            goodsList:{
+                type: Array
+             },
+            deleteStatus: {
+                type:Boolean
+            },
+            userCode: {
+                 type: String
+            },
+            isLoad: {
+                 type:Boolean
+            },
+          
+        },
         data() {
             return {
-               cartList: [],
+               userLevel: '', 
                checkAllFlag: false,
                orderArr: [],
-               orderStr: ''
+               orderStr: '',
+               selectAll: [],
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode')
-            this.getCartList();
+          this.userLevel = this.getCookie('userLevel');
+        },
+        watch: {
            
         },
        
         computed:{
+            cartList(){
+                return this.goodsList;
+            },
             //计算总价
             countTotalPrice(){
                 let totalPrice = 0;
@@ -102,32 +122,9 @@
             }
         },
          methods:{
-            getCartList(){
-                this.$http.post('Cart/index',{userCode:this.userCode},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;
-                    if(res.flag == 'success'){
-                         this.cartList  = res.data;
-                        //  
-                    }else{
-                         this.cartList  = [];
-                    }
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    
-                })
-            },
+            
             //数量加减
-            cheangeQuantity(item,status){
+            async cheangeQuantity(item,status){
                 if(status>0){
                     item.goodsCount++;
                     if(item.goodsCount >= item.goodsInventory){
@@ -140,27 +137,13 @@
                         item.goodsCount = 1
                     }
                 }
-                 this.$http.post('Cart/numberCart',{userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount},{
-                    transformRequest:[function(data){
-                        let params = '';
-                        for(let key in data){
-                            params += key +'='+data[key]+'&'
-                        }
-                        return params
-                    }]
-                    
-                }).then(response=>{
-                    let res =response.data;              
-                    if(res.flag == 'success'){
-                    //    console.log(res)                       
-                    }else{
-                         console.log(res.flag)
-                    }
-                    
-                }).catch(err=>{
-                    console.log(err)
-                    
-                })
+                let {data:res} = await getCartCount({userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount});
+                if(res.flag == 'success'){
+                  
+                }else{
+                     console.log(res.infn)
+        
+                }
             },
             //商品单选
             selectedProduct(goods,goodsList,items){
@@ -222,7 +205,7 @@
                     if(typeof item.checked == 'undefined'){
                         this.$set(item,'checked',this.checkAllFlag);
                     }else{
-                        item.checked = this.checkAllFlag
+                        item.checked = this.checkAllFlag;
                     }
                    item.shopList.forEach((item,index)=>{
                         if(typeof item.checked == 'undefined'){
@@ -234,7 +217,7 @@
                 })
             },
             //结账
-            nextStep(){
+            async nextStep(){
                 if(this.countTotalPrice<=0){
                     this.$toast({
                         message: '请选择商品哦！',
@@ -264,104 +247,84 @@
                     })            
                     this.orderStr = this.orderArr.join(',')
                     //结算数据
-                    this.$http.post('Cart/cartPay',{userCode:this.userCode,orderId:this.orderStr},{
-                        transformRequest:[function(data){
-                            let params = '';
-                            for(let key in data){
-                                params += key +'='+data[key]+'&'
-                            }
-                            return params
-                        }]
-                        
-                    }).then(response=>{
-                        let res =response.data;
-                
-                        if(res.flag == 'success'){
-                           let goods =  JSON.stringify(res.data)
-                           sessionStorage.setItem('goods',goods)
-                            this.$router.push({
-                                name: 'order',
-                                 query: {id:1}
-                            })
-                             
-                        }else{       
-                            this.$toast({
-                                message: res.info,
-                                position:'middle',
-                                duration: 2000
-                            });
-                            return
-                        }
-
-                        
-                    }).catch(err=>{
-                        console.log(err)
-                        
-                    })
+                    let {data:res} = await getCartPay({userCode:this.userCode,orderId:this.orderStr});
+                    if(res.flag == 'success'){
+                        let goods =  JSON.stringify(res.data)
+                        sessionStorage.setItem('goods',goods)
+                        this.$router.push({
+                            name: 'order',
+                                query: {id:1}
+                        })
+                    }else{       
+                        this.$toast({
+                            message: res.info,
+                            position:'middle',
+                            duration: 2000
+                        });  
+                    }
                 }
             },
             //删除
             deleteGoods(){
-                 if(this.countTotalPrice<=0){
+                
+                this.orderArr = []
+                this.cartList.forEach((item,index)=>{
+                    if (item.checked) {
+                        
+                        item.shopList.forEach((ele,i)=>{
+                            if (ele.checked){
+                                this.orderArr.push(ele.orderId)      
+                            }
+                        })
+                    }
+                    else{
+                        item.shopList.forEach((ele,i)=>{
+                            if (ele.checked){
+                                this.orderArr.push(ele.orderId)             
+                            }           
+                        })
+                    }
+                
+                })    
+                let  orderStr = this.orderArr.join(',');   
+                if(this.orderArr.length<=0){
                     this.$toast({
                         message: '请选择删除的商品！',
                         position:'middle',
                         duration: 2000
                     });
                 }else{
-                    this.orderArr = []
-                    this.cartList.forEach((item,index)=>{
-                        if (item.checked) {
-                           
-                            item.shopList.forEach((ele,i)=>{
-                                if (ele.checked){
-                                    this.orderArr.push(ele.orderId)      
-                                }
-                            })
-                        }
-                        else{
-                            item.shopList.forEach((ele,i)=>{
-                                if (ele.checked){
-                                    this.orderArr.push(ele.orderId)             
-                                }           
-                            })
-                        }
-                    
-                    })    
-                    let  orderStr = this.orderArr.join(',')    
-                    this.$http.post('Cart/delCart',{userCode:this.userCode,orderId:orderStr},{
-                        transformRequest:[function(data){
-                            let params = '';
-                            for(let key in data){
-                                params += key +'='+data[key]+'&'
-                            }
-                            return params
-                        }]
-                        
-                    }).then(response=>{
-                        let res =response.data;
-                
-                        if(res.flag == 'success'){
+                    let msg =  `确定删除这${this.orderArr.length}个商品?`
+                    this.$messagebox.confirm(msg).then(action => { 
+                       
+                        getCartDelete({userCode:this.userCode,orderId:orderStr}).then(res=>{
+                            if(res.data.flag == 'success'){                        
                             this.$toast({
-                                message: res.info,
+                                message: res.data.info,
                                 position:'middle',
                                 duration: 2000
                             });
-                            setTimeout(()=>{
-                                 this.getCartList();
-                            },2000)
                             
-                        }else{       
-                            this.$toast({
-                                message: res.info,
-                                position:'middle',
-                                duration: 2000
-                            });
+                            this.$emit('deleteSucceed')
                           
-                        }
+                                
+                            }else{       
+                                this.$toast({
+                                    message: res.data.info,
+                                    position:'middle',
+                                    duration: 2000
+                                });
+                            
+                            }
+                        },err=>{console.log(err)})
+                        
+                    }).catch(err=>{})
 
-                    }).catch(err=>{console.log(err)})
                 }
+                   
+                    
+                   
+                
             }
             
          }

@@ -84,8 +84,10 @@
                             name: this.invoiceName,
                             boole: false
                         }
-                        this.$emit('childSaveMasg',invoice)
 
+                      
+                        this.$emit('childSaveMasg',invoice)
+                        this.$router.go(-1)
                      
                     }
                 }else{
@@ -109,18 +111,21 @@
                             boole: false
                         }
                          this.$emit('childSaveMasg',invoice)
-
+                         this.$router.go(-1)
                     }
                 }
                     
                 
             },
             invoiceFlag(){
-                let data = {
-                    type: '个人',
-                    boole: false
-                }
-                this.$emit('listenToChild',data);
+                // let data = {
+                //     type: '个人',
+                //     boole: false
+                // }
+                // this.$emit('listenToChild',data);
+                this.$router.go(-1)
+
+                
             }
         }
     }
