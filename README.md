@@ -10,4 +10,4 @@
 
 聚康版本一，开发完毕
 
-I am the new development version.
+I am the new development version. The developer is fengzheng.
