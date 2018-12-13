@@ -42,7 +42,7 @@
 <style scoped>
   .swiper-slide img{
     width: 100%;
-    height: 4rem;
+    height: 6.4rem;
   }
 </style>
 

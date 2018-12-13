@@ -1,15 +1,19 @@
 <template>
-  <footer class="footer">
+  <footer class="footer border-top">
       <div class="item" :class="{'active':selected == 'index'}" @click="go('index')">
-          <i slot="icon" class="iconfont icon-icon-test"></i>
+          <i slot="icon" class="iconfont icon-zhuye"></i>
           <span class="text">首页</span>
       </div>
-      <div class="item"  @click="go('cart')">
-         <i slot="icon" class="iconfont icon-gouwuche1"></i>
+      <div class="item" :class="{'active':selected == 'goods'}"  @click="go('goods')">
+         <i slot="icon" class="iconfont icon-leimupinleifenleileibie2-copy"></i>
+         <span class="text"> 分类</span>
+      </div>
+      <div class="item" :class="{'active':selected == 'cart'}"  @click="go('cart')">
+         <i slot="icon" class="iconfont icon-gouwuche1-copy-copy"><sub>99</sub></i>
          <span class="text"> 购物车</span>
       </div>
       <div class="item" :class="{'active':selected == 'member'}" @click="go('member')">
-          <i slot="icon" class="iconfont icon-wode1"></i>
+          <i slot="icon" class="iconfont icon-wodedangxuan1"></i>
           <span class="text">我</span>
       </div>
   </footer>
@@ -18,7 +22,7 @@
   export default {
     data(){
       return {
-        selected:''
+        selected: ''
       }
       
     },
@@ -39,25 +43,46 @@
 
 <style lang="stylus" scoped>
     footer
-        height .9rem
+        height .89rem
         color #575757
         position fixed
         bottom 0
         background #fff
-        width 6.4rem
+        width 100%
         display flex
+        justify-content center
+        align-items center
         left 0
+       
         .item
             flex 1
             text-align center
-            padding-top .1rem
-            color #999
+            padding .1rem
+            color #737373
+            
             .iconfont 
-              font-size .5rem
+              color #bdbdbd
+              font-size .4rem
+              position relative
+              sub
+                position absolute
+                top 0
+                right -.1rem
+                width .25rem
+                height .25rem
+                line-height .25rem
+                background #ff0000
+                font-size .1rem
+                border-radius 50%
+                color #fff
             .text 
               display block
-              font-size .24rem
+              padding-top .1rem
+              font-size .18rem
             &.active 
-                color #38a0df  
+                color #ff6600
+                .iconfont 
+                   color #ff6600
+
 </style>
 

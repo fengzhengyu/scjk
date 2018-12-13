@@ -1,74 +1,78 @@
 <template>
     <transition name="slide">
-        <div class="detail">
-            <mt-header title="商品详情" fixed>
-                <span to="" slot="left" @click="back">
-                    <mt-button icon="">
-                        <i class="iconfont icon-fanhui"></i>
-                    </mt-button>
-
-                </span>   
-                <span slot="right" @click="$router.push({path: '/'})">
-                    <mt-button icon="">
-                        <i class="iconfont icon-icon-test"></i>
-                    </mt-button>
-                </span>     
-            </mt-header>
-            <!-- <div class="img-wrap"> -->
-            <Swiper :sliders=" goodsDetailPhotos" class="img-wrap"></Swiper>
-                <!-- <img :src="goodsDetailPhotos" alt=""> -->
-            <!-- </div> -->
-            <h1 class="goods-name">{{ goods.goodsName }}</h1>
-            <p class="info">{{goods.goodsSpecification}}</p>
-            <p class="info">{{goods.goodsRetailPrice}}</p>
-            <p class="info">
-                <span  v-if="userCode" class="price">{{goods.goodsProcurementPrice}}</span>
-                <span class="show" v-else @click.prevent="show">查看采购价</span>
-                <span class="repertory"> 库存:{{goods.goodsInventory || 0}}</span>
-            </p>
-            <div class="mumber">
-                数量
-                <div class="box">
-                    <a href="javascript:;" @click=" cheangeQuantity(goods,0)">-</a><input type="text" disabled v-model="goodsQuantity"><a href="javascript:;"  @click=" cheangeQuantity(goods,1)">+</a>
+        <div>
+            <div class="header">
+                <div class="back"  @click="$router.go(-1)">
+                    <i class="iconfont icon-fanhui2"></i>
                 </div>
             </div>
-            <div class="info">
-                运费  <span class="bold">免运费</span>
-            </div>
-            <div class="info">
-                <i class="iconfont icon-wancheng"></i>
-                <span class="info-text">退货需要联系客户进行咨询</span>  
-            </div>
-           
-            <div class="goods-detail-desc" v-html="goods.goodsDetail">
+            <div class="detail" >
+               <div ref="detailWrapper" class="detailWrapper">
+                 <div>
+                     <Swiper :sliders=" goodsDetailPhotos" class="img-wrap"></Swiper>
+                    <h1 class="goods-name">{{ goods.goodsName }}</h1>
+                   
+                    <p class="buy-price">{{symbol}} <b>{{num}}</b> <span >{{str}}</span> </p>
+                   
+                    <p class="info">{{goods.goodsRetailPrice}}</p>
+                    <p class="info size">{{goods.goodsSpecification}}</p>
+                    <!-- <div class="mumber">
+                        数量
+                        <div class="box">
+                            <a href="javascript:;" @click=" cheangeQuantity(goods,0)">-</a><input type="text" disabled v-model="goodsQuantity"><a href="javascript:;"  @click=" cheangeQuantity(goods,1)">+</a>
+                        </div>
+                    </div> -->
+                    <div class="desc-tit">
+                        <span class="bold">商品详情</span>
+                    </div>
+                
+                    <div class="goods-detail-desc" v-html="goods.goodsDetail">
+                    
+                        
+                    </div>
+        
+
+                </div>
+               </div>
+          
                
+                    <!-- <img :src="goodsDetailPhotos" alt=""> -->
+                <!-- </div> -->
+               
+            </div>
+            <div class="shopCart border">
+               
+                <div class="left">
+                    <div class="logo-wrapper " >
+                        <div class="logo">
+                            <i class="iconfont icon-gouwuche1-copy-copy"></i>
+                        </div>
+                        <div class="num">99</div>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="btn">加入购物车</div>
+                    <div class="cart-control-wrapper">
+                               
+                            <div class="cart-decrease icon-circle" >
+                                <i class="iconfont icon-jian"></i>
+                                </div>
+                            <div class="cart-count" >0</div> 
+                            <div class="cart-add icon-circle" >
+                                <i class="iconfont icon-jiaru"></i>
+                                </div>
+                        
+                    </div>
+                </div>
                 
             </div>
-            <div class="footer-wrap">
-                <ul class="handle left">
-                    <li @click="goCollect">
-                        <i class="iconfont icon-shoucang1 " :class="{'icon-shoucang':active}"></i><br>
-                        收藏
-                    </li>
-                    <li @click="goShop">
-                        <i class="iconfont icon-guanzhudianpu"></i><br>
-                        店铺
-                    </li>
-                    <li @click="goCart">
-                        <i class="iconfont icon-gouwuche1"></i><br>
-                        购物车
-                    </li>
-                </ul>
-                <div class="handle right">
-                    <div class="go-cart" @click="addCart">加入购物车</div>
-                    <div class="go-buy" @click="nowBuy">立即购买</div>
-                </div>
-            </div>
         </div>
+        
     </transition>
     
 </template>
 <script>
+    import BScroll from 'better-scroll'
     import { getGoodsDetailData, getAddCartData , getNowBuyData, getCollectData } from 'common/api'
     import Swiper from 'components/common/Swiper'
     export default {
@@ -78,13 +82,23 @@
                 goodsDetailPhotos: [],
                 userCode: '',
                 goodsQuantity: 1,
-                active: false
+                active: false,
+                symbol: '',
+                num: '',
+                str: ''
             }
         },
         created(){
            
            this.userCode = this.getCookie('userCode')
            this.getData();
+        },
+        mounted(){
+             this.$nextTick(() => {
+                    // this.scroll = new BScroll(this.$refs.detailWrapper,{
+                    //         click: true
+                    // })
+              })      
         },
         methods: {
             async getData(){
@@ -93,6 +107,10 @@
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
+                    this.symbol = this.goods.goodsProcurementPrice.substring(4,5)
+                    this.num = this.goods.goodsProcurementPrice.substring(5)
+                    this.str = this.goods.goodsProcurementPrice.substring(0,3)
+                 
                     this.$indicator.close()
                 }else{
                     this.$indicator.open({
@@ -264,148 +282,188 @@
     }
 </script>
 <style lang="stylus" scoped>
+@import "~common/stylus/variable.styl"
 .slide-enter-active, .slide-leave-active
     transition: all 0.3s
 
 .slide-enter, .slide-leave-to
     transform: translate3d(100%, 0, 0)
+.header
+    width 6.4rem
+    position fixed
+    top 0
+    font-size 18px
+    height .8rem
+    z-index 100
+   
+    .back
+        width .6rem
+        height .6rem
+        background #898889
+        text-align center
+        line-height .6rem
+        border-radius 50%
+        margin  .15rem 0 0 .25rem
+        i 
+            color #fff
+            font-size .3rem
 .detail
    
     width 6.4rem
     position relative
-    padding-bottom .8rem
-    background #fff
     overflow-y auto
+    padding-bottom .9rem
     // -webkit-overflow-scrolling: touch;
    
-    .mint-header
-        width 6.4rem
-        margin 0 auto
-        background #ffffff
-        color #000
-        font-size 18px
-        .mint-header-button 
-            .iconfont 
-                font-size 18px
-            .mint-header-title
-                font-weight bold
-    .img-wrap
-        width 6.4rem
-        height 4rem
-        margin-top 40px
-        img 
-            width 100%
-            height 100%
-
-    .goods-name
-        padding 0 .15rem
-        height .6rem
-        line-height .6rem
-        font-size .24rem
-        font-weight bold
-
-    .info 
-        padding .1rem .15rem
-        overflow hidden
-        font-size .2rem
-        line-height .24rem
-        color #6d6d6d
-        .price 
-            color  #dc143c
-        .show
-            background #ff0000
-            color #ffffff
-            padding .05rem .1rem
-        .repertory
-            float right 
-            font-size .2rem
-        .bold
+    
+    .detailWrapper
+        flex 1    
+        .img-wrap
+            width 6.4rem
+            height 6.4rem
+        .goods-name
+            padding .25rem
+            height .32rem
+            line-height .32rem
+            color #474747
+            font-size .28rem
             font-weight bold
-            color #000    
-            padding 0 .15rem
-        i  
-            font-size .24rem    
-            color #ef3030
-            padding-right .2rem
-            vertical-align middle
-        .info-text
-            font-size .2rem    
-    .mumber
-        padding .4rem .15rem
-        font-size .2rem
-        height .4rem
-        color #6d6d6d
-        line-height .4rem
-        .box
-            float right
-            input 
-                float left
-                width .4rem
-                height .4rem
-                border-top 1px solid #ccc
-                border-bottom 1px solid #ccc
-                outline none          
-                text-align center
-                background #ffffff
-                color  #000    
-               
-            a 
-                float left
-                border 1px solid #ccc
-                width .4rem
-                height .4rem
-                text-align center
-                background #ffffff
-                color  #000    
-                font-size .24rem           
-    // .goods-detail-desc
-    //     background pink
-    //     p 
-    //         padding .2rem .15rem !important
-    //         font-size .18rem !important
-    //         color #000 !important
-    //         img
-    //             width 100% !important
-           
+        .buy-price
+            padding 0 .25rem
+            font-size .22rem
+            color #ff3d00
+            
+            
+            b 
+                font-size .34rem
+                display inline-block
+                vertical-align: text-bottom;
+            span 
+                display inline-block
+                color #fd7f31
+                border 0.01rem solid #fd7f31
+                text-align: center;
+                vertical-align: text-bottom;
+                height .32rem
+                line-height .34rem
+                width .8rem
+                margin-left .10rem
+                border-radius .05rem
+                font-size .16rem
 
-    .footer-wrap
-        height .8rem
-        position fixed
-        bottom 0
-        width 6.4rem
-        line-height .8rem
-        text-align center
-        overflow hidden
-        background #ffffff
-        -webkit-transform: translateZ(0);
-        .handle
-           
-            float left
-            &.left 
-                width 40%
-                display flex
-                li 
-                    flex 1
-                    line-height normal
-                    font-size .16rem
-                    color #6d6d6d
-                    height .8rem
-                    padding-top .1rem
-                    i  
-                        font-size .36rem
-                        color #6d6d6d
-            &.right 
-                width 60%
-                display flex
-                div     
-                    flex 1
+              
+        .info 
+            padding .2rem .25rem
+            overflow hidden
+            font-size .18rem
+            line-height .24rem
+            color #9a9a9a
+            &.size
+                font-size .22rem
+            
+        .desc-tit
+            padding .2rem .25rem
+            font-size .24rem
+            font-weight bold    
+            span    
+                padding 0 .15rem  
+                border-left .05rem solid #000  
+        
+        .goods-detail-desc
+            padding .2rem .25rem
+.shopCart
+    width 6.4rem
+    height: .9rem;
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    background: #fff;
+    display: flex;
+    justify-content center
+    align-items center
+    .left
+        flex: 1;
+        background: #fff;
+        .logo-wrapper
+            width .95rem
+            height .95rem
+            background #f8f8f8
+            border-radius 50%
+            position absolute
+            top -.35rem
+            left .3rem
+            box-shadow  0px  -1px 2px #ddd
+    
+            padding: .1rem
+            .logo
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background: #fd7722;
+                text-align: center;
+                line-height .95rem
+                i 
+                    font-size .4rem
                     color #fff
-                    font-size .26rem
-                    
-                    &.go-cart
-                        background #ff0000
-                    &.go-buy
-                        background #f97d0a
+            .num
+                position: absolute;
+                top: 0;
+                right: 0;      
+                width .26rem
+                height .26rem
+                background #ff0000  
+                line-height .26rem
+                text-align center
+                border-radius 50%
+                color #fff
+                font-size .14rem
+    .right 
+        flex: 1;
+        justify-content center
+        align-items center
+        .btn
+            width 2.7rem
+            height .7rem
+            text-align center
+            line-height .7rem
+            font-size .24rem
+            color #ff3d00
+            background #fe8f32
+            border-radius .4rem
+            margin  0 auto
+            display none
+        .cart-control-wrapper
+            position absolute
+            right  .3rem
+            bottom .3rem
+            font-size: 0;
+            .cart-decrease, .cart-add
+                display: inline-block;
+                
+            .cart-count
+                display: inline-block;
+                
+                width .36rem
+                height .36rem
+                padding 0 .05rem
+                color: #000;
+                font-size $font-info
+                line-height: .36rem;
+                text-align: center;
+                font-size .22rem
+            .icon-circle
+                width .36rem
+                height .36rem
+                background  $color-theme
+                border-radius 50%
+                line-height .36rem
+                text-align center
+                font-size $font-info
+                i 
+                    font-size .18rem
+                    color #fff
+                    font-weight bold
+
 
 
 </style>

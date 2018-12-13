@@ -24,6 +24,7 @@
         width 100%
         height .8rem
         background $mainBgColor
+       
         .logo
             float left
             width .67rem

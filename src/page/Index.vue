@@ -3,7 +3,7 @@
          <Header></Header>
          <Swiper :sliders = "sliders"></Swiper>
          <Classify :goodsTypeList="goodsTypeList"></Classify>   
-          <!-- <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad"> -->
+        
             <GoodsList :goodsList="goodsList" 
                 :loading="end"
                 v-if="isLoad"
@@ -13,11 +13,12 @@
                
                 >
             </GoodsList>
-          <!-- </mt-loadmore> -->
+         
          <Footer></Footer>
     </div>
 </template>
 <script>
+    
     import { getIndexData } from 'common/api'
     import Header from 'components/Index/Header'
     import Swiper from 'components/Index/Swiper'

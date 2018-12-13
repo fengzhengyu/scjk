@@ -4,6 +4,8 @@ import Router from 'vue-router'
 import Index from 'page/Index.vue'
 import Cart from 'page/Cart.vue'
 import Member from 'page/Member.vue'
+import AddressList from 'components/Member/AddressList'
+import AddressAdd from 'components/Member/AddressAdd'
 import Password from 'components/Member/Password'
 import Collect from 'components/Member/Collect'
 import MyOrder from 'components/Member/MyOrder'
@@ -38,7 +40,7 @@ export default new Router({
       name: 'cart',
       component: Cart,
       meta: {
-        keepAlive:true
+        keepAlive:false
       }
     },
     {
@@ -72,7 +74,18 @@ export default new Router({
       ]
     },
     {
-      path: '/goods/:id',
+      path: '/member/address',
+      name: 'address',
+      component: AddressList,
+    },
+    {
+      path: '/member/addressAdd',
+      name: 'addressAdd',
+      component: AddressAdd,
+    },
+    {
+      // path: '/goods/:id',
+      path: '/goods',
       name: 'goods',
       component: Goods,
       

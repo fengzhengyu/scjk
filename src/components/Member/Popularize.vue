@@ -133,17 +133,18 @@ export default {
             })
          
         },
-        // watch: {
-        //     $route(){
-        //         this.getWeChatShare(); //当路由改变时 重新请求签名
-        //     }
-        // },
+        watch: {
+            $route(){
+                console.log(1)
+                this.getWeChatShare(); //当路由改变时 重新请求签名
+            }
+        },
         methods: {
         // 获取微信分享
             async getWeChatShare(){
                
                 let {data: res} = await getShareData({url:encodeURIComponent(location.href.split('#')[0])}); //
-
+  
                 if(res &&res.flag == 'success'){
                    let data =res.data;
             
@@ -232,7 +233,7 @@ export default {
                         })
                     })
                 }else{
-                    console.log(res.info)
+                    console.log(res)
                 }
             },
            

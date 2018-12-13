@@ -7,7 +7,7 @@ import VueLazyload from 'vue-lazyload'
 import wx from 'weixin-js-sdk'
 import 'common/js/base'
 import 'common/stylus/index.styl'
-
+import 'common/stylus/border.css'
 
 // 300ms 点击事件延迟
 import fastClick  from 'fastclick'
@@ -153,38 +153,39 @@ Vue.prototype.$setShare = setShare
 
 // 购物车 第一次今日缓存，其余刷新
 router.afterEach((to, from) => {
-  // console.log(to)
-  // console.log(from)
+  //  console.log(to.fullPath)
+  //  console.log(location.pathname)
 
   // 
   
-  let isRefresh =  sessionStorage.getItem('Refresh')
-  if(to.name== 'cart' && from.name == 'index') { 
+  // let isRefresh =  sessionStorage.getItem('Refresh')
+  // if(to.name== 'cart' && from.name == 'index') { 
    
-    if(isRefresh == '1'){
-     router.go(0)
-      // window.location.reload()
-    }else{
-      sessionStorage.setItem('Refresh',1);
-    }
-  }else if(to.name== 'cart' && from.name == 'id'){
-    if(isRefresh == '1'){
-      router.go(0)
-    }else{
-      sessionStorage.setItem('Refresh',1);
-    }
-  }else if(to.name== 'cart' && from.name == 'login'){
-    sessionStorage.setItem('isRefresh',1);
-    if(isRefresh == '1'){
-      router.go(0)
-    }
-  }else if(to.name== 'cart' && from.name == 'member'){
-    if(isRefresh == '1'){
-      router.go(0)
-    }else{
-      sessionStorage.setItem('Refresh',1);
-    }
-  }else if(to.name !=='popularize' ){
+  //   if(isRefresh == '1'){
+  //    router.go(0)
+  //     // window.location.reload()
+  //   }else{
+  //     sessionStorage.setItem('Refresh',1);
+  //   }
+  // }else if(to.name== 'cart' && from.name == 'id'){
+  //   if(isRefresh == '1'){
+  //     router.go(0)
+  //   }else{
+  //     sessionStorage.setItem('Refresh',1);
+  //   }
+  // }else if(to.name== 'cart' && from.name == 'login'){
+  //   sessionStorage.setItem('isRefresh',1);
+  //   if(isRefresh == '1'){
+  //     router.go(0)
+  //   }
+  // }else if(to.name== 'cart' && from.name == 'member'){
+  //   if(isRefresh == '1'){
+  //     router.go(0)
+  //   }else{
+  //     sessionStorage.setItem('Refresh',1);
+  //   }
+  // }else 
+  if(to.name !=='popularize' ){
 
     // setTimeout(()=> {
     //   setShare('聚康供采平台', '供应商与采购商的理想平台', require('./common/img/logo.png'), location.href, encodeURIComponent(location.href.split('#')[0]))

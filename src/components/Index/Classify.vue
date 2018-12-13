@@ -2,7 +2,7 @@
   <div class="classify">
       <ul class="classify-wrap">
           <li class="item" v-for="(item,index) in goodsTypeList" :key="index">
-            <router-link :to="{name:'goods',params:{id:item.typeId}}" class="link">
+            <router-link :to="{name:'goods',query:{id:item.typeId}}" class="link">
                 <span >
                     <div class="box" :class="imgList[index]"></div>
                 </span>
@@ -90,7 +90,7 @@
             .text
                 padding-top 0.1rem
                 font-size $font-highlight
-                color $color-highlight
+                color $color-text-d
 
             
         

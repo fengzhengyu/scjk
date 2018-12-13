@@ -96,7 +96,9 @@
 <style lang="stylus" scoped>
  @import "~common/stylus/variable.styl"
 .goods 
-    padding-bottom 55px;     
+    padding-bottom .9rem; 
+    padding-top .15rem
+    background #f2f2f2    
     .load-more-wrap 
         padding-left  .13rem
         overflow hidden
@@ -105,7 +107,8 @@
         .goods-list 
             float left;
             width 3rem;
-            margin 0 .13rem .25rem 0
+            margin 0 .13rem .15rem 0
+            background #fff    
         
             .list-img 
                 width: 100%;
@@ -129,7 +132,7 @@
                    overflow hidden
                 p
                    padding-top .2rem
-                   color $color-text-d
+                   color $color-highlight
                    font-size $font-info 
                    position relative
                    &.text

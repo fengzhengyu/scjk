@@ -37,20 +37,19 @@
             </div>
         </div>
     </div>
-    <div class="empty-goods" v-show="cartList.length<=0 && isLoad">
-        购物车空空如也
-    </div>
+   
     <div class="footer-fiexd" v-show="cartList.length>0">
         <div class="all-check" @click="checkAllFlag?checkAll(false):checkAll(true)">
             <i class="iconfont icon-weixuanzhong" :class="{'icon-xuanzhong':checkAllFlag}"></i>
             <span>全选</span>
         </div>
-        <div class="total-wrap" v-show="!deleteStatus">
-            <div class="total">合计:￥{{countTotalPrice}}</div>
-            <div class="next-btn" @click="nextStep">结算</div>
-        </div>
+        <div class="total">商品合计<span>￥{{countTotalPrice}}</span></div>
+        
+           
+        <div class="next-btn" @click="nextStep" v-show="!deleteStatus">去结算()</div>
+        
         <div class="delete" v-show="deleteStatus" @click="deleteGoods">
-            删除
+            删除()
         </div>
     </div>
 </div>
@@ -332,8 +331,7 @@
 </script>
 <style lang="stylus" scoped>
     .cart
-        padding-top 40px
-        padding-bottom .8rem
+        padding-bottom .9rem
         background #fff
        .shop
            overflow hidden
@@ -458,9 +456,9 @@
         
     .footer-fiexd
         position fixed
-        bottom 0
+        bottom .88rem
         width 6.4rem
-        height .8rem
+        height .9rem
         line-height  .8rem
         background #fff
         overflow hidden
@@ -474,30 +472,42 @@
                 &.icon-xuanzhong
                     color #cc3e2e
              span 
-                font-size .24rem
-        .total-wrap
-            float right 
-            font-size .26rem
-            .total
-                float left
-               
-                font-weight bold
-                margin-right .2rem
-            .next-btn
-                float right
-                height 100%
-                width 1.5rem
-                text-align center
-                background #ff0000
-                color #fff
+                font-size .22rem
+        
+           
+        .total
+            float left
+            font-size .22rem
+            font-weight bold
+            margin-right .2rem
+            color #000000
+            span    
+                color #ff6600
+                font-size .26rem
+        .next-btn
+            float right
+           
+            width 1.7rem
+            text-align center
+            // background #f86320
+            color #fff
+            display inline-block
+            line-height .7rem
+            border-radius .5rem
+            font-size .24rem
+            margin-right .3rem
+            background-image linear-gradient(-90deg,#e93b3d,#ff9574);
         .delete
             float right 
-            font-size .26rem
-            height 100%
-            width 1.5rem
+            font-size .24rem
+            height .7rem
+            width 1.7rem
             text-align center
-            background #e4393c
+            line-height .7rem
+            background #fe4600
             color #fff
+            margin-right .3rem
+            border-radius .05rem
 
 
 </style>    

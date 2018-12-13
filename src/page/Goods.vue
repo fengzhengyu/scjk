@@ -1,42 +1,60 @@
 <template>
-    <div class="goods">
-       <mt-header :title="title" fixed>
-            <router-link to="/" slot="left">
-                <mt-button icon="">
-                    <i class="iconfont icon-fanhui"></i>
-                </mt-button>
-            </router-link>
+    <div>
+        <RankHead></RankHead>
+    
+        <div class="goods border-top">
+            <div class="menu-wrapper " ref="menuWrapper">
+                <ul>
+                    <li class="menu-list border" v-for="(item,index) in typeName" :key="index" :class="{'current':active == item.typeId}" @click="navTap(item.typeId)"> {{item.typeName}} <i></i></li>
+                </ul>
+            </div>
+            <div class="goods-wrapper" ref="goodsWrapper">
+                <ul>
+                    <li class="goods-list border-bottom" v-for="(item,index) in goodsList" :key="index" @click="goDetail(item)">
+                        <div class="img">
+                            <img :src="item.goodsPhoto" alt="">
+                        </div>
+                        <div class="content">
+                            <h2 class="title">{{item.goodsName}}</h2>
+                            <p class="norms">{{item.goodsSpecification}}</p>
+                            <p class="price">{{item.goodsRetailPrice}} </p>
+                            <p class="buy-pirce">采购价：￥100</p>
+                            <div class="cart-control-wrapper">
+                               
+                                    <div class="cart-decrease icon-circle" >
+                                        <i class="iconfont icon-jian"></i>
+                                        </div>
+                                    <div class="cart-count" >0</div> 
+                                    <div class="cart-add icon-circle" >
+                                        <i class="iconfont icon-jiaru"></i>
+                                       </div>
+                               
+                            </div>
+                        </div>
+                    </li>
+                    <div class="bottom-tip" v-if="goodsList.length>0 ">
+                        <span class="loading-hook"> <img src="../common/img/loading-svg/loading-spinning-bubbles.svg"> 加载中...</span>
+                    </div>
+                </ul>
+                
+                <div class="no-goods" v-if="goodsList.length<=0 && isLoad">数据载入中</div>
+            </div>
           
-        </mt-header>
-        <div class="top-nav">
-            <div :class="{'active': active==1}" @click="active=1,getGoodsTypeList('recommend')" >推荐</div>
-            <div :class="{'active': active==2}" @click="active=2 ,tabStatus =!tabStatus,getGoodsTypeList(tabStatus ==true?1:0)">价格<i class="iconfont icon-xiaosanjiaodown" :class="{'icon-xiaosanjiaoup': tabStatus==1}"></i></div>
-            <div :class="{'active': active==3}" @click="active=3,getGoodsTypeList('salesVolume')">销量</div>
+            
+            
+           
         </div>
-        <!-- <mt-loadmore :bottom-method="loadBottom" ref="loadmore" :auto-fill="isAutoFill" :bottom-all-loaded="allLoaded" v-if="isLoad"> -->
-            <GoodsList 
-                :goodsList="goodsList"
-                :loading="end"
-                v-if="isLoad"
-                v-infinite-scroll="loadMore"
-                infinite-scroll-disabled="loading"
-                infinite-scroll-distance="10"
-                class="goods-list"
-            ></GoodsList>    
-        <!-- </mt-loadmore> -->
-       
-        <div v-if="goodsList.length<=0 && isLoad" class="no-goods">
-            暂无商品！
-        </div>
-        
-        <!-- <router-view></router-view> -->
-        <Footer></Footer> 
+        <!-- <Footer></Footer>  -->
     </div>
+    
 </template>
 <script>
-import { getGoodsTypeData, getIndexData } from 'common/api'
+    import BScroll from 'better-scroll'
+     import RankHead from 'components/goods/RankHead.vue'
+    import { getGoodsTypeData, getIndexData } from 'common/api'
     import GoodsList from 'components/Index/GoodsList.vue'
-     import Footer from 'components/common/Footer'
+    
+    import Footer from 'components/common/c-footer'
     export default {
         data() {
             return {
@@ -47,12 +65,13 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 goodsList: [],
                 page: 1,
                 loading: true,  //true为禁止，false 为启动
-                end: false, //true  加载到底了
                 isLoad:false
             }
         },
         created(){
             this.userCode = this.getCookie('userCode')
+            this.active = this.$route.query.id || 1;
+
             this.getTypeName();
             this.$indicator.open({
                 text: 'Loading...',
@@ -60,6 +79,74 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
             })
             this.getGoodsTypeList('recommend');
            
+         
+           
+        },
+        mounted(){
+              this.$nextTick(() => {
+                    this.menuScroll = new BScroll(this.$refs.menuWrapper,{
+                            click: true
+                    })
+                    this.goodsScroll = new BScroll(this.$refs.goodsWrapper,{
+                            click: true,
+                            scrollY: true,
+                            pullUpLoad: {
+                                threshold: -10, // 当上拉距离超过30px时触发 pullingUp 事件
+                                mouseWheel: {    // pc端同样能滑动
+                                    speed: 20,
+                                    invert: false
+                                },
+                                useTransition:false  // 防止iphone微信滑动卡顿
+                            }
+            
+                    });
+                
+                 console.log(this.goodsList)
+                    this.goodsScroll.on('pullingUp', (pos) => {
+                        
+                        
+                        if(this.goodsScroll ) { //&& !this.loading
+                      
+                                if(!this.loading){
+                                    this.page++
+                                    setTimeout(()=>{
+                                        getGoodsTypeData({typeId:this.active,userCode:this.userCode,screening:'recommend',page:this.page}).then((response)=>{
+                                        let res = response.data;
+                                            console.log( res)
+                                            if(res.flag == 'success'){
+                                                this.goodsList  = res.typeGoodsList;
+                                                if(res.msg== '已到底部'){ 
+                                                    document.querySelector('.loading-hook').innerHTML = '~ 到底了 ~';
+                                                    this.loading = true;           
+                                                return;
+                                                }
+                                                this.loading = false;
+                                            }
+                                        },(err)=>{console.log(err)});
+
+                                    },300)
+
+                                }
+                            
+                        
+                                this.goodsScroll.refresh()
+                                this.goodsScroll.finishPullUp()
+                            }
+                        
+
+                        
+                        // this.goodsScroll.finishPullUp(); // 事情做完，需要调用此方法告诉 better-scroll 数据已加载，否则上拉事件只会执行一次
+                    })
+
+            })
+           
+        },
+         watch: {
+        $route(){
+            this.page =1;
+            this.goodsList =[];
+            this.getGoodsTypeList('recommend')
+            }
         },
        
         methods:{
@@ -67,7 +154,7 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 let {data:res} = await getIndexData();
                 if(res.goodsTypeList){
                     this.typeName = res.goodsTypeList;  
-                  this.getTitle();//获取分类名称 
+                    this.getTitle();//获取分类名称 
                 }
                 
                  
@@ -86,20 +173,25 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
             },
             async getGoodsTypeList(value){
                 this.page =1;
-               
-                let {data:res} = await getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page});
+                let {data:res} = await getGoodsTypeData({typeId:this.active,userCode:this.userCode,screening:value,page:this.page});
                 if(res.flag == 'success'){
 
                     this.goodsList = res.typeGoodsList;
-                    this.isLoad = true;
-                    this.loading = false;
-                   
+                    this.loading = false;     
                 }
-               
-                this.$indicator.close()
-               
+               this.$indicator.close()
+               this.isLoad = true
                 
 
+            },
+            navTap(id){
+                this.active = id;
+                this.$router.push({
+                     name:'goods',
+                        query: {
+                            id: id
+                        }
+                })
             },
                //上拉刷新
             loadMore(){
@@ -111,84 +203,161 @@ import { getGoodsTypeData, getIndexData } from 'common/api'
                 }else if(this.active == 3){
                     value = 'salesVolume';
                 }
-
-                this.loading = true;
-
-                setTimeout(()=>{
-                    this.page++
-                   getGoodsTypeData({typeId:this.$route.params.id,userCode:this.userCode,screening:value,page:this.page}).then((response)=>{
-                       let res = response.data;
-                        if(res.flag == 'success'){
-                            this.goodsList  = res.typeGoodsList;
-                            if(res.msg== '已到底部'){
-                                this.loading = true;
-                                this.end = true;
-                                this.$toast({
-                                    message: '没有更多数据了',
-                                    position:'middle',
-                                    duration: 2000
-                                });
-                                
-                            }else{
-                                this.loading = false;
-                            }
-                        }
-                    },(err)=>{console.log(err)});
-                   
-
-                },300)
-
-               
-            
-                
-                
             },
+            goDetail(item){
+                this.$router.push({
+                    name: 'id',
+                    params: {goodsId: item.goodsId}
+                })
+            }
 
         },
         components: {
+             RankHead,
              GoodsList,
              Footer 
         }
     }
 </script>
 <style lang="stylus" scoped>
+@import "~common/stylus/variable.styl"
+    
     .goods
-        background #ffffff
-        .mint-header
-            width 6.4rem
-            margin 0 auto
-            background #ffffff
-            color #000
-            font-size 18px
-            .mint-header-button 
-                .iconfont 
-                    font-size 20px
-                .mint-header-title
-                    font-weight bold
-        .top-nav
-            padding-top 40px
-            height .6rem
-            border-bottom 1px solid #c9c9c9
-            display flex
-            margin-bottom .15rem
-            div
-                flex 1
-                line-height .6rem
+        width 6.4rem
+        display flex
+        position absolute
+        top .8rem
+        // bottom .9rem
+        bottom 0
+        overflow: hidden;
+        .menu-wrapper
+            flex: 0 0 1.4rem;
+            width: 1.4rem;
+            background: #f8f8f8;
+            overflow: hidden;
+            .menu-list
+                border-left 0.05rem solid $color-text
+                height .8rem
+                line-height .8rem
                 text-align center
-                font-size .24rem
-                color #898989
+                color $color-text-d
+                font-size  $font-info
+                position relative
+                // border-bottom 1px solid #dddddd
                 i 
-                    font-size .24rem
-                &.active 
-                    color #ff0000
-                    border-bottom 2px solid #ff0000
-        .goods-list
-            padding-bottom 55px;     
-        .no-goods
-            text-align center
-            line-height 3rem
-            font-size .22rem
-            color #666                   
+                  height 100%  
+                  position absolute
+                  width 1px
+                  right 0
+                  top 0
+                  background #fff
+                  display none
+                &.current
+                  border-left-color $color-theme  
+                  background #fff
+                  i 
+                    display block
+                  
+                 
+                 
+                 
+        .goods-wrapper
+            flex: 1;  
+            position relative  
+            
+
+            ul
+                margin-left .2rem 
+                .goods-list
+                    padding .25rem 0
+                    display: flex;
+                  
+                    .img
+                        flex 0 0 1.15rem
+                        margin-right .2rem
+                        height 1.15rem
+                        img 
+                            width 100%
+                            height  100%
+                    .content
+                        flex 1    
+                        position relative
+                        margin-right .2rem
+                        .title
+                            font-size $font-highlight
+                            font-weight bold
+                            height .25rem
+                            line-height .25rem
+                            color $color-highlight
+                            width 3.25rem
+                            text-overflow: ellipsis
+                            overflow: hidden
+                            white-space: nowrap
+                        p 
+                            padding-top .14rem
+                            height .16rem
+                            line-height .16rem
+                            color $color-highlight
+                            font-size $font-info
+                            width 3.25rem
+                            text-overflow: ellipsis
+                            overflow: hidden
+                            white-space: nowrap
+                            &.buy-pirce
+                                color $color-theme 
+                        .cart-control-wrapper
+                            position absolute
+                            right  0
+                            bottom 0
+                            font-size: 0;
+                            .cart-decrease, .cart-add
+                                display: inline-block;
+                               
+                            .cart-count
+                                display: inline-block;
+                               
+                                width .3rem
+                                height .3rem
+                                padding 0 .05rem
+                                color: #000;
+                                font-size $font-info
+                                line-height: .3rem;
+                                text-align: center;
+                                font-size .18rem
+                            .icon-circle
+                                width .3rem
+                                height .3rem
+                                background  $color-theme
+                                border-radius 50%
+                                line-height .3rem
+                                text-align center
+                                font-size $font-info
+                                i 
+                                    font-size .18rem
+                                    color #fff
+                                    font-weight bold
+            .bottom-tip
+                width 100%
+                height: 40px;
+                line-height: 40px;
+                text-align: center;
+                color: #000;
+                background: #fff;
+                font-size .18rem
+                .loading-hook
+                    img 
+                        width .3rem
+              
+                
+
+           
+            .no-goods
+                display flex
+                justify-content center
+                height 100%
+                align-items center
+                font-size .2rem
+                color #666                   
 </style>
 
 

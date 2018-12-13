@@ -1,55 +1,70 @@
 <template>
     <div class="member">
         <div class="member-header">
-            <div class="photot" @click="hanldePhoto">
-                <img src="../common/img/account.png" alt="头像" v-show="!isLogin">
-                <img :src="photoImg" alt="头像" v-show="isLogin">
-            </div>
-            <div class="nickname">
-                <p class="name">{{userName}}</p>
-                <p class="icon">聚康{{userLevelName}}</p>
-            </div>
+            
         </div>
-        <div class="order-nav">
-            <div class="list"  @click="goMyOrder(1)">
-                <i class="iconfont icon-yifukuan"></i><br/>
-                已付款
+        <div class="info-wrapper">
+            <div class="info">
+                <div class="photo" @click="hanldePhoto">
+                    <img src="../common/img/account.png"  v-if="!isLogin">
+                    <img :src="photoImg"  v-if="isLogin">
+                </div>
+                <div class="nickname">
+                    <p class="name">{{userName}}</p>
+                    <p class="icon">
+                        <i class="iconfont icon-huiyuantongjibaobiao"></i>
+                        {{userLevelName}}
+                        </p>
+                </div>
+                <div class="bar"></div>
             </div>
-            <div class="list"  @click="goMyOrder(2)">
-                <i class="iconfont icon-renwuwanchengqingkuangyujing"></i><br/>
-                已完成
-            </div>
-            <div class="list" @click="goCollect">
-                <i class="iconfont icon-shangpinshoucang"></i><br/>
-                已收藏
+            <div class="order-nav">
+                <div class="list"  @click="goMyOrder(1)">
+                    <i class="iconfont icon-daifukuan"></i><br/>
+                    待付款
+                </div>
+                <div class="list"  @click="goMyOrder(2)">
+                    <i class="iconfont icon-icon3"></i><br/>
+                    待发货
+                </div>
+                <div class="list" @click="goCollect">
+                    <i class="iconfont icon-hongjiuchengicondaishouhuo"></i><br/>
+                    待收货
 
+                </div>
+                <div class="list" @click="goCollect">
+                    <i class="iconfont icon-yishoukuan"></i><br/>
+                    已完成
+
+                </div>
+                <div class="list last" @click="goCollect">
+                    <i class="iconfont icon-quanbudingdan"></i><br/>
+                    全部订单
+
+                </div>
             </div>
         </div>
-        <div class="menu-list" @click="goPassword">
-            设置登录密码
-            <span class="right">
-                <i class="iconfont icon-qianjin1"></i>
-            </span>
-        </div>
-        <div class="menu-list">
-            手机号
-           <span class="phone">{{phone}}</span>
-        </div>
-         <div class="menu-list" @click="goPopularize">
-            我要推广
+      
+       
+        
+        <div class="menu-list" @click="goAddress">
+            收货地址
            <span class="right">
                 <i class="iconfont icon-qianjin1"></i>
             </span>
         </div>
-        <div class="exit" @click="exit" v-show="isLogin">
-            退出
+         <div class="menu-list" @click="goPopularize">
+           个人信息
+           <span class="right">
+                <i class="iconfont icon-qianjin1"></i>
+            </span>
         </div>
-        <div class="exit" @click="login" v-show="!isLogin">
-            登录
-        </div>
-        <p class="client">
-            客服电话：<a href="tel:13658050467">13658050467</a> 王
-        </p>
+        <div class="menu-list" @click="goPassword">
+            系统设置
+            <span class="right">
+                <i class="iconfont icon-qianjin1"></i>
+            </span>
+        </div>  
 
         <a href="https://m.kuaidi100.com/" target="_blank" class="expressage">快递查询</a>
 
@@ -77,7 +92,7 @@
 </template>
 <script>
     import { getMemberData, getLoadPhotoData } from 'common/api'
-    import Footer from 'components/common/Footer.vue'
+    import Footer from 'components/common/c-footer.vue'
     export default {
         data(){
             return {
@@ -150,6 +165,19 @@
                     });
                 }
                 
+            },
+            goAddress(){
+                if(this.userCode){
+                    this.$router.push({
+                        name: 'address'
+                    })
+                }else{
+                     this.$toast({
+                        message: '请先登录！',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                }
             },
             goPopularize(){
                 if(this.userCode){
@@ -237,89 +265,113 @@
 </script>
 <style lang="stylus" scoped>
     .member
-        background #ffffff
         position absolute
-        left 0
-        bottom 0
-        top 0
-        right 0 
         width 6.4rem
-        margin 0 auto
+        background #f3f4f6
+        top 0
+        bottom 0
+        z-index 20
         .member-header
            
             height 1.8rem
-            background-image linear-gradient(-90deg,#e93b3d,#ff9574);
-            padding .8rem 0 0 .4rem
-            div
-                display inline-block
-              
-            .photot
-                // margin .8rem 0 0 .4rem
-                width 1rem
-                height 1rem
-                border-radius 50%
+            background url('../common/img/member-bg.png')
+            background-size 100% 100%
+        .info-wrapper
+            position relative  
+            margin 0 .15rem      
+            height 2rem    
+            
+            .info
+                background #fff
+                // height 2.4rem
+                position absolute
+                top -1rem
+                width 5.5rem
+                padding  .3rem
                 overflow hidden
-                vertical-align top
-               
-                img 
-                    width 100%
-                    height 100%
-            .nickname
-                padding-left .2rem
-                .name
-                    padding .1rem 0
-                    font-size .26rem
-                    color #ffffff
-                .icon
-                    margin .1rem 0
-                    padding 0 .1rem
-                    height .3rem
-                    background #ffffff
-                    line-height .35rem
-                    text-align center
-                    border-radius .3rem
-                    color #ff7575
-                    font-size .18rem
-        .order-nav
-            display flex
-            padding-bottom .2rem
-            border-bottom 1px solid #c9c9c9
-            .list 
-                flex 1
-                text-align center
-                color #1a1a1a
-                font-size .2rem
-                i 
-                    font-size .5rem
+                div 
                     display inline-block
-                    padding .2rem 0
-                    color #a5a5a5
-        .menu-list
-            border-bottom 1px solid #c9c9c9
-            height .6rem
-            line-height .6rem
-            font-size .24rem
-            color #000
-            // padding-left .15rem
-            padding .15rem 0 .15rem .15rem;
-            .right,.phone 
-               float right 
-               color #a1a1a1
-               margin-right .15rem
+                .photo
+                    width 1rem
+                    height 1rem
+                    border-radius 50%
+                    overflow hidden
+                    vertical-align top
+                    img
+                        width 100%
+                        height 100%
+                .nickname
                 
-        .exit
-            padding-left .15rem
-            height .6rem
-            line-height .6rem
-            color red
-            font-size .24rem
-        .client
-            padding .5rem 0
-            text-align center
-            color #343434
-            span 
-                color #3c3cff
+                    .name
+                        padding .15rem 0 .25rem  .15rem
+                        font-size .26rem
+                        color #414141
+                    .icon
+        
+                        margin-left .15rem
+                        width 1.4rem
+                        height .3rem
+                        background #82848a
+                        line-height .3rem
+                        text-align center
+                        border-radius .3rem
+                        color #ffffff
+                        font-size .16rem       
+                        position relative
+                        i 
+                            font-size .2rem   
+                            position absolute
+                            top .0rem
+                            left .1rem
+                .bar
+                    width 1.38rem
+                    height .75rem
+                    background url('../common/img/member-icon.png')
+                    background-size 100% 100%
+                    float right
+                    margin-top .2rem
+           
+
+            .order-nav
+                background #fff
+                height 1.4rem
+                display flex
+                position absolute
+                bottom 0
+                width 100%
+                justify-content center
+                align-items center
+              
+                .list 
+                    flex 1
+                    text-align center
+                    color #2c2c2c
+                    font-size .18rem
+                    i 
+                        font-size .45rem
+                        display inline-block
+                        padding-bottom .2rem
+                        color #686868
+                    &.last
+                        border-left .01rem solid #e2e2e2
+                        i 
+                            color #ff6600    
+        .menu-list
+          
+            height .8rem
+            line-height .8rem
+            font-size .2rem
+            color #161616
+            padding 0 .3rem
+            background #fff
+            margin .15rem;
+            .right
+               float right 
+               i 
                 font-size .24rem
+                color #bdbdbd
+                
+        
 
         .update-photo
             width: 6.4rem;
