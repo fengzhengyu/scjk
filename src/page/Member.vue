@@ -5,17 +5,17 @@
         </div>
         <div class="info-wrapper">
             <div class="info">
-                <div class="photo" @click="hanldePhoto">
-                    <img src="../common/img/account.png"  v-if="!isLogin">
-                    <img :src="photoImg"  v-if="isLogin">
+                <div class="photo" @click="hanldePhoto" v-if="isLogin">
+                    <img :src="photoImg"  >
                 </div>
-                <div class="nickname">
+                <div class="nickname" v-if="isLogin">
                     <p class="name">{{userName}}</p>
                     <p class="icon">
                         <i class="iconfont icon-huiyuantongjibaobiao"></i>
-                        {{userLevelName}}
+                        &nbsp;&nbsp;&nbsp;{{userLevelName}}
                         </p>
                 </div>
+                <div class="login" v-if="!isLogin" @click="login">点击登录</div>
                 <div class="bar"></div>
             </div>
             <div class="order-nav">
@@ -53,13 +53,13 @@
                 <i class="iconfont icon-qianjin1"></i>
             </span>
         </div>
-         <div class="menu-list" @click="goPopularize">
+         <div class="menu-list" @click="goUser">
            个人信息
            <span class="right">
                 <i class="iconfont icon-qianjin1"></i>
             </span>
         </div>
-        <div class="menu-list" @click="goPassword">
+        <div class="menu-list" @click="goSetting">
             系统设置
             <span class="right">
                 <i class="iconfont icon-qianjin1"></i>
@@ -87,7 +87,7 @@
         </mt-popup>
         <Footer></Footer>
 
-        <router-view></router-view>
+        <!-- <router-view></router-view> -->
     </div>
 </template>
 <script>
@@ -128,8 +128,7 @@
             goMyOrder(id){
                 if(this.userCode){
                     this.$router.push({
-                        name: 'myorder',
-                        params: {id:id}
+                        name: 'myorder'
                     })
                 }else{
                      this.$toast({
@@ -170,6 +169,32 @@
                 if(this.userCode){
                     this.$router.push({
                         name: 'address'
+                    })
+                }else{
+                     this.$toast({
+                        message: '请先登录！',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                }
+            },
+              goUser(){
+                if(this.userCode){
+                    this.$router.push({
+                        name: 'user'
+                    })
+                }else{
+                     this.$toast({
+                        message: '请先登录！',
+                        position: 'middle',
+                        duration: 2000
+                    });
+                }
+            },
+            goSetting(){
+                if(this.userCode){
+                    this.$router.push({
+                        name: 'setting'
                     })
                 }else{
                      this.$toast({
@@ -291,6 +316,9 @@
                 overflow hidden
                 div 
                     display inline-block
+                .login
+                    padding .4rem .35rem .35rem 0
+                    font-size .24rem    
                 .photo
                     width 1rem
                     height 1rem
@@ -307,21 +335,26 @@
                         font-size .26rem
                         color #414141
                     .icon
-        
+                        // display: table-cell;
+                        // text-align: center;
+                        // vertical-align: middle;
                         margin-left .15rem
                         width 1.4rem
-                        height .3rem
+                        // height .3rem
+                        padding  .05rem 0 
                         background #82848a
-                        line-height .3rem
+                        // line-height .3rem
+                        line-height:normal;
                         text-align center
                         border-radius .3rem
                         color #ffffff
                         font-size .16rem       
                         position relative
-                        i 
-                            font-size .2rem   
+                
+                        i   
+                            font-size .28rem   
                             position absolute
-                            top .0rem
+                            top 0.01rem
                             left .1rem
                 .bar
                     width 1.38rem

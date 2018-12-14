@@ -1,16 +1,47 @@
 <template>
     <div class="order-write">
-        <mt-header title="填写订单" >
+        <!-- <mt-header title="填写订单" >
             <span to="" slot="left" @click="goBack">
                 <mt-button icon="">
                     <i class="iconfont icon-fanhui"></i>
                 </mt-button>
             </span>        
-        </mt-header>
-        <div class="hint">
-            <i class="iconfont icon-iconfontzhizuobiaozhun023132"></i>
-            温馨提示：发票为必填项，请确认相关商品信息后提交订单
+        </mt-header> -->
+        <div class="header">
+            <div class="top">
+                <div class="back" @click="$router.go(-1)">
+                <i class="iconfont icon-fanhui2"></i>
+                </div>
+                <div class="text">订单结算</div>
+            </div>
+            <div class="tab-wrap">
+                <div class="tab">
+                    <div class="left active">
+                        <i class="iconfont icon-peisong1"></i>
+                        <span>物流配送</span>
+                    </div>
+                    <div class="right">
+                         <i class="iconfont icon-mendianzitiicon"></i>
+                         <span>上门自提</span>
+                    </div>
+                </div>
+                <div class="address-content">
+                    <div class="change" style="display: none">
+                        <!-- <div >sdfsdfsfsfsf</div> -->
+                        <div class="add">
+                            <span class=" circle">  <i class="iconfont icon-jiaru"></i></span>
+                            选择收货地址
+                        </div>
+                       
+                    </div>
+                    <div class="self">
+                        sfsdfsdfsfsd
+                    </div>
+                    <div class="next"><i class="iconfont icon-qianjin1"></i></div>    
+                </div>
+            </div>
         </div>
+      
         <div class="address" v-show=" active == '上门自提'">
             <div class="come-door">上门自提</div>
             <div class="text">四川省广汉市东莞路二段10号内一号市场二层<br/><span>上午9:00—下午17:00</span> 咨询电话：<a href="javascript:;">13658050467</a> 王</div>
@@ -339,24 +370,108 @@
 </script>
 <style lang="stylus" scoped>
     .order-write
-        background #fff
+        background #f3f4f6
         width 6.4rem
         position absolute
         top 0
-        left 0
-        right 0
         bottom 0
-        margin 0 auto
-        overflow-y auto
-        .mint-header
-            background #ffffff;
-            color #000
-            font-size 18px
-            .mint-header-button 
-                .iconfont 
-                    font-size 20px
-                .mint-header-title
-                    font-weight bold
+       
+        .header
+            width 100%
+            height 2.63rem
+            background url('../../common/img/result-bg.png')   
+            background-size 100% 100% 
+            .top
+                height .9rem
+                line-height .9rem
+             
+                color #fff
+               
+                div
+                    float left
+                .back
+                    width .8rem
+                    text-align center
+                    height 100%
+                
+                    i 
+                        font-size .3rem
+                        color #fff
+                .text 
+                    font-size .26rem
+            .tab-wrap
+                margin 0 .13rem
+                .tab
+                    height .8rem
+                    overflow hidden
+                    div
+                        width 3rem
+                        height 100%
+                        background #fecfb0
+                        color #474747
+                        font-size  .24rem
+                        line-height .8rem
+                        text-align center
+                        font-weight 700
+                        i 
+                            font-size  .32rem
+                        span
+
+                            font-size  .24rem
+                        &.left
+                            float left
+                            
+                        &.right 
+                            float right  
+                        &.active
+                            background #fff
+                            color #ff6600
+                .address-content
+                    padding .4rem 0
+                    background #fff
+                    display flex
+                    width 100%
+                    div
+
+                    .change 
+                        flex 1
+                        height .8rem
+                        .add
+                            border .03rem  solid #ff6600
+                            font-weight 700
+                            width 2.8rem
+                            padding .21rem 0
+                            font-size .24rem
+                            line-height normal
+                            text-align center 
+                            color #474747
+                            border-radius .15rem
+                            margin 0 auto
+                            .circle
+                                width .28rem
+                                display inline-block
+                                background #ff6600
+                                color #fff
+                                line-height normal
+                                text-align center
+                                // padding .07rem 0
+                                border-radius 50%
+                                vertical-align top
+                                margin-top .01rem
+                                i 
+                                    font-size 0.16rem
+                    .next
+                        flex 0 0 .45rem
+                        width 45rem
+                        line-height .8rem
+                        i 
+                            font-size .24rem
+                            color #c1c1c1
+
+                    .self
+                        flex 1
+                        height .8rem
+
         .hint
             background #f08080
             height .6rem

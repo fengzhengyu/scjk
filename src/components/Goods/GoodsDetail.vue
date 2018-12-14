@@ -344,8 +344,9 @@
                 border 0.01rem solid #fd7f31
                 text-align: center;
                 vertical-align: text-bottom;
-                height .32rem
-                line-height .34rem
+                // height .32rem
+                line-height normal
+                padding .05rem 0
                 width .8rem
                 margin-left .10rem
                 border-radius .05rem

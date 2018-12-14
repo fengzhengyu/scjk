@@ -2,17 +2,13 @@
   
    <transition name="slide">
     <div class="address-list">
-        <div class="header border-bottom">
-          <div class="back" @click="$router.go(-1)">
-            <i class="iconfont icon-fanhui2"></i>
-          </div>
-          <div class="text">我的收货地址</div>
-          <div class="add" @click="$router.push({name:'addressAdd'})">
-            <i class="iconfont icon-jiaru">
-            </i>
-          </div>
-        </div>
-
+        <mHeader>
+             <div class="text" slot="text">我的收货地址</div>
+             <div class="add" @click="$router.push({name:'addressAdd'})" slot="handle">
+                <i class="iconfont icon-jiaru">
+                </i>
+            </div>
+        </mHeader>
         <ul class="list ">
               <li v-for="(item,index) in addressList" :key="index" class="border-bottom">
                   <div class="info">
@@ -51,6 +47,7 @@
 <script>
     import EventBus from 'common/js/eventBus.js'
     import {  getAddressData, delAddressData } from 'common/api'
+    import mHeader from 'components/Member/memberHead'
   export default {
       // props: {
       //     userCode: {
@@ -147,6 +144,9 @@
     // 只有在组件销毁前，bus页面created 才能接受eventBus$on
     beforeDestroy(){
             EventBus.$emit('changeEditAddressMsg',this.addressItem)
+    },
+    components: {
+        mHeader
     }
     
     
@@ -164,7 +164,7 @@
   top 0
   width 6.4rem
   bottom 0
-  z-index 999
+//   z-index 999
   
   .header
     height .8rem
@@ -210,12 +210,12 @@
               width .55rem
               span
                 width .45rem
-                height .25rem
+                padding .03rem 0
                 background #fd7722
                 color #ffffff
                 font-size .16rem
                 text-align center
-                line-height .25rem
+                line-height normal
                 display block
                         
             .msg 

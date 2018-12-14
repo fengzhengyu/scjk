@@ -2,21 +2,16 @@
   
    <transition name="slide">
     <div class="address-list">
-        <div class="header border-bottom">
-          <div class="back" @click="$router.go(-1)">
-            <i class="iconfont icon-fanhui2"></i>
-          </div>
-          <div class="text">添加收货地址</div>
-          <div class="save">
-            保存
-          </div>
-          <!-- <div class="del">
-            删除
-          </div> -->
-        </div>
+      
+        <mHeader>
+           <div slot="text" class="text">添加收货地址</div>
+           <div slot="handle"  class="save">保存</div>
+             <!-- <div slot="handle"  class="del">删除</div> -->
+        </mHeader>
 
         <ul class="user-info">
              <li class="border-bottom">
+               
                  <span>收货人</span>
                  <input type="text" placeholder="收货人姓名" maxlength="15" v-model="addressName">
                  <!-- <div>x</div> -->
@@ -37,7 +32,7 @@
              <li class="border-bottom last">
                  <span>设为默认</span>
                  <p class="btn" >
-                     <i class="iconfont icon-danxuanxuanzhong" ></i>
+                     <mt-switch v-model="defaultStatus" class="mt-btn"></mt-switch>
                  </p>
              </li>
               
@@ -62,6 +57,7 @@
   import { Picker } from 'mint-ui';
   import EventBus from 'common/js/eventBus.js'
   import { addressDataAdd , addressDataSave } from 'common/api'
+   import mHeader from 'components/Member/memberHead'
   export default {
     // props: {
     //       userCode: {
@@ -101,7 +97,7 @@
       // but ,接受的参数是打印多次的，因为不会自动销毁事件，需要手动消除，在beforeDestroy组件销毁前移除事件
         // EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
 　　
-      
+       
      
     },
     watch: {
@@ -158,6 +154,9 @@
       }
     },
     methods: {
+      a(){
+         console.log(this.defaultStatus)
+      },
       // 初始化三级联动
       pickerInit(){
         this.getProvinceArr();
@@ -351,6 +350,9 @@
     // 在beforeDestroy组件销毁前移除事件
     beforeDestroy () {
        EventBus.$off('changeEditAddressMsg');
+    },
+    components: {
+        mHeader
     }
     
   }
@@ -366,7 +368,7 @@
   top 0
   width 6.4rem
   bottom 0
-  z-index 999
+  // z-index 999
   
   .header
     height .8rem
@@ -428,15 +430,10 @@
      .btn
        position absolute 
        right  .3rem
-       bottom .1rem
-       
-       i 
-         font-size .4rem
-         color #c6c6c6
+       bottom .3rem
       
      &.last
         padding-top 1rem
-
 
 </style>
 

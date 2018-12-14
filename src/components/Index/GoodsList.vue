@@ -14,8 +14,9 @@
                         <p class="last"> 
                             <span class="price" v-if="userCode">{{item.goodsProcurementPrice}}</span>  
                         
-                            <span class="show" v-else @click.prevent="show()">查看采购价</span>
-                            <span class="repertory" @click.prevent="addCart">+</span>
+                            <span class="repertory" @click.prevent="addCart(item)">
+                                 <i class="iconfont icon-jiaru"></i>
+                            </span>
                             
                         </p>
                     </div>
@@ -35,6 +36,7 @@
   </div>  
 </template>
 <script>
+ import { getAddCartData } from 'common/api'
     export default {
         props: {
             goodsList:{
@@ -70,11 +72,19 @@
                     });
                 },500)
             },
-            addCart(ev){
-                ev.preventDefault();
+            addCart(item){
+              
                 
                 if(this.userCode ){
-                  
+        
+                  getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount:1}).then((response)=>{
+                      let res = response.data;
+                     this.$toast({
+                        message: res.info,
+                        position:'middle',
+                        duration: 2000
+                    });
+                  })
 
                 }else{
                     this.$toast({
@@ -155,14 +165,19 @@
                        position absolute
                        right .05rem
                        bottom 0
-                       width .36rem
-                       height .36rem
+                       width .35rem
+                      
                        background #ff6600
                        color #fff
-                       line-height .36rem
+                       line-height normal
                        text-align center
-                       font-size $font-info 
+                       padding .07rem 0
+                      
                        border-radius 50%
+                       i 
+                         font-size 0.16rem
+                         margin-top .03rem
+                         font-weight bold
 
             
     .ladding

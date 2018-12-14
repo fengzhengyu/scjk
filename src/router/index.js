@@ -6,6 +6,8 @@ import Cart from 'page/Cart.vue'
 import Member from 'page/Member.vue'
 import AddressList from 'components/Member/AddressList'
 import AddressAdd from 'components/Member/AddressAdd'
+import UserInfo from 'components/Member/UserInfo'
+import Setting from 'components/Member/Setting'
 import Password from 'components/Member/Password'
 import Collect from 'components/Member/Collect'
 import MyOrder from 'components/Member/MyOrder'
@@ -47,41 +49,57 @@ export default new Router({
       path: '/member',
       name: 'member',
       component: Member,
-      children: [
-        {
-          path: 'pwd',
-          name: 'password',
-          component: Password
-        },
-        {
-          path: 'collect',
-          name: 'collect',
-          component: Collect
-        },
-        {
-          path: 'myorder/:id',
-          name: 'myorder',
-          component: MyOrder,
-          children: [
-            {
-              path: 'detail',
-              name: 'orderdetail',
-              component: OrderDetail
-            },
-          ]
-        }
+      // children: [
+      //   {
+      //     path: 'pwd',
+      //     name: 'password',
+      //     component: Password
+      //   },
+      //   {
+      //     path: 'collect',
+      //     name: 'collect',
+      //     component: Collect
+      //   },
+      //   {
+      //     path: 'myorder/:id',
+      //     name: 'myorder',
+      //     component: MyOrder,
+      //     children: [
+      //       {
+      //         path: 'detail',
+      //         name: 'orderdetail',
+      //         component: OrderDetail
+      //       },
+      //     ]
+      //   }
         
-      ]
+      // ]
     },
     {
       path: '/member/address',
       name: 'address',
       component: AddressList,
     },
+   
     {
       path: '/member/addressAdd',
       name: 'addressAdd',
       component: AddressAdd,
+    },
+    {
+      path: '/member/user',
+      name: 'user',
+      component: UserInfo,
+    },
+    {
+      path: '/member/setting',
+      name: 'setting',
+      component: Setting,
+    },
+    {
+      path: '/myorder',
+      name: 'myorder',
+      component: MyOrder
     },
     {
       // path: '/goods/:id',
