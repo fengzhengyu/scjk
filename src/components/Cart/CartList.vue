@@ -496,7 +496,7 @@
             border-radius .5rem
             font-size .24rem
             margin-right .3rem
-            background-image linear-gradient(-90deg,#e93b3d,#ff9574);
+            background linear-gradient(-90deg,#e93b3d,#ff9574);
         .delete
             float right 
             font-size .24rem

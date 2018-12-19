@@ -6,7 +6,7 @@
         </mHeader>
            
          <div class="submit">
-           <div class="btn">退出当前账号</div>
+           <div class="btn" @click="quit">退出当前账号</div>
          </div>
     </div>
   </transition>
@@ -17,6 +17,17 @@
 export default {
    components: {
         mHeader
+    },
+    methods: {
+      quit(){
+          this.delCookie ('userCode');
+          this.delCookie ('userLevel');
+          // sessionStorage.clear();
+          this.isLogin = false;
+          this.$router.push({
+              name: 'login'
+          })
+      }
     }
 }
 </script>

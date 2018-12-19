@@ -6,27 +6,22 @@
         <div class="login-wrap">
             <p>
                 <i class="iconfont icon-wode"></i>
-                <input type="text"  placeholder="会员账号/邮箱/手机号" v-model="userName">
+                <input type="text"  pattern="[0-9]*"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11" oninput="if(value.length>11)value=value.slice(0,11)" >
             </p>
             <p>
                 <i class="iconfont icon-mima"></i>
                 <input type="password"  placeholder="请输入登录密码" v-model="userPass">
             </p>
-            <p class="btn-wrap">
-                <span  @click="goLogin" @keyup.enter="goLogin">登 录</span>
-            </p>
-            <p class="btn-wrap"> 
-                <span class="btn " @click="signIn">注册新账号</span>
-            </p>
+            <div class="register">
+                <span class="reg" @click="signIn">快速注册</span>
+                <span>找回密码</span>
+            </div>
+        </div>
+        <div class="login-btn">
+            <span  @click="goLogin" @keyup.enter="goLogin">登 录</span>
+        </div>
+         
            
-        </div>
-        <div class="text-wrap"> 
-            <p class="info-text">
-                    1、请登陆后操作。<br/>2、如您是采购商，请使用聚康采购商专用账号。<br>3、若想申请成为采购商，请拨打咨询电话，<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="tel://15208368809" ><b>15208368809</b>曹先生</a> ，<a href="tel://18628056545" ><b>18628056545</b>金女士</a>
-            </p>
-            
-
-        </div>
     
     </div>
 </template>
@@ -41,19 +36,26 @@
             }
         },
         created() {
-            
+            console.log(this.$route.query.redirect)
         },
         methods: {
            
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,passWord:this.userPass});     
-                   
+                    console.log(res)
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode;
                         let userLevel = res.message.userLevel;
-                        this.setCookie('userCode',userCode,30);
-                        this.setCookie('userLevel',userLevel,30);
+                        // this.setCookie('userCode',userCode,30);
+                        // this.setCookie('userLevel',userLevel,30);
+                        let data = {
+                            userCode: userCode,
+                            userLevel: userLevel
+                        }
+                        this.$store.commit('getUserInfo', data)
+                       
+                   
             
                         this.$toast({
                             message: res.message.info,
@@ -98,18 +100,16 @@
 <style lang="stylus" scoped>
     .login
         width 6.4rem
-        margin 0 auto
+        
         background #fff
         position fixed
         top 0
-        left 0
-        right 0
         bottom 0
-        overflow-y auto
+        overflow-y scroll
         .header 
             position relative
             height 4.5rem
-            background url('./login.png') no-repeat;
+            background url('../../common/img/logo.png') no-repeat;
             background-size 100% 4.5rem
             i   
                 position absolute
@@ -118,25 +118,28 @@
                 left .3rem
         .login-wrap
             background #fff
-            padding 0 .5rem
+            padding 0 .7rem
+        
            
             p 
                 margin .3rem 0
-             
                 background #e6e6e6
                 border-radius .5rem
-                line-height .5rem
+                padding 0.22rem 0
                 overflow hidden
+                align-items center
+                display flex
                 i 
-                    font-size .26rem  
+                    font-size .3rem  
                     padding  0 .2rem
+                    color #b6b6b6
                    
                 input 
                     height 100%
                     width 4.5rem    
                     outline none
                     background #e6e6e6
-                    font-size .24rem
+                    font-size .26rem
 
                 &.btn-wrap
                     background #fff
@@ -154,17 +157,28 @@
                            color #1969b2
                            background #fff
                            border 1px solid #1969b2
-                    
-        .text-wrap
-            padding .3rem .2rem
-            background rgba(0,0,0,.5)
-           
-            .info-text
-                text-align left 
-                font-size .25rem
-                color #fff;
-                line-height 130%
-                a 
-                    color #fff;
+            .register
+               padding  .2rem 0
+               font-size .22rem
+               color #858585
+               display flex
+               justify-content center 
+               span
+                padding 0 .35rem
+                &.reg 
+                    color #1cb727
+        .login-btn
+            text-align center
+            padding  .4rem 0
+            span 
+                display inline-block
+                width 3.2rem
+                height .7rem
+                line-height .7rem
+                background #ff5400
+                font-size .28rem
+                color #fff
+                border-radius .5rem
+
 
 </style>    

@@ -1,12 +1,5 @@
 <template>
     <div class="order-write">
-        <!-- <mt-header title="填写订单" >
-            <span to="" slot="left" @click="goBack">
-                <mt-button icon="">
-                    <i class="iconfont icon-fanhui"></i>
-                </mt-button>
-            </span>        
-        </mt-header> -->
         <div class="header">
             <div class="top">
                 <div class="back" @click="$router.go(-1)">
@@ -16,143 +9,108 @@
             </div>
             <div class="tab-wrap">
                 <div class="tab">
-                    <div class="left active">
+                    <div class="left " :class="{'active': active =='快递运输'}" @click="active='快递运输'">
                         <i class="iconfont icon-peisong1"></i>
                         <span>物流配送</span>
                     </div>
-                    <div class="right">
+                    <div class="right" :class="{'active': active=='上门自提'}"  @click="active='上门自提'">
                          <i class="iconfont icon-mendianzitiicon"></i>
                          <span>上门自提</span>
                     </div>
                 </div>
                 <div class="address-content">
-                    <div class="change" style="display: none">
+                    <div class="change"  v-if="active =='快递运输'">
                         <!-- <div >sdfsdfsfsfsf</div> -->
-                        <div class="add">
-                            <span class=" circle">  <i class="iconfont icon-jiaru"></i></span>
+                        <div class="add"  @click="$router.push({name: 'addressAdd'})" v-if="!addressData.consigneeName">
+                            <span class="circle">  <i class="iconfont icon-jiaru"></i></span>
                             选择收货地址
+                        </div>
+                        <div class="show" v-else @click="goAddress">
+                            <p> {{addressData.addressRegion}}{{addressData.addressDetail}} </p>
+                            <p>{{addressData.consigneeName}} <span> {{addressData.consigneePhone}}</span> </p>
                         </div>
                        
                     </div>
-                    <div class="self">
-                        sfsdfsdfsfsd
+                    <div class="self" v-else>
+                        <h2><span>地址：</span>河南省南阳市</h2>
+                        <p><span>电话：</span>13015238110</p>
+                        <p><span>时间：</span>周一至周日 08:00 - 17:00</p>
                     </div>
                     <div class="next"><i class="iconfont icon-qianjin1"></i></div>    
                 </div>
             </div>
         </div>
-      
-        <div class="address" v-show=" active == '上门自提'">
-            <div class="come-door">上门自提</div>
-            <div class="text">四川省广汉市东莞路二段10号内一号市场二层<br/><span>上午9:00—下午17:00</span> 咨询电话：<a href="javascript:;">13658050467</a> 王</div>
-        </div>
-         <div class="address" @click=" goAddress" v-show=" active == '快递运输'">
-             <template v-if="addressData.consigneeName">
-                <h2 class="address-name"> {{addressData.consigneeName}} <span> {{addressData.consigneePhone}}</span>   </h2>
-                <p class="address-desc">
-                    <i class="iconfont icon-icon2"></i>
-                    {{addressData.addressRegion}}{{addressData.addressDetail}}
-                </p>
-             </template>
-           
-            <p class="change-address" v-else>请设置收货地址</p>
-            <div class="next">
-                <i class="iconfont icon-qianjin1"></i>
+        <div class="fill-wrap"></div>
+        <div class="goods-wrap">
+            <div class="goods">
+                <div class="list" @click="goList">
+                    <ul class="img-list">
+                        <li>img</li>
+                        <li>img</li>
+                        <li>img</li>
+                        <li>img</li>
+                    </ul>
+                    <div class="total">
+                        <p>共8件</p>
+                        <div>￥128.80</div>
+                    </div>
+                    
+                </div>
+                <div class="next"><i class="iconfont icon-qianjin1"></i></div>    
             </div>
-        </div>
-        
-        <div  class="goods-wrap">
-            <div class="cart-wrap" v-for="item in goodsList">
-                <div class="shop">
-                    <div class="shop-icon list">
-                        <i class="iconfont icon-guanzhudianpu"></i>
-                    </div>
-                    <div class="shop-name list">
-                        <router-link :to="{name:'shop',params:{shopId:item.shopId}}" class="name">{{item.shopName}}</router-link>
-                    </div>
-                </div>
-                <div class="group" v-for="goods in item.shopList">
-                    <div class="group-detail">
-                        <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsId}})">
-                            <img :src="goods.goodsPhoto" alt="">
-                        </div>
-                        <div class="item-info">                            
-                            <p class="title">{{goods.goodsName}}</p>
-                            <p class="specification">
-                                <span class="text">规格：{{goods.goodsSpecification}}</span>
-                                <span class="box">
-                                   x{{goods.goodsCount}}
-                                </span>
-                            </p>
-                            <p class="price">{{userLevel == 5?"零售价":"采购价"}}：￥{{goods.goodsPrice}} </p>
-                            
-                        </div>
-                    </div>
-                </div>
+            <div class="post-wrap">
+               <div class="desc">
+                  <div class="text">
+                     <h2>配送费</h2>  
+                     <p>单笔订单满500元免配送</p>
+                  </div>
+                  <div class="price">+￥20</div>
+               </div>
+               <div class="next"></div>
+            </div>
             
-            </div>
         </div>
-        <div class="invoice-wrap">
-            <h3 class="name">发票信息</h3>
-            <!-- invoiceFlag = !invoiceFlag -->
-            <div class="desc" @click=" goInvoice">  
-                <span class="red">纸质</span>(商品明细--{{invoiceType}}) 
-                <span class="go">〉</span>
+        <div class="invoice-wrap column-list"  @click="goInvoice">
+            <div class="text-wrap" >
+                <h2>
+                    发票开具
+                </h2>
+                <p>
+                    不需要
+                </p>
             </div>
-        </div>   
-        <div class="tabs-btn">
-            <h3>配送方式</h3> 
-            <div>
-                <span class="btn" @click="active ='快递运输'">
-                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':active=='快递运输'}"></i>
-                    快递运输
-                </span>
-                <span class="btn"  @click="active = '上门自提'">
-                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':active== '上门自提'}"></i>
-                    上门自提
-                </span>
-            </div>            
+            <div class="next"><i class="iconfont icon-qianjin1"></i></div>
+        </div>
+         <div class="mark-wrap column-list"  @click=" goMark">
+            <div class="text-wrap">
+                 <h2>
+                     订单备注
+                </h2>
+                <p>
+                    商品、备注补充说明
+                </p>
+            </div>
+            <div class="next"><i class="iconfont icon-qianjin1"></i></div>
         </div>
        
-        <div class="tabs-btn">
-            <h3>支付方式</h3> 
-            <div>
-                <span class="btn" >
-                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong': payType =='微信支付'}"></i>
-                    微信支付
-                </span>
-                <span class="btn"  @click=" payType = '线下汇款'">
-                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong': payType == '线下汇款'}"></i>
-                    线下汇款
-                </span>
-            </div>
-        
-        </div>
-        <dir v-show="payType == '线下汇款'" class="offline-pay">
-            <!-- <p class="tips-title">通过网银在线转账，或者自行到银行进行汇款，汇款账号如下：</p> -->
-            <ul class="bank-info">
-                <li>开户名称：四川聚康商贸有限公司</li>
-                <li>开户银行：长城华西银行股份有限公司广汉支行</li>
-                <li>汇款账号：1107 1600 0000 0459</li>
-                <li>联系电话：<a href="tel:13658050467">13658050467</a></li>
-            </ul>
-            <div class="tips-content">
-                <p> 温馨提示：</p>
-                <p>1、<span>受银行处理时间影响，采用外汇或者线下汇款方式到账会有延误。</span></p>
-                <p>2、<span>线下汇款到账时间一般为：1-5天（具体到账时间以银行的实际到账时间为准）。</span></p>
-                <p>3、<span>请避免北京时间21：00-00：00进行汇款，否则受银行出账时间影响，可能出现延迟一天到账情况。</span></p>
-            </div>
-        </dir>
+
+     
+  
+    
         <div class="footer-fiexd">
-            <div class="total-wrap">
-                <div class="total">合计:￥{{totalMoney}}</div>
-                <div class="next-btn"  @click="submitOrder">提交订单</div>
-            </div>
+            
+                <div class="total">
+                    <h2>应付金额 <span> ￥{{totalMoney}}</span>  </h2>
+                    <p>配送费 ￥20</p>
+                </div>
+                <div class="next-btn"  @click="submitOrder">去支付</div>
+          
         </div>
-        <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
+        
+        <!-- <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
         <Address :userCode="userCode" v-if="$route.hash == '#address'"  @changeAddressMsg="getChangeAddress"></Address>
         <AddressEdit :userCode="userCode" v-if="$route.hash == '#addressEdit'"></AddressEdit>
-        <router-view></router-view>
+        <router-view></router-view> -->
     </div>
 </template>
 <script>
@@ -161,6 +119,7 @@
     import AddressEdit from 'components/Order/AddressEdit'
     import { submitOrderData , getAddressData   } from 'common/api'
     export default {
+        
         data(){
             return {
                 userCode: '',
@@ -217,6 +176,7 @@
                 let{data:res} = await getAddressData({userCode: this.userCode});
                 if(res.flag == 'success'){
                     this.addressData = res.data[0]
+                    console.log(this.addressData)
                 }
             },
             async submitOrder(){
@@ -322,22 +282,31 @@
             goAddress(){
                  let  id =this.$route.query.id;
                 this.$router.push({
-                    name: 'order',
-                    query: {id:id},
-                    hash: '#address'
+                    name: 'address'
 
                 })
             },
             //  去发票页面
             goInvoice(){
-                let  id =this.$route.query.id;
+        
                 this.$router.push({
-                    name: 'order',
-                    query: {id:id},
-                    hash: '#invoice'
-
+                    name: 'orderInvoice'
+                    
                 })
                 
+            },
+            goList(){
+                this.$router.push({
+                    name: 'orderGoods',
+                   
+                })
+
+            },
+            goMark(){
+                  this.$router.push({
+                    name: 'orderMark',
+                   
+                })
             },
             goBack(){
                 // let id = this.$route.query.id
@@ -375,7 +344,7 @@
         position absolute
         top 0
         bottom 0
-       
+     
         .header
             width 100%
             height 2.63rem
@@ -437,6 +406,8 @@
                         flex 1
                         height .8rem
                         .add
+                          
+                            height .28rem
                             border .03rem  solid #ff6600
                             font-weight 700
                             width 2.8rem
@@ -447,6 +418,8 @@
                             color #474747
                             border-radius .15rem
                             margin 0 auto
+                           
+    
                             .circle
                                 width .28rem
                                 display inline-block
@@ -460,6 +433,15 @@
                                 margin-top .01rem
                                 i 
                                     font-size 0.16rem
+                        .show   
+                            padding 0 .2rem
+                            color #000000
+                            font-size .2rem  
+                            
+                            p
+                                padding .1rem  0
+                                font-weight bold
+
                     .next
                         flex 0 0 .45rem
                         width 45rem
@@ -471,221 +453,149 @@
                     .self
                         flex 1
                         height .8rem
+                        padding 0 .2rem
+                        h2
+                            font-size .2rem
+                        p 
+                            font-size .16rem
+                            padding-top .15rem
+        .fill-wrap
+            height .67rem
+        .goods-wrap
+            margin .15rem
+            background #ffffff
+            padding .35rem 0
+           
+            .goods
+                display flex
+                .list 
+                    flex 1
+                    display flex
+                    align-items center
+                    padding 0 .15rem
+                    .img-list
+                        flex 1
+                        li  
+                            float left 
+                            width .88rem
+                            height .88rem
+                            border 0.01rem solid #0c0406
+                            margin-right 0.15rem
+                    .total
+                        flex 0 0 1rem
+                        width 1rem
+                        text-align right
+                        p 
+                            font-size .18rem
+                            padding-bottom .1rem
+                            color #9a9a9a
+                        div
+                            font-size .22rem
+                            color #474747
+                                
 
-        .hint
-            background #f08080
-            height .6rem
-            color #fff
-            line-height .6rem
-            font-size .22rem
-            i 
-                font-size .28rem
-                padding 0 .1rem 0 .15rem
-        .address 
-            padding .2rem .15rem
-            overflow hidden
-            position relative
-            div
-                float left
-                font-size .2rem
-            .come-door  
-                width 1.2rem
-                line-height .6rem
-                height .6rem
-            .text
-                padding 0
-                width 4.9rem
-                line-height .3rem
-                height .6rem
-                span
-                    color #ff2d2d
-                    padding  0 .05rem
-            .change-address
-                font-size .28rem
-                padding-left .3rem
-                line-height .76rem
-            .address-name
-                font-size .26rem
-                padding-left .3rem
-                line-height .38rem
-                span    
-                    padding-left .2rem
-            .address-desc
-                font-size .2rem
-                line-height .38rem
-                color #999
-                i 
-                    font-size .22rem
-                    padding-right 0.05rem
-            .next
-                position absolute 
-                right .2rem     
-                top: 50%;
-                transform translateY(-50%)
-                i 
-                    font-size .3rem
-                    color #7D7D7D
-        .tabs-btn
-            padding  .2rem
-            line-height .5rem
-            overflow hidden
-            h3  
-                float left
-                font-size .24rem
-            div
-                float right
-                .btn 
-                    font-size .22rem
-                    color #000
-                    padding .1rem .3rem .1rem 0
+                .next
+                    flex 0 0 .45rem
+                    width 45rem
+                    line-height .8rem
                     i 
-                        font-size .36rem
-                        vertical-align middle
-                        color #a2a2a2
-                        &.icon-xuanzhong
-                            color #cc3e2e        
-        .offline-pay
-            padding 0
-            font-size .22rem
-            margin-bottom 1rem
-            .tips-title
-                // font-size .2rem
-                color #666666
-            .bank-info
+                        font-size .24rem
+                        color #c1c1c1
+            .post-wrap
+                display flex
+                padding-top  .35rem
+                .desc
+                    flex 1
+                    display flex
+                    align-items center
+                    padding 0 .15rem 
+                    .text
+                        flex 1
+                        h2 
+                            font-size .2rem
+                            color #161616
+                        p
+                            font-size .16rem
+                            padding-top .1rem
+                            color #9a9a9a
 
-                padding  0  .2rem  
-                li  
-                    color #000000;
+                    .price 
+                        flex 0 0 1rem  
+                        width 1rem
+                        text-align right  
+                        font-size .22rem
+                        color #474747
+
+                .next
+                    flex 0 0 .45rem
+                    width 45rem
+                    line-height .8rem
+                    i 
+                        font-size .24rem
+                        color #c1c1c1
+        .column-list
+            display flex
+            align-items center
+            background #ffffff
+            margin 0 .15rem
+            .text-wrap
+                flex 1
+                display flex
+                align-items center
+                padding 0 .15rem
+                h2 
+                    flex 1
+                    font-size .2rem
+                    color #161616
+                p
+                    font-size .16rem
+                    flex 1
+                    text-align right
+                    color #9a9a9a
+
+            .next 
+                flex 0 0 .45rem
+                width 45rem
+                line-height .8rem
+                i 
                     font-size .24rem
-                    font-weight: bold
-                    line-height 180%
-                    a   
-                        color #000000;
-                        text-decoration underline
-            .tips-content
-               
-                color #666666
-                padding 0.2rem
-                background #f9f9f9
-                line-height 130%
-                color: #545454
-                border 1px solid #efefef
-              
-                p   
-                    padding-bottom .08rem
-                    span    
-                        width 93%
-                        display inline-block
-                        vertical-align top
-
-        .goods-wrap            
-            .cart-wrap
-                .shop
-                    overflow hidden
-                    background #e4e4f6
-                    height .6rem
-                    line-height .6rem 
-                    .list
-                        float left       
-                    .shop-icon                 
-                        margin 0 .1rem
-                        i 
-                            font-size 0.32rem
-                            color #707070
-                    .shop-name  
-                        width 5rem 
-                        font-size .24rem       
-                        .name 
-                            color #000000   
-                            font-weight bold
-                            
-                .group
-                    overflow hidden
-                    .group-detail
-                        float left
-                        width 6.4rem                      
-                        .item-img
-                            width 1.5rem
-                            height 1.5rem
-                            margin  .2rem
-                            float left
-                            img 
-                                width 100%
-                                height 100%
-                        .item-info
-                            float left
-                            width 4.5rem
-                            
-                            .title
-                                padding .2rem 0
-                                font-size .24rem
-                                font-weight bold
-                                overflow hidden
-                                text-overflow ellipsis
-                                white-space nowrap
-                            .specification
-                                font-size .2rem
-                                color #787878
-                                position relative
-                                padding .2rem 0
-
-                                span 
-                                    
-                                    display inline-block
-                                    &.text
-                                        line-height .3rem
-                                    &.box
-                                        float right
-                                        padding 0 .2rem
-                                        font-size .24rem
-                            .price
-                                font-size .2rem
-                                color #f00
-                                position relative
-                                padding .1rem 0
-        .invoice-wrap
-            overflow hidden
-            height .5rem
-            line-height .5rem
-            font-size .2rem
-            margin .2rem 0
-            .name{
-                float left
-                padding  0 .2rem
-                font-size .24rem
-            }
-            .desc
-                float right 
-                color #000
-                .red
-                    color #ff0000
-                .go 
-                    padding 0 .1rem      
-                    color #c7c7cc         
+                    color #c1c1c1    
+        
 
         .footer-fiexd
             position fixed
             bottom 0
-            width 6.4rem
-            height .8rem
-            line-height  .8rem
+            width 5.8rem
+            height 1rem
+            align-items center
             background #fff
-            overflow hidden
-            .total-wrap
-                float right 
-                font-size .26rem
-                .total
-                    float left
+            display flex
+
+            padding 0 .3rem
+            .total
+                flex 1
                 
-                    font-weight bold
-                    margin-right .2rem
-                    color #ff0000
-                .next-btn
-                    float right
-                    height 100%
-                    width 2rem
-                    text-align center
-                    background #ff0000
-                    color #fff
+                h2 
+                    font-size .24rem
+                    color #000
+                    span    
+                        font-size .3rem
+                        color #ff6600
+
+                p
+                    font-size .16rem
+                    padding-top .08rem
+                    color #999999
+            .next-btn
+                flex 0 0 1.8rem
+               
+                width 1.8rem
+                font-size .24rem
+
+                text-align center
+                background linear-gradient(90deg,#fea233,#ff6600);
+                color #fff
+                border-radius .6rem
+                padding  .22rem 0
 </style>
 

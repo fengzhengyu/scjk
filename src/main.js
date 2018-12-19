@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store'
 import VueLazyload from 'vue-lazyload'
 import wx from 'weixin-js-sdk'
 import 'common/js/base'
@@ -152,11 +153,27 @@ Vue.prototype.$setShare = setShare
 
 
 // 购物车 第一次今日缓存，其余刷新
-router.afterEach((to, from) => {
-  //  console.log(to.fullPath)
-  //  console.log(location.pathname)
+router.beforeEach((to, from,next) => {
+                    
+  // store.state.user = JSON.parse(localStorage.getItem('key'));//获取本地存储的token
 
-  // 
+  // console.log(store.getters.getStorage )
+  
+ 
+  
+
+  if(to.meta.requireAuth){
+    if(store.getters.getStorage !== null){
+      next();
+    }else{
+      next({
+        name: 'login',
+        query: {redirect: to.name}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+      })
+    }
+  }else{
+    next();
+  }
   
   // let isRefresh =  sessionStorage.getItem('Refresh')
   // if(to.name== 'cart' && from.name == 'index') { 
@@ -185,13 +202,13 @@ router.afterEach((to, from) => {
   //     sessionStorage.setItem('Refresh',1);
   //   }
   // }else 
-  if(to.name !=='popularize' ){
+  // if(to.name !=='popularize' ){
 
-    // setTimeout(()=> {
-    //   setShare('聚康供采平台', '供应商与采购商的理想平台', require('./common/img/logo.png'), location.href, encodeURIComponent(location.href.split('#')[0]))
-    // },1000)
+  //   // setTimeout(()=> {
+  //   //   setShare('聚康供采平台', '供应商与采购商的理想平台', require('./common/img/logo.png'), location.href, encodeURIComponent(location.href.split('#')[0]))
+  //   // },1000)
     
-  }
+  // }
 
 
 })
@@ -199,6 +216,7 @@ router.afterEach((to, from) => {
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

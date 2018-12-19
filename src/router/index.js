@@ -15,6 +15,10 @@ import Goods from 'page/Goods.vue'
 import Shop from 'page/Shop.vue'
 import GoodsDetail from 'components/Goods/GoodsDetail'
 import OrderWrite from 'components/Order/OrderWrite'
+import OrderMark from 'components/Order/OrderMark'
+import OrderGoods from 'components/Order/OrderGoods'
+import OrderInvoice from 'components/Order/OrderInvoice'
+
 import OrderDetail from 'components/Order/OrderDetail'
 import Login from 'components/Member/Login'
 import Register from 'components/Member/Register'
@@ -36,6 +40,7 @@ export default new Router({
       path: '/index',
       name: 'index',
       component: Index,
+      
     },
     {
       path: '/cart',
@@ -79,27 +84,43 @@ export default new Router({
       path: '/member/address',
       name: 'address',
       component: AddressList,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
+      
     },
    
     {
       path: '/member/addressAdd',
       name: 'addressAdd',
       component: AddressAdd,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/member/user',
       name: 'user',
       component: UserInfo,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/member/setting',
       name: 'setting',
       component: Setting,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
     },
     {
       path: '/myorder',
       name: 'myorder',
-      component: MyOrder
+      component: MyOrder,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
     },
     {
       // path: '/goods/:id',
@@ -116,9 +137,46 @@ export default new Router({
     {
       path: '/order',
       name: 'order',
-      component: OrderWrite
+      component: OrderWrite,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
            
     },
+    {
+      path: '/order/invoice',
+      name: 'orderInvoice',
+      component: OrderInvoice,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
+           
+    },
+    {
+      path: '/order/mark',
+      name: 'orderMark',
+      component: OrderMark,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
+           
+    },
+    {
+      path: '/order/goods',
+      name: 'orderGoods',
+      component: OrderGoods,
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      }
+           
+    },
+    // {
+    //   path: '/order',
+    //   name: 'order',
+    //   component: OrderWrite
+           
+    // },
+
     {
       path: '/shop/:shopId',
       name: 'shop',

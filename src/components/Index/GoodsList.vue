@@ -57,6 +57,7 @@
            
             this.userCode = this.getCookie('userCode')  
           
+          
         },
         methods: {
            
@@ -68,7 +69,10 @@
                 });
                 setTimeout(()=>{
                     this.$router.push({
-                        name: 'login'
+                        name: 'login',
+                        query: {
+                            redirect: this.$route.name
+                        }
                     });
                 },500)
             },
@@ -94,7 +98,10 @@
                     });
                     setTimeout(()=>{
                         this.$router.push({
-                            name: 'login'
+                            name: 'login',
+                            query: {
+                                redirect: this.$route.name
+                            }
                         });
                     },500)
                 }

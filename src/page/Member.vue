@@ -126,17 +126,9 @@
                
             },
             goMyOrder(id){
-                if(this.userCode){
-                    this.$router.push({
+               this.$router.push({
                         name: 'myorder'
                     })
-                }else{
-                     this.$toast({
-                        message: '请先登录！',
-                        position: 'middle',
-                        duration: 2000
-                    });
-                }
             },
             goCollect(){
                 if(this.userCode){
@@ -166,43 +158,19 @@
                 
             },
             goAddress(){
-                if(this.userCode){
-                    this.$router.push({
+                this.$router.push({
                         name: 'address'
                     })
-                }else{
-                     this.$toast({
-                        message: '请先登录！',
-                        position: 'middle',
-                        duration: 2000
-                    });
-                }
             },
               goUser(){
-                if(this.userCode){
-                    this.$router.push({
+                  this.$router.push({
                         name: 'user'
                     })
-                }else{
-                     this.$toast({
-                        message: '请先登录！',
-                        position: 'middle',
-                        duration: 2000
-                    });
-                }
             },
             goSetting(){
-                if(this.userCode){
-                    this.$router.push({
+                this.$router.push({
                         name: 'setting'
                     })
-                }else{
-                     this.$toast({
-                        message: '请先登录！',
-                        position: 'middle',
-                        duration: 2000
-                    });
-                }
             },
             goPopularize(){
                 if(this.userCode){

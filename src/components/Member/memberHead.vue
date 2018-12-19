@@ -51,4 +51,12 @@
         padding 0  .3rem 
         color #fd7722  
         font-size .18rem 
+    .finish
+        float right 
+        padding 0  .3rem 
+        font-size .24rem 
+        span 
+          color #ff0000
+          i
+            font-size .2rem 
 </style>  

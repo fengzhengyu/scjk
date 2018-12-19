@@ -164,8 +164,7 @@
   top 0
   width 6.4rem
   bottom 0
-//   z-index 999
-  
+  background #fff
   .header
     height .8rem
     line-height .8rem
