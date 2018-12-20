@@ -13,7 +13,7 @@
                         <p>{{item.goodsRetailPrice}}<!--<span class="price"> ￥150.00</span>--></p>
                         <p class="last"> 
                             <span class="price" v-if="userCode">{{item.goodsProcurementPrice}}</span>  
-                        
+                        <!-- v-if="userCode" -->
                             <span class="repertory" @click.prevent="addCart(item)">
                                  <i class="iconfont icon-jiaru"></i>
                             </span>
@@ -54,35 +54,47 @@
             }
         },
         created(){
+          
            
-            this.userCode = this.getCookie('userCode')  
           
-          
+        },
+        computed: {
+            userCode(){               
+                return this.$store.state.userCode;
+            }
         },
         methods: {
            
             show(ev){
-                this.$toast({
-                    message: '请登陆后查看！',
-                    position:'middle',
-                    duration: 2000
-                });
-                setTimeout(()=>{
-                    this.$router.push({
-                        name: 'login',
-                        query: {
-                            redirect: this.$route.name
-                        }
+                if(!this.userCode){
+                    this.$toast({
+                        message: '请登陆后查看！',
+                        position:'middle',
+                        duration: 2000
                     });
-                },500)
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login',
+                            query: {
+                                redirect: this.$route.name
+                            }
+                        });
+                    },500)
+                }
+               
             },
             addCart(item){
               
                 
                 if(this.userCode ){
         
-                  getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount:1}).then((response)=>{
-                      let res = response.data;
+                  getAddCartData({userCode: this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount:1}).then((response)=>{
+                    let res = response.data;
+                      if(res.flag == 'success'){
+                        this.$store.commit('updateCartCount',1)
+                      }
+                   
+                    
                      this.$toast({
                         message: res.info,
                         position:'middle',

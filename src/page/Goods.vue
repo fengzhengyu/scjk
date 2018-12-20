@@ -18,15 +18,15 @@
                             <h2 class="title">{{item.goodsName}}</h2>
                             <p class="norms">{{item.goodsSpecification}}</p>
                             <p class="price">{{item.goodsRetailPrice}} </p>
-                            <p class="buy-pirce">采购价：￥100</p>
-                            <div class="cart-control-wrapper">
+                            <p class="buy-pirce" v-if="userCode">{{item.goodsProcurementPrice}}</p>
+                            <div class="cart-control-wrapper" @click.stop="">
                                
-                                    <div class="cart-decrease icon-circle" >
+                                    <div class="cart-decrease icon-circle" v-show="item.goodsNum>0"  @click="editCart('minus',item)">
                                         <i class="iconfont icon-jian"></i>
                                         </div>
-                                    <div class="cart-count" >0</div> 
+                                    <div class="cart-count" v-show="item.goodsNum>0" >{{typeof item.goodsNum == 'undefined'?$set(item,'goodsNum',0):item.goodsNum }}</div> 
                                     <div class="cart-add icon-circle" >
-                                        <i class="iconfont icon-jiaru"></i>
+                                        <i class="iconfont icon-jiaru" @click="editCart('add',item)"></i>
                                        </div>
                                
                             </div>
@@ -51,9 +51,9 @@
 <script>
     import BScroll from 'better-scroll'
      import RankHead from 'components/goods/RankHead.vue'
-    import { getGoodsTypeData, getIndexData } from 'common/api'
+    import { getGoodsTypeData, getIndexData, getAddCartData, getCartCount } from 'common/api'
+
     import GoodsList from 'components/Index/GoodsList.vue'
-    
     import Footer from 'components/common/c-footer'
     export default {
         data() {
@@ -65,11 +65,12 @@
                 goodsList: [],
                 page: 1,
                 loading: true,  //true为禁止，false 为启动
-                isLoad:false
+                isLoad:false,
+                goodsNum: 0
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode')
+         
             this.active = this.$route.query.id || 1;
 
             this.getTypeName();
@@ -81,6 +82,11 @@
            
          
            
+        },
+        computed: {
+            userCode(){
+                return this.$store.state.userCode == 'null'? '': this.$store.state.userCode;
+            }
         },
         mounted(){
               this.$nextTick(() => {
@@ -101,7 +107,7 @@
             
                     });
                 
-                 console.log(this.goodsList)
+             
                     this.goodsScroll.on('pullingUp', (pos) => {
                         
                         
@@ -173,7 +179,9 @@
             },
             async getGoodsTypeList(value){
                 this.page =1;
+                   console.log(res)
                 let {data:res} = await getGoodsTypeData({typeId:this.active,userCode:this.userCode,screening:value,page:this.page});
+                console.log(res)
                 if(res.flag == 'success'){
 
                     this.goodsList = res.typeGoodsList;
@@ -209,6 +217,29 @@
                     name: 'id',
                     params: {goodsId: item.goodsId}
                 })
+            },
+            // 加入购物车
+            editCart(flag,item){
+                if(flag == 'add'){
+                    item.goodsNum++;
+                }else if(flag == 'minus'){
+                    if(item.goodsNum<=0){
+                        return;
+                    }
+                    item.goodsNum--;
+                }
+              getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount: item.goodsNum}).then(response=>{
+                  let res = response.data;
+                  if(res.flag == 'success'){
+                        this.$store.commit('updateCartCount',1)
+                  }
+                  this.$toast({
+                        message: res.info,
+                        position:'middle',
+                        duration: 2000
+                    });
+              })
+
             }
 
         },

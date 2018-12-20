@@ -20,9 +20,11 @@ export default {
     },
     methods: {
       quit(){
-          this.delCookie ('userCode');
-          this.delCookie ('userLevel');
-          // sessionStorage.clear();
+             
+        this.$store.commit('delUserInfo', '');
+        this.$store.commit('initCartCount', 0)
+       
+
           this.isLogin = false;
           this.$router.push({
               name: 'login'

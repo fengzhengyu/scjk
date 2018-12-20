@@ -12,7 +12,12 @@ import 'common/stylus/border.css'
 
 // 300ms 点击事件延迟
 import fastClick  from 'fastclick'
-fastClick.attach(document.body)
+if ('addEventListener' in document) {
+  document.addEventListener('DOMContentLoaded', function() {
+      fastClick.attach(document.body);
+  }, false);
+}
+
 
 Vue.config.productionTip = false
 
@@ -154,18 +159,22 @@ Vue.prototype.$setShare = setShare
 
 // 购物车 第一次今日缓存，其余刷新
 router.beforeEach((to, from,next) => {
-                    
-  // store.state.user = JSON.parse(localStorage.getItem('key'));//获取本地存储的token
+                  
+  store.state.userCode = localStorage.getItem('key');//获取本地存储的token
+  store.state.userLevel = localStorage.getItem('key2');
+  store.state.cartCount = parseFloat(localStorage.getItem('num'));
 
-  // console.log(store.getters.getStorage )
-  
+
+
  
   
 
   if(to.meta.requireAuth){
-    if(store.getters.getStorage !== null){
+    if(store.state.user !== null){
       next();
+      console.log(1)
     }else{
+      console.log(2)
       next({
         name: 'login',
         query: {redirect: to.name}  // 将跳转的路由path作为参数，登录成功后跳转到该路由

@@ -12,7 +12,7 @@
                      <Swiper :sliders=" goodsDetailPhotos" class="img-wrap"></Swiper>
                     <h1 class="goods-name">{{ goods.goodsName }}</h1>
                    
-                    <p class="buy-price">{{symbol}} <b>{{num}}</b> <span >{{str}}</span> </p>
+                    <p class="buy-price" v-if="userCode">{{symbol}} <b>{{num}}</b> <span >{{str}}</span> </p>
                    
                     <p class="info">{{goods.goodsRetailPrice}}</p>
                     <p class="info size">{{goods.goodsSpecification}}</p>
@@ -40,29 +40,31 @@
                 <!-- </div> -->
                
             </div>
-            <div class="shopCart border">
+            <div class="shopCart border-top">
                
                 <div class="left">
                     <div class="logo-wrapper " >
                         <div class="logo">
                             <i class="iconfont icon-gouwuche1-copy-copy"></i>
                         </div>
-                        <div class="num">99</div>
+                        <div class="num" v-if="cartCount>=0">{{cartCount}}</div>
                     </div>
                 </div>
                 <div class="right">
-                    <div class="btn">加入购物车</div>
-                    <div class="cart-control-wrapper">
+                   
+                    <div class="cart-control-wrapper" v-show="goods.goodsNum>0" >
+                        <!--  -->
                                
-                            <div class="cart-decrease icon-circle" >
+                            <div class="cart-decrease icon-circle"  @click=" editCart('minus',goods)">
                                 <i class="iconfont icon-jian"></i>
                                 </div>
-                            <div class="cart-count" >0</div> 
-                            <div class="cart-add icon-circle" >
+                            <div class="cart-count" >{{typeof goods.goodsNum == 'undefined'?$set(goods,'goodsNum',0):goods.goodsNum }}</div> 
+                            <div class="cart-add icon-circle" @click=" editCart('add',goods)" >
                                 <i class="iconfont icon-jiaru"></i>
                                 </div>
                         
                     </div>
+                     <div class="btn" v-show="goods.goodsNum<=0"  @click=" editCart('add',goods)" >加入购物车</div>
                 </div>
                 
             </div>
@@ -80,7 +82,7 @@
             return {
                 goods: {},
                 goodsDetailPhotos: [],
-                userCode: '',
+              
                 goodsQuantity: 1,
                 active: false,
                 symbol: '',
@@ -90,19 +92,26 @@
         },
         created(){
            
-           this.userCode = this.getCookie('userCode')
+        
            this.getData();
+        },
+        computed: {
+            userCode(){
+                return this.$store.state.userCode == 'null'? '': this.$store.state.userCode;
+            },
+            cartCount(){
+                return this.$store.state.cartCount;
+            }
         },
         mounted(){
              this.$nextTick(() => {
-                    // this.scroll = new BScroll(this.$refs.detailWrapper,{
-                    //         click: true
-                    // })
+                  
               })      
         },
         methods: {
             async getData(){
                 let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
+                console.log(res)
                 
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
@@ -120,40 +129,9 @@
                 }
                 
                 
-            },
-            show(ev){
-                this.$toast({
-                    message: '登陆后才可以查看哦！',
-                    position:'middle',
-                    duration: 2000
-                });
-                setTimeout(()=>{
-                    this.$router.push({
-                        name: 'login'
-                    });
-                },500)
-            },
-            back(){
-                this.$router.back()
-            },
-            //数量加减
-            cheangeQuantity(item,status){
-                if(status>0){
-                    this.goodsQuantity++;
-                    if(this.goodsQuantity >= item.goodsInventory){
-                        this.goodsQuantity = item.goodsInventory;
-                    }
-
-                }else{
-                    this.goodsQuantity--;
-                    if(this.goodsQuantity < 1){
-                        this.goodsQuantity = 1
-                    }
-                }
-                
-            },
-            //加入购物车
-            async addCart(){
+            },         
+             // 加入购物车
+            editCart(flag,item){
                 if(!this.userCode){
                     this.$toast({
                         message: '请登录',
@@ -162,21 +140,39 @@
                     });
                     setTimeout(()=>{
                         this.$router.push({
-                            name: 'login'
+                            name: 'login',
+                             query: {
+                                redirect: this.$route.name
+                            }
                         });
                     },500)
                     return;
                 }
-                let {data:res} = await getAddCartData({userCode:this.userCode,goodsId:this.goods.goodsId,shopId:this.goods.shopId,goodsCount:this.goodsQuantity});
+               
+
+                if(flag == 'add'){
+                    item.goodsNum++;
                 
-                this.$toast({
-                    message: res.info,
-                    position:'middle',
-                    duration: 2000
-                });
-               
-               
+                }else if(flag == 'minus'){
+                    if(item.goodsNum<=0){
+                        return;
+                    }
+                    item.goodsNum--;
+                }
+                getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount: item.goodsNum}).then(response=>{
+                    let res = response.data;
+                    if(res.flag == 'success'){
+                            this.$store.commit('updateCartCount',1)
+                    }
+                    this.$toast({
+                            message: res.info,
+                            position:'middle',
+                            duration: 2000
+                        });
+                })
+
             },
+           
             //立即购买
             async nowBuy(){
                 if(!this.userCode){
@@ -432,7 +428,7 @@
             background #fe8f32
             border-radius .4rem
             margin  0 auto
-            display none
+           
         .cart-control-wrapper
             position absolute
             right  .3rem

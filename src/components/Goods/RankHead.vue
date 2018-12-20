@@ -10,13 +10,18 @@
     <div class="cart">
       
       <i class="iconfont icon-gouwuche1-copy-copy">
-        <sub>99</sub>
+        <sub v-if="cartCount>0">{{cartCount}}</sub>
       </i>
     </div>
   </div>
 </template>
 <script>
   export default {
+    computed: {
+      cartCount(){
+        return this.$store.state.cartCount;
+      }
+    }
 
   }
 </script>

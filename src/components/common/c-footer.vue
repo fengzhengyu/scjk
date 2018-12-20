@@ -9,7 +9,7 @@
          <span class="text"> 分类</span>
       </div>
       <div class="item" :class="{'active':selected == 'cart'}"  @click="go('cart')">
-         <i slot="icon" class="iconfont icon-gouwuche1-copy-copy"><sub>99</sub></i>
+         <i slot="icon" class="iconfont icon-gouwuche1-copy-copy" ><sub v-if="cartCount>0">{{cartCount}}</sub></i>
          <span class="text"> 购物车</span>
       </div>
       <div class="item" :class="{'active':selected == 'member'}" @click="go('member')">
@@ -29,6 +29,11 @@
     created() {
      this.selected = this.$route.name;
       
+    },
+    computed:{
+      cartCount(){
+        return this.$store.state.cartCount;
+      }
     },
     methods: {
       go(value){

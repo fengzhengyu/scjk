@@ -50,8 +50,13 @@
 
             }
         },
+        computed:{
+             userCode(){               
+                return this.$store.state.userCode;
+            }
+        },
         created(){
-            this.userCode = this.getCookie('userCode');
+            
             // loading...
             this.$indicator.open({
                 text: 'Loading...',

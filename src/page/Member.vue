@@ -5,10 +5,10 @@
         </div>
         <div class="info-wrapper">
             <div class="info">
-                <div class="photo" @click="hanldePhoto" v-if="isLogin">
+                <div class="photo" @click="hanldePhoto" v-show="isLogin">
                     <img :src="photoImg"  >
                 </div>
-                <div class="nickname" v-if="isLogin">
+                <div class="nickname" v-show="isLogin">
                     <p class="name">{{userName}}</p>
                     <p class="icon">
                         <i class="iconfont icon-huiyuantongjibaobiao"></i>
@@ -105,13 +105,18 @@
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode');
+           
              
             if(this.userCode){
                 this.isLogin =true;
                 this.getUserMessage()
             }
             
+        },
+        computed: {
+            userCode(){
+                return this.$store.state.userCode == 'null'? '': this.$store.state.userCode;
+            }
         },
         methods: {
             async getUserMessage(){

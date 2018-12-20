@@ -8,24 +8,36 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: '',
+    userCode: '',
+    userLevel: '',
     cartCount: 0
   },
-  getters:{
-    getStorage(state){
-      return state.user = JSON.parse(localStorage.getItem('key'))
-    }
-  },
+ 
   mutations: {
-    getUserInfo(state,value){
-      localStorage.setItem('key',JSON.stringify(value));
-      state.user = value;
+    getUserCode(state,value){
+      localStorage.setItem('key',value);
+   
+      state.userCode = value;
+    
 
     },
+    getUserLevel(state,value){
+      localStorage.setItem('key2',value);
+      state.userLevel = value
+    },
+    delUserInfo(state,value){
+      localStorage.clear();
+      state.userCode =value;
+      state.userLevel = value
+
+    },
+
     updateCartCount(state,cartCount){
       state.cartCount += cartCount;
+      localStorage.setItem('num', state.cartCount);
     },
     initCartCount(state,cartCount){
+      localStorage.setItem('num',cartCount);
       state.cartCount = cartCount;
 
     }

@@ -47,13 +47,10 @@
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode;
                         let userLevel = res.message.userLevel;
-                        // this.setCookie('userCode',userCode,30);
-                        // this.setCookie('userLevel',userLevel,30);
-                        let data = {
-                            userCode: userCode,
-                            userLevel: userLevel
-                        }
-                        this.$store.commit('getUserInfo', data)
+                        this.$store.commit('getUserCode', res.message.userCode);
+                        this.$store.commit('getUserLevel',res.message.userLevel);
+                       
+                        this.getCartCount();
                        
                    
             
@@ -87,6 +84,12 @@
                  this.$router.push({
                     name: 'register'
                 })
+            },
+            getCartCount(){
+
+                let  cartNum = Math.floor(Math.random()*99 +1);
+                this.$store.commit('initCartCount',cartNum)
+
             }
         },
         beforeRouteEnter (to, from, next) {
