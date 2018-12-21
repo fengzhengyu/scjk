@@ -76,7 +76,7 @@
                         this.$router.push({
                             name: 'login',
                             query: {
-                                redirect: this.$route.name
+                                redirect: this.$route.fullPath
                             }
                         });
                     },500)
@@ -205,6 +205,7 @@
         height .6rem
         font-size $font-size-22
         margin .15rem 0
+     
         img 
             display inline-block
             vertical-align middle

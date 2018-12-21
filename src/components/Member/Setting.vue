@@ -23,12 +23,7 @@ export default {
              
         this.$store.commit('delUserInfo', '');
         this.$store.commit('initCartCount', 0)
-       
-
-          this.isLogin = false;
-          this.$router.push({
-              name: 'login'
-          })
+        this.$router.go(-1)
       }
     }
 }

@@ -170,14 +170,12 @@ router.beforeEach((to, from,next) => {
   
 
   if(to.meta.requireAuth){
-    if(store.state.user !== null){
+    if(store.state.userCode !== null){
       next();
-      console.log(1)
     }else{
-      console.log(2)
       next({
         name: 'login',
-        query: {redirect: to.name}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+        query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
       })
     }
   }else{

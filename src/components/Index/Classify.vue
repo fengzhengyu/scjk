@@ -41,12 +41,13 @@
     @import "~common/stylus/variable.styl"
 .classify 
     width 100%
+    background #fff
     .classify-wrap 
         overflow hidden
         padding-bottom .35rem
         .item 
             float left
-            width 20%
+            width 16.6%
             margin-top .25rem
             span
                 display block
@@ -89,7 +90,7 @@
                         background-size 100% 100%
             .text
                 padding-top 0.1rem
-                font-size $font-highlight
+                font-size .18rem
                 color $color-text-d
 
             

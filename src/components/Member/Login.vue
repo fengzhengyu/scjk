@@ -36,14 +36,14 @@
             }
         },
         created() {
-            console.log(this.$route.query.redirect)
+            
         },
         methods: {
            
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,passWord:this.userPass});     
-                    console.log(res)
+                  
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode;
                         let userLevel = res.message.userLevel;
@@ -59,18 +59,17 @@
                             position: 'middle',
                             duration: 2000
                         });
-                        setTimeout(()=>{
-                            if(this.routerName == 'register' || this.routerName == 'null'){
-                                 this.$router.push({
-                                    name: 'index'
-                                });
-                            }else {
-                                 this.$router.go(-1)
-                            }
-                           
-                            // sessionStorage.setItem('routerName',null)
-                            
-                        },2000)
+                        if(this.$route.query.redirect){
+                        
+                             this.$router.push({
+                                path: this.$route.query.redirect
+                            });
+                        }else{
+                            this.$router.push({
+                                name: 'index'
+                            });
+                        }
+                        
                     }else{
                         this.$toast({
                             message: res.message.info,
@@ -91,12 +90,8 @@
                 this.$store.commit('initCartCount',cartNum)
 
             }
-        },
-        beforeRouteEnter (to, from, next) {
-        
-            sessionStorage.setItem('routerName',from.name)
-            next();
-        },
+        }
+       
     }
 </script>
 

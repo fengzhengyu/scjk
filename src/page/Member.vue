@@ -115,7 +115,7 @@
         },
         computed: {
             userCode(){
-                return this.$store.state.userCode == 'null'? '': this.$store.state.userCode;
+                return this.$store.state.userCode == null? '': this.$store.state.userCode;
             }
         },
         methods: {
@@ -167,7 +167,7 @@
                         name: 'address'
                     })
             },
-              goUser(){
+            goUser(){
                   this.$router.push({
                         name: 'user'
                     })
@@ -239,17 +239,7 @@
                     console.log(err)
                 })
                 
-            },
-            exit(){
-              
-                this.delCookie ('userCode');
-                 this.delCookie ('userLevel');
-                // sessionStorage.clear();
-                this.isLogin = false;
-                this.$router.push({
-                    name: 'login'
-                })
-            },
+            },   
             login(){
                  this.$router.push({
                     name: 'login'

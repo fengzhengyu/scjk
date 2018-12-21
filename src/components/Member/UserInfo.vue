@@ -18,24 +18,24 @@
              <li class="border-bottom">
                
                  <span>其他电话</span>
-                 <input type="text" placeholder="收货人姓名" maxlength="15" v-model="addressName">
+                 <input type="text" placeholder="固话格式为： xxxx-xxxxxxx"  v-model="otherPhone" @blur="regPhone">
                  <!-- <div>x</div> -->
              </li>
               <li class="border-bottom">
                
                  <span>昵称</span>
-                 <input type="text" placeholder="收货人姓名" maxlength="15" v-model="addressName">
+                 <input type="text" placeholder="昵称" maxlength="15" v-model="nickname">
                  <!-- <div>x</div> -->
              </li>
               <li class="border-bottom">
                
                  <span>邮箱</span>
-                 <input type="text" placeholder="收货人姓名" maxlength="15" v-model="addressName">
+                 <input type="text" placeholder="邮箱"  v-model="email" @blur="regEmail">
                  <!-- <div>x</div> -->
              </li>
          </ul>    
          <div class="submit">
-           <div class="btn">提交</div>
+           <div class="btn" @click="submit">提交</div>
          </div>
     </div>
   </transition>
@@ -46,6 +46,46 @@
 export default {
    components: {
         mHeader
+    },
+    data(){
+      return  {
+        otherPhone: '',
+        nickname: '',
+        email: ''
+      }
+    },
+    methods: {
+      regPhone(){
+       if(!/^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/.test(this.otherPhone) ){
+      
+        this.$toast({
+          message: '请输入正确格式的号码',
+          position:'middle',
+          duration: 2000
+        });   
+       } 
+      },
+       regEmail(){
+       if(!/^[\w.-]+@[0-9a-zA-Z]+(\.[a-zA-Z]{2,4}){1,2}$/.test(this.email) ){
+          this.$toast({
+          message: '请输入正确格式的邮箱',
+          position:'middle',
+          duration: 2000
+        });   
+       } 
+      },
+      async submit(){
+      
+        let params= {
+          otherPhone: this.otherPhone,
+          nickname: this.nickname,
+          email: this.email,
+          userCode: this.$store.state.userCode
+        }
+        console.log(  params )
+          // let {data:res} = await getMemberData( params);
+      
+      }
     }
 }
 </script>
@@ -61,6 +101,7 @@ export default {
     top 0
     bottom 0
     background #f4f5f7
+    overflow-y auto
     .info-wrapper
       background #ffffff
       padding .6rem 0

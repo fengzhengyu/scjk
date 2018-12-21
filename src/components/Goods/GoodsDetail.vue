@@ -47,7 +47,7 @@
                         <div class="logo">
                             <i class="iconfont icon-gouwuche1-copy-copy"></i>
                         </div>
-                        <div class="num" v-if="cartCount>=0">{{cartCount}}</div>
+                        <div class="num" v-if="cartCount>0">{{cartCount}}</div>
                     </div>
                 </div>
                 <div class="right">
@@ -91,13 +91,16 @@
             }
         },
         created(){
-           
+           this.$indicator.open({
+                        text: 'Loading...',
+                        spinnerType: 'fading-circle'
+                    });
         
            this.getData();
         },
         computed: {
             userCode(){
-                return this.$store.state.userCode == 'null'? '': this.$store.state.userCode;
+                return this.$store.state.userCode == null ? '': this.$store.state.userCode;
             },
             cartCount(){
                 return this.$store.state.cartCount;
@@ -110,22 +113,22 @@
         },
         methods: {
             async getData(){
-                let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
-                console.log(res)
+               let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
+             
                 
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
-                    this.symbol = this.goods.goodsProcurementPrice.substring(4,5)
+                    if(this.goods.goodsProcurementPrice != null){
+                         this.symbol = this.goods.goodsProcurementPrice.substring(4,5)
                     this.num = this.goods.goodsProcurementPrice.substring(5)
                     this.str = this.goods.goodsProcurementPrice.substring(0,3)
+                    }
+                   
                  
                     this.$indicator.close()
                 }else{
-                    this.$indicator.open({
-                        text: 'Loading...',
-                        spinnerType: 'fading-circle'
-                    });
+                    
                 }
                 
                 
@@ -142,7 +145,7 @@
                         this.$router.push({
                             name: 'login',
                              query: {
-                                redirect: this.$route.name
+                                redirect: this.$route.fullPath
                             }
                         });
                     },500)
@@ -275,6 +278,7 @@
         components: {
             Swiper
         }
+      
     }
 </script>
 <style lang="stylus" scoped>
@@ -310,6 +314,7 @@
     overflow-y auto
     padding-bottom .9rem
     // -webkit-overflow-scrolling: touch;
+    background #fff
    
     
     .detailWrapper

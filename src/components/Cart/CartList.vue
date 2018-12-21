@@ -1,58 +1,75 @@
 <template>
-<div>
-    <div class="cart">
-        <div class="cart-wrap" v-for="(item,index) in  cartList" :key="index">
-            <div class="shop">
-                <div class="check-btn list">
-                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':item.checked}" @click=" selectedShop(item,item.shopList)"></i>
-                </div>
-                <div class="shop-icon list">
-                    <i class="iconfont icon-guanzhudianpu"></i>
-                </div>
-                <div class="shop-name list">
-                   <router-link :to="{name:'shop',params:{shopId:item.shopId}}" class="name">{{item.shopName}}</router-link>
-                </div>
+
+<div class="cart" :style="{'padding-bottom': paddingVal}">
+    <div class="cart-wrap" v-for="(item,index) in  cartList" :key="index">
+        <div class="shop">
+            <div class="check-btn list">
+                <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':item.checked}" @click=" selectedShop(item,item.shopList)"></i>
             </div>
-            <div class="group" v-for="(goods,index) in item.shopList" :key="index">
-                <div class="group-check" >
-                     <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':goods.checked}" @click="selectedProduct(goods,item.shopList,item)"></i>
+            <div class="shop-icon list">
+                <i class="iconfont icon-guanzhudianpu"></i>
+            </div>
+            <div class="shop-name list">
+                <router-link :to="{name:'shop',params:{shopId:item.shopId}}" class="name">{{item.shopName}}</router-link>
+            </div>
+        </div>
+        <div class="group border-bottom" v-for="(goods,index) in item.shopList" :key="index">
+            <div class="group-check" >
+                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':goods.checked}" @click="selectedProduct(goods,item.shopList,item)"></i>
+            </div>
+            <div class="group-detail" >
+                <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsId}})">
+                    <img v-lazy="goods.goodsPhoto" :key="goods.goodsPhoto">
                 </div>
-                <div class="group-detail" >
-                    <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsId}})">
-                        <img v-lazy="goods.goodsPhoto" :key="goods.goodsPhoto">
-                    </div>
-                    <div class="item-info">
-                       
-                        <p class="title">{{goods.goodsName}}</p>
-                        <p class="specification">
-                           <span class="text">规格：{{goods.goodsSpecification}}</span>
-                           <span class="box">
-                               <a href="javascript:;" @click=" cheangeQuantity(goods,0)">-</a><input type="text" disabled  v-model="goods.goodsCount"><a href="javascript:;"  @click=" cheangeQuantity(goods,1)">+</a>
-                           </span>
-                        </p>
-                        <p class="price">{{userLevel == 5? "零售价": "采购价"}}：￥{{goods.goodsPrice}} <span class="store">库存：{{goods.goodsInventory}}</span></p>
+                <div class="item-info">
+                    
+                    <p class="title">{{goods.goodsName}}</p>
+                    <p class="specification">
+                        <span class="text">规格：{{goods.goodsSpecification}}</span>
                         
-                    </div>
+                    </p>
+                    
+                        <div class="bottom">
+                        <p class="price">{{userLevel == 5? "零售价": "采购价"}}：￥{{goods.goodsPrice}} </p>
+                            <div class="cart-control-wrapper"  >
+                            <!--  -->
+                        
+                            <div class="cart-decrease icon-circle border"  @click=" editCart('minus',goods)">
+                                <i class="iconfont icon-jian"></i>
+                                </div>
+                            <div class="cart-count" >{{typeof goods.goodsNum == 'undefined'?$set(goods,'goodsNum',0):goods.goodsNum }}</div> 
+                            <div class="cart-add icon-circle border" @click=" editCart('add',goods)" >
+                                <i class="iconfont icon-jiaru"></i>
+                            </div>
+                    
+                            </div>
+                        </div>
+                    
+                    
                 </div>
             </div>
         </div>
     </div>
-   
-    <div class="footer-fiexd" v-show="cartList.length>0">
+
+    <div class="footer-fiexd"  :class="{'fiexd':fiexdStatus}">
         <div class="all-check" @click="checkAllFlag?checkAll(false):checkAll(true)">
             <i class="iconfont icon-weixuanzhong" :class="{'icon-xuanzhong':checkAllFlag}"></i>
             <span>全选</span>
         </div>
         <div class="total">商品合计<span>￥{{countTotalPrice}}</span></div>
         
-           
+        
         <div class="next-btn" @click="nextStep" v-show="!deleteStatus">去结算()</div>
         
         <div class="delete" v-show="deleteStatus" @click="deleteGoods">
             删除()
         </div>
     </div>
+
 </div>
+
+    
+
     
 </template>
 <script>
@@ -80,10 +97,17 @@
                orderArr: [],
                orderStr: '',
                selectAll: [],
+               fiexdStatus: false,
+               paddingVal: 0
             }
         },
         created(){
           this.userLevel = this.getCookie('userLevel');
+        },
+        mounted(){
+            
+                window.addEventListener('scroll', this.handleScroll,false)
+           
         },
         watch: {
            
@@ -324,15 +348,36 @@
                     
                    
                 
+            },
+            // 滚动固定位置
+            handleScroll(){
+                var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+                console.log( scrollTop)
+                var parentH =  document.querySelector('.cart').parentNode.offsetHeight,
+                    cartH =  document.querySelector('.cart').offsetHeight;
+                  console.log( parentH, cartH)
+
+                  if(cartH >parentH && scrollTop>0){
+                      this.fiexdStatus = true;
+                      this.paddingVal = '.8rem';
+                  }else{
+                     this.fiexdStatus = false; 
+                     this.paddingVal = 0
+                  }
             }
-            
+         },
+         destroyed(){
+              window.removeEventListener('scroll', this.handleScroll,false)
          }
     }
 </script>
 <style lang="stylus" scoped>
     .cart
-        padding-bottom .9rem
         background #fff
+        margin .15rem .15rem .95rem .15rem
+        // padding-bottom .9rem
+       
+
        .shop
            overflow hidden
            background #e4e4f6
@@ -364,150 +409,161 @@
                  color #010101   
        .group
            overflow hidden
+           padding .4rem 0
+           display flex
+           align-items center
+           width 6.1rem
+           height 1.65rem
            .group-check
-               margin  0 .2rem
-               float left
-               vertical-align middle
-               line-height 1.9rem
+               padding  0 .2rem
+               flex 0 0 .4rem
+               width .4rem 
                i
                 font-size 0.36rem
 
                 &.icon-xuanzhong
-                    color #cc3e2e
+                    color #ff6600
                 
            .group-detail
-               float left
-               width 5.6rem
-             
+
+                flex 1
+                max-width calc(100% - .8rem)
+                display flex
+              
                .item-img
-                   width 1.5rem
-                   height 1.5rem
-        
-                   margin  .2rem
-                   float left
+                   flex 0 0 1.65rem
+                   width 1.65rem
+                   height 1.65rem
                    img 
                       width 100%
                       height 100%
                .item-info
-                   float left
-                   width 3.6rem
-                  
+                    flex 1
+                    padding 0 .25rem 
+                    max-width calc(100% - 1.65rem - .5rem)
                    .title
-                       padding .2rem 0
                        font-size .24rem
                        font-weight bold
                        text-overflow ellipsis
                        white-space nowrap
                        overflow hidden
+                       padding  .05rem 0
+                       color #474747
                    .specification
-                       font-size .2rem
-                       color #787878
-                       position relative
-                       padding .2rem 0
+                       font-size .18rem
+                       color #9a9a9a
+                       padding .1rem 0 .6rem 0
+                    .bottom
+                        display flex
+                        align-items center    
 
-                       span 
-                         
-                         display inline-block
-                         &.text
-                             line-height .3rem
-                         &.box
-                             float right
+                        .price
+                            flex 1
+                            font-size .2rem
+                            color #dc143c
+                            position relative
                             
-                             background pink 
-                             input 
-                                float left
-                                width .3rem
-                                height .3rem
-                                border-top 1px  solid #ccc
-                                border-bottom 1px solid #ccc
-                                outline none
-                                line-height .3rem
-                                text-align center
-                                background #fff
-                                font-size .2rem
-                             a 
-                                float left
-                                border 1px solid #ccc
-                                width .3rem
-                                height .3rem
-                                line-height .3rem
-                                text-align center
-                                background #fff
-                                color  #000
-                                font-size .24rem
 
-                   .price
-                       font-size .2rem
-                       color #dc143c
-                       position relative
-                       padding .1rem 0
+                            .store
+                                position absolute 
+                                bottom 0
+                                right  0
+                                color #787878
+                        .cart-control-wrapper
+                            flex 1
+                            font-size: 0;
+                            text-align right
+                            .cart-decrease, .cart-add
+                                display: inline-block;
+                                
+                            .cart-count
+                                display: inline-block;
+                                
+                                width .36rem
+                                height .36rem
+                                padding 0 .05rem
+                                color: #000;
+                                font-size $font-info
+                                line-height: .36rem;
+                                text-align: center;
+                                font-size .22rem
 
-                       .store
-                           position absolute 
-                           bottom 0
-                           right  0
-                           color #787878
-    .empty-goods
-        color #222
-        text-align center
-        margin-top 2.5rem
-        font-size .26rem
-        font-weight bold
-        
-    .footer-fiexd
-        position fixed
-        bottom .88rem
-        width 6.4rem
-        height .9rem
-        line-height  .8rem
-        background #fff
-        overflow hidden
-        margin 0 auto
-        .all-check
-             margin  0 .2rem
-             float left
-             i 
-                font-size .36rem
-                vertical-align middle
-                &.icon-xuanzhong
-                    color #cc3e2e
-             span 
+                            .icon-circle
+                                width .36rem
+                                height .36rem
+                                background  $color-theme
+                                border-radius 50%
+
+                                line-height .36rem
+                                text-align center
+                                font-size $font-info
+                                &:before
+                                    border-radius 50%
+
+                                i 
+                                    font-size .18rem
+                                    color #000
+                                    font-weight bold
+    
+        .footer-fiexd
+            // position fixed
+            // bottom .88rem
+            // width 6.4rem
+            height .8rem
+            line-height  .8rem
+            background #fff
+            overflow hidden
+            // margin 0 auto
+            .all-check
+                margin  0 .2rem
+                float left
+                i 
+                    font-size .36rem
+                    vertical-align middle
+                    &.icon-xuanzhong
+                        color #ff6600
+                span 
+                    font-size .22rem
+            
+            
+            .total
+                float left
                 font-size .22rem
-        
-           
-        .total
-            float left
-            font-size .22rem
-            font-weight bold
-            margin-right .2rem
-            color #000000
-            span    
-                color #ff6600
-                font-size .26rem
-        .next-btn
-            float right
-           
-            width 1.7rem
-            text-align center
-            // background #f86320
-            color #fff
-            display inline-block
-            line-height .7rem
-            border-radius .5rem
-            font-size .24rem
-            margin-right .3rem
-            background linear-gradient(-90deg,#e93b3d,#ff9574);
-        .delete
-            float right 
-            font-size .24rem
-            height .7rem
-            width 1.7rem
-            text-align center
-            line-height .7rem
-            background #fe4600
-            color #fff
-            margin-right .3rem
-            border-radius .05rem
-
+                font-weight bold
+                margin-right .2rem
+                color #000000
+                span    
+                    color #ff6600
+                    font-size .26rem
+            .next-btn
+                float right
+            
+                width 1.7rem
+                text-align center
+                // background #f86320
+                color #fff
+                display inline-block
+                line-height .7rem
+                border-radius .5rem
+                font-size .24rem
+                margin-right .3rem
+                background linear-gradient(-90deg,#e93b3d,#ff9574);
+                margin-top .05rem
+            .delete
+                float right 
+                font-size .24rem
+                height .7rem
+                width 1.7rem
+                text-align center
+                line-height .7rem
+                background #fe4600
+                color #fff
+                margin-right .3rem
+                border-radius .05rem
+                margin-top .05rem
+            &.fiexd
+                width 6.1rem
+                position fixed
+                bottom .88rem
 
 </style>    

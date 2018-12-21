@@ -9,7 +9,7 @@
         <CartList :deleteStatus="deleteFlag" v-show="userCode" :goodsList="cartList"  :isLoad="isLoad" :userCode="userCode" @deleteSucceed="getDeleteMsg"></CartList>  
         
 
-        <div class="empty-cart" v-show="cartList.length<=0">
+        <div class="empty-cart" v-if="cartList.length<=0">
             <div class="icon">
             
             </div>
@@ -30,14 +30,13 @@
      data(){
          return {
              deleteFlag:false,
-             userCode: '',
              cartList:[],
              isLoad: false,
          }
      },
   
      created(){
-           this.userCode = this.getCookie('userCode')
+        
            if( this.userCode){
                this.$indicator.open({
                 text: 'Loading...',
@@ -45,12 +44,17 @@
             })
             this.getCartList();
            }
-             console.log(this.cartList.length)
+            
            
      },
      watch: {
       
      },
+       computed: {
+            userCode(){
+                return this.$store.state.userCode == null? '': this.$store.state.userCode;
+            }
+        },
      methods: {
             async getCartList(){
                 let {data:res} = await getCartData({userCode:this.userCode});
@@ -79,11 +83,14 @@
 </script>
 <style lang="stylus" scoped>
 .cart-home
-    position relative
+    position absolute
     padding-top .8rem
     padding-bottom .8rem
     width 6.4rem
-    overflow-y auto
+    top 0
+    bottom 0
+   
+    
     .header 
         position fixed
         top 0
@@ -118,11 +125,12 @@
             span
                 width  2.1rem 
                 border: .03rem solid #ff6908;
-                height .6rem
+                padding .12rem 0
                 color: #ff6908
                 font-size .22rem
                 display: inline-block;
                 border-radius: .1rem;
-                line-height: .6rem;       
+                line-height normal
+                background #fff
                 
 </style>

@@ -62,41 +62,18 @@
       }
     },
     created(){
-         this.userCode = this.getCookie('userCode');
+         this.userCode = this.$store.state.userCode
              
             if(this.userCode){
                 this.getAddressList()
             }
         
    },
-    //  beforeCreate () {
-    // console.group('%c%s', 'color:red', 'beforeCreate 创建前状态===============组件2》')
-    // },
-    // created () {
-    // console.group('%c%s', 'color:red', 'created 创建完毕状态===============组件2》')
-    // },
-    // beforeMount () {
-    // console.group('%c%s', 'color:red', 'beforeMount 挂载前状态===============组件2》')
-    // },
-    // mounted () {
-    // console.group('%c%s', 'color:red', 'mounted 挂载状态===============组件2》')
-    // },
-    // beforeUpdate () {
-    // console.group('%c%s', 'color:red', 'beforeUpdate 更新前状态===============组件2》')
-    // },
-    // updated () {
-    // console.group('%c%s', 'color:red', 'updated 更新状态===============组件2》')
-    // },
-    // beforeDestroy () {
-    // console.group('%c%s', 'color:red', 'beforeDestroy 破前状态===============组件2》')
-    // },
-    // destroyed () {
-    // console.group('%c%s', 'color:red', 'destroyed 破坏状态===============组件2》')
-    // }    
+    
     methods: {
         async getAddressList(){
             let {data:res} = await getAddressData({userCode: this.userCode});
-         
+            console.log(res)
             this.addressList = res.data;
 
         },
@@ -115,14 +92,11 @@
             
         },
         EditAddress(data,i){
-           this.addressItem = data;
-            //  点击编辑时，vue生命周期,editaddres页面还未创建，导致   editaddres页created得不到eventbus.$on,mounted里面也是第一次得不到，之后点击才能得到，解决： 在beforeDestroy 前， editaddres页已加载
-            // EventBus.$emit('changeEditAddressMsg',this.addressItem)
-            let  id =this.$route.query.id;
+         
             this.$router.push({
-                name: 'order',
-                query: {id:id},
-                hash: '#addressEdit'
+                name: 'addressAdd',
+                query: {id:data.addressId}
+               
 
             })
 

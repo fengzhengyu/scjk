@@ -5,7 +5,7 @@
       
         <mHeader>
            <div slot="text" class="text">添加收货地址</div>
-           <div slot="handle"  class="save">保存</div>
+           <div slot="handle"  class="save" @click="saveAddressInfo">保存</div>
              <!-- <div slot="handle"  class="del">删除</div> -->
         </mHeader>
 
@@ -38,6 +38,7 @@
               
              
           </ul>
+          <div class="save-btn-wrap">保存收货地址</div>
           <mt-popup position="bottom" v-model="popupVisible">
            <mt-picker :slots="myAddressSlots" @change="onMyAddressChange" value-key="name" style="width: 6.4rem;"   :showToolbar="true" ref="addressSlot">
             
@@ -59,11 +60,6 @@
   import { addressDataAdd , addressDataSave } from 'common/api'
    import mHeader from 'components/Member/memberHead'
   export default {
-    // props: {
-    //       userCode: {
-    //           type: String
-    //       }
-    //   },
    
     data(){
       return {
@@ -85,15 +81,14 @@
       }
     },
     created(){
-         this.userCode = this.getCookie('userCode');
-             
-           
+         this.userCode = this.$store.state.userCode;
+         
       // 初始化三级联动
        this.pickerInit();
 
       // 接受编辑信息 
       // but ,接受的参数是打印多次的，因为不会自动销毁事件，需要手动消除，在beforeDestroy组件销毁前移除事件
-        // EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
+      // EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
 　　
        
      
@@ -152,9 +147,7 @@
       }
     },
     methods: {
-      a(){
-         console.log(this.defaultStatus)
-      },
+      
       // 初始化三级联动
       pickerInit(){
         this.getProvinceArr();
@@ -167,7 +160,6 @@
       },
       onMyAddressChange(picker, values) {
         if(values[0]) {
-        
               picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
               picker.setSlotValues(2, this.getCountyArr(values[0]["name"],values[1]["name"]));
            
@@ -289,6 +281,7 @@
               addressDetail: this.addressDetail,
               addressStatus: this.defaultStatus ? 0: 1
             }
+            console.log( data )
             addressDataAdd(data).then((response)=>{
               let res = response.data;
                 if(res.flag == 'success'){
@@ -304,6 +297,7 @@
               },(err)=>{console.log(err)})
   
             }else{
+
               let data = {
               userCode: this.userCode,
               consigneeName: this.addressName,
@@ -337,7 +331,14 @@
    
     mounted(){
 　　　　this.$nextTick(() => { //vue里面全部加载好了再执行的函数 （类似于setTimeout）     
-       
+        // 编辑数据
+        // this.showAdressInfo()
+        this.addressId = this.$route.query.id  ;
+        if(this.addressId){
+          
+        }else{
+          console.log('mei ')
+        }
 // 　　　　
 　　　　});
 
@@ -433,6 +434,11 @@
       
      &.last
         padding-top 1rem
-
+  .save-btn-wrap
+    width 5rem
+    padding .2rem 0
+    margin .4rem auto 
+    background pink
+    text-align center
 </style>
 

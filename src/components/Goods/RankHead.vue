@@ -3,7 +3,7 @@
     <div class="back" @click="$router.push({path: '/'})">
       <i class="iconfont icon-fanhui2"></i>
     </div>
-    <div class="search">
+    <div class="search" @click="$router.push({name: 'search'})">
       <i class="iconfont icon-search"></i>
       <input type="text" placeholder="搜索商品名称">
     </div>

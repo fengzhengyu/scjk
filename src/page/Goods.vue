@@ -85,7 +85,7 @@
         },
         computed: {
             userCode(){
-                return this.$store.state.userCode == 'null'? '': this.$store.state.userCode;
+                return this.$store.state.userCode == null? '': this.$store.state.userCode;
             }
         },
         mounted(){
@@ -179,9 +179,9 @@
             },
             async getGoodsTypeList(value){
                 this.page =1;
-                   console.log(res)
+                  
                 let {data:res} = await getGoodsTypeData({typeId:this.active,userCode:this.userCode,screening:value,page:this.page});
-                console.log(res)
+
                 if(res.flag == 'success'){
 
                     this.goodsList = res.typeGoodsList;
@@ -220,6 +220,24 @@
             },
             // 加入购物车
             editCart(flag,item){
+
+                if(!this.userCode){
+                    this.$toast({
+                        message: '请先登录',
+                        position:'middle',
+                        duration: 2000
+                    });
+                    setTimeout(()=>{
+                        this.$router.push({
+                            name: 'login',
+                            query: {
+                                redirect: this.$route.fullPath
+                            }
+                        });
+                    },500)
+
+                    return;
+                }
                 if(flag == 'add'){
                     item.goodsNum++;
                 }else if(flag == 'minus'){
@@ -259,6 +277,7 @@
         position absolute
         top .8rem
         // bottom .9rem
+        background #fff
         bottom 0
         overflow: hidden;
         .menu-wrapper
