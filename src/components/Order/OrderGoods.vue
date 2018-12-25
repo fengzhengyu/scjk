@@ -8,27 +8,21 @@
             <div class="goods-wrap">
               <div class="desc border-bottom">
                   <p>包裹</p>
-                  <span>4件</span>
+                  <span>{{goodsList.length}}件</span>
               </div>
               <ul class="goods">
-                  <li class="border-bottom">
-                      <div class="img"></div>
+                  <li class="border-bottom" v-for="item in goodsList">
+                      <div class="img">
+                          <img :src="item.goodsPhoto" >
+                      </div>
                       <div class="info">
-                          <h3>标题</h3>
-                          <p>300/sdfsd </p>
-                          <p class="price">$50.00</p>
-                          <div>x1</div>
+                          <h3>{{item.goodsName}}</h3>
+                          <p>{{item.goodsSpecification}} </p>
+                          <p class="price">￥{{item.goodsPrice}}</p>
+                          <div>x{{item.goodsCount}}</div>
                       </div>
                   </li>
-                  <li class="border-bottom">
-                      <div class="img"></div>
-                      <div class="info">
-                          <h3>标题</h3>
-                          <p>300/sdfsd </p>
-                          <p class="price">$50.00</p>
-                          <div>x1</div>
-                      </div>
-                  </li>
+                 
               </ul>
             </div>
         </div>
@@ -43,18 +37,17 @@
         },
         data(){
             return {
-                writeWord: ''
+                goodsList: []
                
             }
         },
         created(){
-
+            let goodsStr = sessionStorage.getItem('imgList');
+            this.goodsList = JSON.parse(goodsStr);
+            console.log(  this.goodsList)
         },
         computed: {
-            newLength(){
-                
-                return this.writeWord.length
-            }
+          
         },
         methods: {
             save(){

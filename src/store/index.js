@@ -10,7 +10,8 @@ export default new Vuex.Store({
   state: {
     userCode: '',
     userLevel: '',
-    cartCount: 0
+    cartCount: 0,
+    addressItem: null
   },
  
   mutations: {
@@ -41,6 +42,9 @@ export default new Vuex.Store({
       localStorage.setItem('num',cartCount);
       state.cartCount = cartCount;
 
+    },
+    getAddressItem(state,value){
+      state.addressItem = value;
     }
   }
 })

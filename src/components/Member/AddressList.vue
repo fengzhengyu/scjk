@@ -49,12 +49,6 @@
     import {  getAddressData, delAddressData } from 'common/api'
     import mHeader from 'components/Member/memberHead'
   export default {
-      // props: {
-      //     userCode: {
-      //         type: String
-      //     }
-          
-      // },
     data(){
       return {
         addressList:[],
@@ -64,9 +58,9 @@
     created(){
          this.userCode = this.$store.state.userCode
              
-            if(this.userCode){
-                this.getAddressList()
-            }
+        if(this.userCode){
+            this.getAddressList()
+        }
         
    },
     
@@ -77,48 +71,41 @@
             this.addressList = res.data;
 
         },
-        goAddressEdit(){
-              let  id =this.$route.query.id;
-                this.$router.push({
-                    name: 'order',
-                    query: {id:id},
-                    hash: '#addressEdit'
-
-                })
-        },
-        changeAddress(data){
-            this.$emit('changeAddressMsg',data)
+        changeAddress(item){
+            if(this.$route.query.id !='buy'){
+                return;
+            }
+            console.log('buy')
+            this.$store.commit('getAddressItem',item)
+            // EventBus.$emit('changeAddressMsg',item)
             this.$router.go(-1)
             
         },
-        EditAddress(data,i){
-         
+        EditAddress(item,i){
+    
+            sessionStorage.setItem('address',JSON.stringify(item))
             this.$router.push({
                 name: 'addressAdd',
-                query: {id:data.addressId}
-               
-
+                query: {addressId:item.addressId}
             })
 
-        },
-        async delAddress(item){
-
-            let {data:res} = await  delAddressData({userCode:  this.userCode,addressId: item.addressId});
-             this.$toast({
-                message: res.info,
-                position:'middle',
-                duration: 2000
-            });   
-            if(res.flag == 'success'){
-                this.getAddressList()
-            }        
-                      
         }
+       
     },
     // 只有在组件销毁前，bus页面created 才能接受eventBus$on
     beforeDestroy(){
             EventBus.$emit('changeEditAddressMsg',this.addressItem)
     },
+    // beforeRouteLeave (to, from , next) {
+    //     console.log(to)
+    //     console.log(from)
+    //     if(to.name == 'member'){
+    //         alert('ok')
+    //     }else{
+    //         next()
+    //     }
+       
+    // },
     components: {
         mHeader
     }
@@ -175,9 +162,11 @@
         padding .5rem .3rem
         display flex
         // flex-direction column
+        width 5.8rem
         .info
             flex 1
             display flex
+            max-width calc(100% - 0.6rem)
             .default
               flex 0 0 .55rem
               width .55rem
@@ -190,16 +179,23 @@
                 text-align center
                 line-height normal
                 display block
+                border-radius .05rem
                         
             .msg 
                 flex 1
+                max-width calc(100% - 0.55rem)
                 h2 
                     font-size .24rem
-                    width 100%
+                    // width 100%
                     color #2a2a2a
+                    padding-right .1rem
+                    white-space nowrap
+                    overflow hidden
+                    text-overflow ellipsis
+                    line-height normal
                     
                 p 
-                    padding-top .2rem
+                    padding-top .15rem
                     color #565656
                     font-size .2rem
                   

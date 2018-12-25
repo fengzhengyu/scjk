@@ -3,7 +3,7 @@
         <div class="mark-wrap">
             <mHeader>
                  <div slot="text" class="text">订单备注</div>
-                 <div slot="handle"  class="finish">完成</div>
+                 <div slot="handle"  class="finish" @click="goFinish">完成</div>
             </mHeader>
             <div class="write">
                 <textarea  class="word" maxlength="50" placeholder="商品、配送补充说明" v-model="writeWord">
@@ -28,28 +28,25 @@
             }
         },
         created(){
+           
+             
+           let hasValue =  sessionStorage.getItem('order_mark');
+             
 
+           this.writeWord =hasValue == null? '': hasValue;
         },
         computed: {
             newLength(){
-                
                 return this.writeWord.length
             }
         },
         methods: {
             save(){
-                
 
-              
-                
-                    
-                
             },
-            invoiceFlag(){
-            
-                this.$router.go(-1)
-
-                
+            goFinish(){
+               sessionStorage.setItem('order_mark',this. writeWord) 
+               this.$router.go(-1)
             }
         }
     }

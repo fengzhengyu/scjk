@@ -53,11 +53,11 @@
         position fixed
         bottom 0
         background #fff
-        width 100%
+        width 6.4rem
         display flex
         justify-content center
         align-items center
-        left 0
+        // left 0
        
         .item
             flex 1

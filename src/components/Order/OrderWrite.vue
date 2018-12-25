@@ -2,7 +2,7 @@
     <div class="order-write">
         <div class="header">
             <div class="top">
-                <div class="back" @click="$router.go(-1)">
+                <div class="back" @click="goBack">
                 <i class="iconfont icon-fanhui2"></i>
                 </div>
                 <div class="text">订单结算</div>
@@ -21,13 +21,15 @@
                 <div class="address-content">
                     <div class="change"  v-if="active =='快递运输'">
                         <!-- <div >sdfsdfsfsfsf</div> -->
-                        <div class="add"  @click="$router.push({name: 'addressAdd'})" v-if="!addressData.consigneeName">
-                            <span class="circle">  <i class="iconfont icon-jiaru"></i></span>
-                            选择收货地址
-                        </div>
-                        <div class="show" v-else @click="goAddress">
+                       
+                        <div class="show"  v-if="addressData" @click="goAddress">
+                          
                             <p> {{addressData.addressRegion}}{{addressData.addressDetail}} </p>
                             <p>{{addressData.consigneeName}} <span> {{addressData.consigneePhone}}</span> </p>
+                        </div>
+                        <div class="add"  @click="$router.push({name: 'addressAdd'})" v-else>
+                            <span class="circle">  <i class="iconfont icon-jiaru"></i></span>
+                            选择收货地址
                         </div>
                        
                     </div>
@@ -45,14 +47,14 @@
             <div class="goods">
                 <div class="list" @click="goList">
                     <ul class="img-list">
-                        <li>img</li>
-                        <li>img</li>
-                        <li>img</li>
-                        <li>img</li>
+                        <li v-for="item in newImgList">
+                            <img :src="item.goodsPhoto" >
+                        </li>
+                        
                     </ul>
                     <div class="total">
-                        <p>共8件</p>
-                        <div>￥128.80</div>
+                        <p>共{{imgList.length}}件</p>
+                        <div>￥{{ totalMoney}}</div>
                     </div>
                     
                 </div>
@@ -62,9 +64,9 @@
                <div class="desc">
                   <div class="text">
                      <h2>配送费</h2>  
-                     <p>单笔订单满500元免配送</p>
+                     <p>单笔订单满199元免配送</p>
                   </div>
-                  <div class="price">+￥20</div>
+                  <div class="price">+￥{{totalMoney>=199? 0:20}}</div>
                </div>
                <div class="next"></div>
             </div>
@@ -76,7 +78,7 @@
                     发票开具
                 </h2>
                 <p>
-                    不需要
+                    {{invoiceInfo?invoiceInfo:'不需要'}}
                 </p>
             </div>
             <div class="next"><i class="iconfont icon-qianjin1"></i></div>
@@ -87,7 +89,7 @@
                      订单备注
                 </h2>
                 <p>
-                    商品、备注补充说明
+                   {{orderMark?orderMark:'商品、备注补充说明'}} 
                 </p>
             </div>
             <div class="next"><i class="iconfont icon-qianjin1"></i></div>
@@ -101,19 +103,17 @@
             
                 <div class="total">
                     <h2>应付金额 <span> ￥{{totalMoney}}</span>  </h2>
-                    <p>配送费 ￥20</p>
+                    <p>配送费 ￥{{totalMoney>=199? 0:20}}</p>
                 </div>
                 <div class="next-btn"  @click="submitOrder">去支付</div>
           
         </div>
         
-        <!-- <OrderInvoice v-show="$route.hash == '#invoice'"  v-on:childSaveMasg = "getSaveMsg"></OrderInvoice>    
-        <Address :userCode="userCode" v-if="$route.hash == '#address'"  @changeAddressMsg="getChangeAddress"></Address>
-        <AddressEdit :userCode="userCode" v-if="$route.hash == '#addressEdit'"></AddressEdit>
-        <router-view></router-view> -->
+       
     </div>
 </template>
 <script>
+    import EventBus from 'common/js/eventBus.js'
     import OrderInvoice from 'components/Order/OrderInvoice'
     import Address from 'components/Order/Address'
     import AddressEdit from 'components/Order/AddressEdit'
@@ -128,27 +128,41 @@
                 goodsIdArr: [],
                 orderIdArr:[],
                 shopArr: [],
+                imgList: [],
                 invoiceType: '个人',
                 invoiceName: '',
                 taxpayerNumber: '',
                 invoiceFlag: false,
                 count: '',
                 addressFlag: false,
-                addressData: {},
-             
+                addressData: null,
+               
                 active: '快递运输',
                 payType: '线下汇款'
               
             }
         },
         created(){
-            this.userCode = this.getCookie('userCode');
-            this.userLevel = this.getCookie('userLevel');
+            this.userCode = this.$store.state.userCode;
+            // this.userLevel = this.getCookie('userLevel');
             let goodsStr = sessionStorage.getItem('goods');
             this.goodsList = JSON.parse(goodsStr);
-            this.getAddressData();
-
+            // console.log( this.goodsList)
+            if(this.changeAddressData){
+                this.addressData = this.changeAddressData;
+            }else{
+                 this.getAddressData();     
+            }
+            
+        
         },
+        mounted(){
+            this.$nextTick(()=>{
+                //   EventBus.$on('changeAddressMsg',this.getChangeAddressMsg)
+            })
+          
+        },
+      
         computed: {
             totalMoney(){
                 let totalPrice = 0;
@@ -158,26 +172,58 @@
                     item.shopList.forEach((ele,i)=>{
                         totalPrice += ele.goodsPrice * ele.goodsCount;
                         this.goodsIdArr.push(ele.goodsId)
+                        this.imgList.push(ele)
                         this.orderIdArr.push(ele.orderId)   
                         this.shopArr.push(ele.shopId)
-                       this.count = ele.goodsCount
+                        this.count = ele.goodsCount
                     })
 
                 })     
+              
                 
                 return totalPrice.toFixed(2)
+            },
+            changeAddressData(){
+        
+                return this.$store.state.addressItem 
+
+            },
+            newImgList(){
+                let arr = []
+                if(this.imgList.length>0){
+                    if(this.imgList.length>4){
+                        arr = this.imgList.slice(0,4)
+                    }else{
+                          arr = this.imgList;
+                    }
+                }
+                 return arr 
+               
+            },
+            orderMark(){
+                return  sessionStorage.getItem('order_mark');
+            },
+            invoiceInfo(){
+                let data =  JSON.parse(sessionStorage.getItem('invoice'));
+                console.log(data)
+                if(data == null){
+                    return data;
+                }
+                return data.type+' - '+data.details;
+
+
             }
         },
        
         methods: {
           
             // 获取地址
-           async getAddressData(){
-                let{data:res} = await getAddressData({userCode: this.userCode});
-                if(res.flag == 'success'){
-                    this.addressData = res.data[0]
-                    console.log(this.addressData)
-                }
+            async getAddressData(){
+            
+                let{data:res} = await getAddressData({userCode: this.userCode})
+                    if(res.flag == 'success'){
+                        this.addressData = res.data[0];
+                    }
             },
             async submitOrder(){
                 
@@ -263,26 +309,18 @@
               
                 
             },
-            //    得到发票信息
-            getSaveMsg(data){
-                this.invoiceFlag = data.boole;
-                this.invoiceType = data.type;
-                this.invoiceName = data.name;
-                this.taxpayerNumber = data.number;
+            // 
+            goBack(){
+                this.$router.go(-1);
+                sessionStorage.clear();
             },
-            // 得到地址信息
-            getChangeAddress(data){
-                this.addressData.consigneeName = data.consigneeName;
-                this.addressData.consigneePhone = data.consigneePhone;
-                this.addressData.addressRegion = data.addressRegion;
-                this.addressData.addressDetail = data.addressDetail;
-                this.addressData.addressId = data.addressId;
-            },
+                       
             // 去地址页
             goAddress(){
                  let  id =this.$route.query.id;
                 this.$router.push({
-                    name: 'address'
+                    name: 'address',
+                    query: {id:'buy'}
 
                 })
             },
@@ -295,39 +333,30 @@
                 })
                 
             },
+            //    得到发票信息
+            getSaveMsg(data){
+                this.invoiceFlag = data.boole;
+                this.invoiceType = data.type;
+                this.invoiceName = data.name;
+                this.taxpayerNumber = data.number;
+            },
+            // 去商品目录页面
             goList(){
+                sessionStorage.setItem('imgList',JSON.stringify(this.imgList))
                 this.$router.push({
                     name: 'orderGoods',
                    
                 })
 
             },
+            // 去备注页面
             goMark(){
                   this.$router.push({
                     name: 'orderMark',
                    
                 })
             },
-            goBack(){
-                // let id = this.$route.query.id
-                // if(id ==   1){
-                //      this.$router.push({
-                //         name: 'cart',
-                //      })
-                // }else{
-
-                //     let goods = sessionStorage.getItem('goods');
-                //     let id =  JSON.parse(goods)[0].shopList[0].goodsId;
-                //     this.$router.push({
-                //         name: 'id',
-                //         params: {
-                //             goodsId: id
-                //         }
-                //      })
-                   
-                // }
-                      this.$router.go(-1)
-            }
+           
         },
         
         components: {
@@ -405,6 +434,7 @@
                     .change 
                         flex 1
                         height .8rem
+                        max-width calc(100% - .45rem)
                         .add
                           
                             height .28rem
@@ -438,10 +468,13 @@
                             color #000000
                             font-size .2rem  
                             
-                            p
+                            p   
+                                width 100%
                                 padding .1rem  0
                                 font-weight bold
-
+                                white-space nowrap
+                                overflow hidden
+                                text-overflow ellipsis
                     .next
                         flex 0 0 .45rem
                         width 45rem
@@ -456,6 +489,7 @@
                         padding 0 .2rem
                         h2
                             font-size .2rem
+                            color #000
                         p 
                             font-size .16rem
                             padding-top .15rem
@@ -481,6 +515,9 @@
                             height .88rem
                             border 0.01rem solid #0c0406
                             margin-right 0.15rem
+                            img
+                                width 100%
+                                height 100%
                     .total
                         flex 0 0 1rem
                         width 1rem
@@ -543,6 +580,7 @@
                 display flex
                 align-items center
                 padding 0 .15rem
+                max-width  calc(100% - .3rem - .3rem)
                 h2 
                     flex 1
                     font-size .2rem
@@ -552,6 +590,10 @@
                     flex 1
                     text-align right
                     color #9a9a9a
+                    width 100%
+                    white-space nowrap
+                    overflow hidden
+                    text-overflow ellipsis
 
             .next 
                 flex 0 0 .45rem

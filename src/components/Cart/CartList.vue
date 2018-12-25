@@ -352,10 +352,10 @@
             // 滚动固定位置
             handleScroll(){
                 var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-                console.log( scrollTop)
+                // console.log( scrollTop)
                 var parentH =  document.querySelector('.cart').parentNode.offsetHeight,
                     cartH =  document.querySelector('.cart').offsetHeight;
-                  console.log( parentH, cartH)
+                //   console.log( parentH, cartH)
 
                   if(cartH >parentH && scrollTop>0){
                       this.fiexdStatus = true;
