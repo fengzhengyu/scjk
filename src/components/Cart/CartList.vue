@@ -37,7 +37,7 @@
                             <div class="cart-decrease icon-circle border"  @click=" editCart('minus',goods)">
                                 <i class="iconfont icon-jian"></i>
                                 </div>
-                            <div class="cart-count" >{{typeof goods.goodsNum == 'undefined'?$set(goods,'goodsNum',0):goods.goodsNum }}</div> 
+                            <div class="cart-count" >{{ goods.goodsCount }}</div> 
                             <div class="cart-add icon-circle border" @click=" editCart('add',goods)" >
                                 <i class="iconfont icon-jiaru"></i>
                             </div>
@@ -145,8 +145,47 @@
             }
         },
          methods:{
-            
+            editCart(flag,item){
+                if(flag == 'add'){
+                    item.goodsCount++;
+                }else if(flag == 'minus'){
+                    if(item.goodsCount<=0){
+                        return;
+                    }
+                    item.goodsCount--;
+                    
+                }
+            //   getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount: item.goodsCount}).then(response=>{
+            //       let res = response.data;
+            //       if(res.flag == 'success'){
+            //             this.$store.commit('updateCartCount',1)
+            //       }
+            //       this.$toast({
+            //             message: res.info,
+            //             position:'middle',
+            //             duration: 2000
+            //         });
+            //   });
+              getCartCount({userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount}).then(response=>{
+                  let res = response.data;
+                  if(res.flag == 'success'){
+                       let num =0;
+                        if(flag == 'add'){
+                            num = 1;
+                        }else if(flag == 'minus'){
+                            num = -1;
+                        }
+                    this.$store.commit('updateCartCount',num)
+                }else{
+                     console.log(res.infn)
+        
+                }
+              });
+                
+
+            },
             //数量加减
+
             async cheangeQuantity(item,status){
                 if(status>0){
                     item.goodsCount++;
@@ -524,6 +563,7 @@
                         color #ff6600
                 span 
                     font-size .22rem
+                    vertical-align middle
             
             
             .total

@@ -7,7 +7,7 @@
       <i class="iconfont icon-search"></i>
       <input type="text" placeholder="搜索商品名称">
     </div>
-    <div class="cart">
+    <div class="cart"  @click="$router.push({name: 'cart'})">
       
       <i class="iconfont icon-gouwuche1-copy-copy">
         <sub v-if="cartCount>0">{{cartCount}}</sub>

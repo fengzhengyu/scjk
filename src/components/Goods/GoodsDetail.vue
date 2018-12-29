@@ -43,7 +43,7 @@
             <div class="shopCart border-top">
                
                 <div class="left">
-                    <div class="logo-wrapper " >
+                    <div class="logo-wrapper "  @click="$router.push({name: 'cart'})">
                         <div class="logo">
                             <i class="iconfont icon-gouwuche1-copy-copy"></i>
                         </div>
