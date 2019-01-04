@@ -5,7 +5,8 @@
 */ 
 import axios from 'axios';
 
-axios.defaults.baseURL= 'http://www.scjksm.com/scjkSvn/Home/'
+axios.defaults.baseURL= 'http://www.scjksm.com/scjkceshi/Home/'
+// http://www.scjksm.com/scjkceshi/Home
 // 拦截器 同归返回数据
 // axios.interceptors.response.use((res)=>{
 //   return res.data;
@@ -368,6 +369,5 @@ export let getShareData = (data) => {
       return params
     }]
   });
-  /*
-  post*/ 
+  
 }

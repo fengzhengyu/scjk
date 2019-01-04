@@ -80,11 +80,11 @@
                     if(res.info == '已到底部'){
                         this.loading = true;
                         this.end = true;
-                        this.$toast({
-                            message: '没有更多数据了',
-                            position:'middle',
-                            duration: 3000
-                        });
+                        // this.$toast({
+                        //     message: '没有更多数据了',
+                        //     position:'middle',
+                        //     duration: 3000
+                        // });
                     }else{
                           this.loading = false;
                     }

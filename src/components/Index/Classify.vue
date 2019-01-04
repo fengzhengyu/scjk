@@ -6,7 +6,7 @@
                 <span >
                     <div class="box" :class="imgList[index]"></div>
                 </span>
-                <span class="text">{{item.typeName}}</span>
+                <span class="text">{{item.typeName.substring(0,4)}}</span>
             </router-link>
           </li>
            
@@ -26,7 +26,7 @@
         data() {
             return {
                 imgList: [
-                    'img1','img2','img3','img4','img5','img6','img7','img8',
+                    'img1','img2','img3','img4','img5','img6','img7','img8','img9','img10','img11','img12',
                 ]
             }
         },
@@ -58,36 +58,52 @@
                     height .76rem
                     display inline-block
                     &.img1
-                        background url('./classify.png') no-repeat
+                        background url('./1.jpg') no-repeat
                         background-size 100% 100%
                     &.img2
-                        background url('./classify.png') no-repeat
+                        background url('./2.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
                     &.img3
-                        background url('./classify.png') no-repeat
+                        background url('./3.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
                     &.img4
-                        background url('./classify.png') no-repeat
+                        background url('./4.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
                     &.img5
-                        background url('./classify.png') no-repeat
+                        background url('./5.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
                     &.img6
-                        background url('./classify.png') no-repeat
+                        background url('./6.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
                     &.img7
-                        background url('./classify.png') no-repeat
+                        background url('./7.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
                     &.img8
-                        background url('./classify.png') no-repeat
+                        background url('./8.jpg') no-repeat
                         background-size 100% 100%
                         background-size 100% 100%
+                    &.img9
+                        background url('./9.jpg') no-repeat
+                        background-size 100% 100%
+                        background-size 100% 100%
+                    &.img10
+                        background url('./10.jpg') no-repeat
+                        background-size 100% 100%
+                        background-size 100% 100%
+                    &.img11
+                        background url('./11.jpg') no-repeat
+                        background-size 100% 100%
+                        background-size 100% 100%
+                    &.img12
+                        background url('./12.jpg') no-repeat
+                        background-size 100% 100%
+                        background-size 100% 100%                
             .text
                 padding-top 0.1rem
                 font-size .18rem
