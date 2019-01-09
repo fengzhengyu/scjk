@@ -4,6 +4,11 @@
             <i class="iconfont icon-guanbi-copy" @click="$router.go(-1)"></i>
         </div>
         <div class="login-wrap">
+             <div class="content">
+                <div @click="type = 1"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==1}"></i>会员入口</div>
+                <div @click="type = 2"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==2}"></i>微商入口</div> 
+
+            </div>
             <p>
                 <i class="iconfont icon-wode"></i>
                 <input type="text"  pattern="[0-9]*"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11" oninput="if(value.length>11)value=value.slice(0,11)" >
@@ -32,7 +37,8 @@
             return {
                 userName: '',
                 userPass: '',
-                routerName: ''
+                routerName: '',
+                type: 1
             }
         },
         created() {
@@ -42,8 +48,8 @@
            
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
-                let {data: res} = await getLoginData({userName:this.userName,userPass:this.userPass});     
-                  
+                let {data: res} = await getLoginData({userName:this.userName,userPass:this.userPass,loginType:this.type});     
+                    console.log(res)
                     if(res.message.flag == 'success'){
                         let userCode = res.message.userCode;
                         let userLevel = res.message.userLevel;
@@ -59,6 +65,7 @@
                             position: 'middle',
                             duration: 2000
                         });
+                       
                         if(this.$route.query.redirect){
                         
                              this.$router.push({
@@ -117,7 +124,23 @@
         .login-wrap
             background #fff
             padding 0 .7rem
-        
+            .content 
+                flex 1    
+                display flex
+                height .8rem
+                align-items center
+               
+                div 
+                    flex 1
+                    font-size .26rem
+                    color #858585
+                    // text-align center
+                    i 
+                        font-size .36rem
+                        vertical-align middle
+                        color #a2a2a2
+                        &.icon-xuanzhong
+                            color #ff6600
            
             p 
                 margin .3rem 0

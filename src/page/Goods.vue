@@ -1,50 +1,55 @@
 <template>
-    <div>
+    <div class="goods">
         <RankHead></RankHead>
-    
-        <div class="goods border-top">
-            <div class="menu-wrapper " ref="menuWrapper">
-                <ul>
-                    <li class="menu-list border" v-for="(item,index) in typeName" :key="index" :class="{'current':active == item.typeId}" @click="navTap(item.typeId)"> {{item.typeName}} <i></i></li>
-                </ul>
-            </div>
-            <div class="goods-wrapper" ref="goodsWrapper">
-                <ul>
-                    <li class="goods-list border-bottom" v-for="(item,index) in goodsList" :key="index" @click="goDetail(item)">
-                        <div class="img">
-                            <img :src="item.goodsPhoto" alt="">
-                        </div>
-                        <div class="content">
-                            <h2 class="title">{{item.goodsName}}</h2>
-                            <p class="norms">{{item.goodsSpecification}}</p>
-                            <p class="price">{{item.goodsRetailPrice}} </p>
-                            <p class="buy-pirce" v-if="userCode">{{item.goodsProcurementPrice}}</p>
-                            <div class="cart-control-wrapper" @click.stop="">
-                               
-                                    <div class="cart-decrease icon-circle" v-show="item.goodsNum>0"  @click="editCart('minus',item)">
-                                        <i class="iconfont icon-jian"></i>
-                                        </div>
-                                    <div class="cart-count" v-show="item.goodsNum>0" >{{typeof item.goodsNum == 'undefined'?$set(item,'goodsNum',0):item.goodsNum }}</div> 
-                                    <div class="cart-add icon-circle" >
-                                        <i class="iconfont icon-jiaru" @click="editCart('add',item)"></i>
-                                       </div>
-                               
-                            </div>
-                        </div>
-                    </li>
-                    <div class="bottom-tip" v-if="goodsList.length>0 ">
-                        <span class="loading-hook"> <img src="../common/img/loading-svg/loading-spinning-bubbles.svg"> 加载中...</span>
-                    </div>
-                </ul>
-                
-                <div class="no-goods" v-if="goodsList.length<=0 && isLoad">数据载入中</div>
-            </div>
-          
-            
-            
-           
+        <div class="menu-wrapper " ref="menuWrapper">
+            <ul>
+                <li class="menu-list border" v-for="(item,index) in typeName" :key="index" :class="{'current':active == item.typeId}" @click="navTap(item.typeId)"> {{item.typeName}} <i></i></li>
+            </ul>
         </div>
-        <!-- <Footer></Footer>  -->
+        
+            
+        <div class="goods-wrapper"  
+                v-if="isLoad"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="loading"
+                infinite-scroll-distance="10"
+                >
+            <ul>
+                <li class="goods-list border-bottom" v-for="(item,index) in goodsList" :key="index" @click="goDetail(item)">
+                    <div class="img">
+                        <img v-lazy="item.goodsPhoto" >
+                    </div>
+                    <div class="content">
+                        <h2 class="title">{{item.goodsName}}</h2>
+                        <p class="norms">{{item.goodsSpecification}}</p>
+                        <p class="price">{{item.goodsRetailPrice}} </p>
+                        <p class="buy-pirce" v-if="item.goodsProcurementPrice">{{item.goodsProcurementPrice}}</p>
+                        <div class="cart-control-wrapper" @click.stop="">
+                            
+                                <div class="cart-decrease icon-circle" v-show="item.goodsNum>0"  @click="editCart('minus',item)">
+                                    <i class="iconfont icon-jian"></i>
+                                    </div>
+                                <div class="cart-count" v-show="item.goodsNum>0" >{{typeof item.goodsNum == 'undefined'?$set(item,'goodsNum',0):item.goodsNum }}</div> 
+                                <div class="cart-add icon-circle" >
+                                    <i class="iconfont icon-jiaru" @click="editCart('add',item)"></i>
+                                    </div>
+                            
+                        </div>
+                    </div>
+                </li>
+               
+            </ul>
+           
+           <div v-if="goodsList.length>0" class="bottom-tip">
+                <div class="ladding" v-if="!loading">
+                    <img src="../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
+                </div>
+                <div class="ladding" v-else>
+                    您已经到底了
+                </div>
+            </div>
+        </div>
+         <div class="no-goods" v-if="goodsList.length<=0 && isLoadEnd">数据载入中</div>
     </div>
     
 </template>
@@ -66,7 +71,9 @@
                 page: 1,
                 loading: true,  //true为禁止，false 为启动
                 isLoad:false,
-                goodsNum: 0
+                goodsNum: 0,
+                end: false,
+                isLoadEnd: false
             }
         },
         created(){
@@ -78,7 +85,7 @@
                 text: 'Loading...',
                 spinnerType: 'fading-circle'
             })
-            this.getGoodsTypeList('recommend');
+            this.getGoodsTypeList();
            
          
            
@@ -89,61 +96,8 @@
             }
         },
         mounted(){
-              this.$nextTick(() => {
-                    this.menuScroll = new BScroll(this.$refs.menuWrapper,{
-                            click: true
-                    })
-                    this.goodsScroll = new BScroll(this.$refs.goodsWrapper,{
-                            click: true,
-                            scrollY: true,
-                            pullUpLoad: {
-                                threshold: -10, // 当上拉距离超过30px时触发 pullingUp 事件
-                                mouseWheel: {    // pc端同样能滑动
-                                    speed: 20,
-                                    invert: false
-                                },
-                                useTransition:false  // 防止iphone微信滑动卡顿
-                            }
-            
-                    });
-                
-             
-                    this.goodsScroll.on('pullingUp', (pos) => {
-                        
-                        
-                        if(this.goodsScroll ) { //&& !this.loading
-                      
-                                if(!this.loading){
-                                    this.page++
-                                    setTimeout(()=>{
-                                        getGoodsTypeData({typeId:this.active,userCode:this.userCode,screening:'recommend',page:this.page}).then((response)=>{
-                                        let res = response.data;
-                                            console.log( res)
-                                            if(res.flag == 'success'){
-                                                this.goodsList  = res.typeGoodsList;
-                                                if(res.msg== '已到底部'){ 
-                                                    document.querySelector('.loading-hook').innerHTML = '~ 到底了 ~';
-                                                    this.loading = true;           
-                                                return;
-                                                }
-                                                this.loading = false;
-                                            }
-                                        },(err)=>{console.log(err)});
-
-                                    },300)
-
-                                }
-                            
-                        
-                                this.goodsScroll.refresh()
-                                this.goodsScroll.finishPullUp()
-                            }
-                        
-
-                        
-                        // this.goodsScroll.finishPullUp(); // 事情做完，需要调用此方法告诉 better-scroll 数据已加载，否则上拉事件只会执行一次
-                    })
-
+            this.$nextTick(() => {
+                    
             })
            
         },
@@ -151,7 +105,7 @@
         $route(){
             this.page =1;
             this.goodsList =[];
-            this.getGoodsTypeList('recommend')
+            this.getGoodsTypeList()
             }
         },
        
@@ -177,19 +131,37 @@
                 }
                 
             },
-            async getGoodsTypeList(value){
-                this.page =1;
+            async getGoodsTypeList(flag){
+              
+                let {data:res} = await getGoodsTypeData({typeId:this.active,userCode:this.userCode,page:this.page});
+                console.log(res);
+                if(flag){
                   
-                let {data:res} = await getGoodsTypeData({typeId:this.active,userCode:this.userCode,screening:value,page:this.page});
+                     this.goodsList = res.typeGoodsList;
+                    if(res.msg == '已到底部'){
+                        this.loading = true;
+                        this.end = true;
+                       
+                    }else{
+                          this.loading = false;
+                    }
+                }else{
 
-                if(res.flag == 'success'){
+                   if(res.flag == 'success'){
+                        this.goodsList = res.typeGoodsList;
+                        this.loading = false;     
+                        this.isLoad = true;
+                       
+                        
+                    }else{
+                        this.isLoadEnd = true;
+                    }
+                    this.$indicator.close();
+                     
 
-                    this.goodsList = res.typeGoodsList;
-                    this.loading = false;     
                 }
-               this.$indicator.close()
-               this.isLoad = true
-                
+
+        
 
             },
             navTap(id){
@@ -203,15 +175,15 @@
             },
                //上拉刷新
             loadMore(){
-                let value = ''
-                if(this.active == 1){
-                   value = 'recommend';
-                }else if(this.active == 2){
-                    value = this.tabStatus == true?1:0;
-                }else if(this.active == 3){
-                    value = 'salesVolume';
-                }
-            },
+                this.loading = true;
+                setTimeout(()=>{
+                     this.page++;
+                     this.getGoodsTypeList(true)
+
+                },300)
+                                       
+              
+             },
             goDetail(item){
                 this.$router.push({
                     name: 'id',
@@ -246,10 +218,17 @@
                     }
                     item.goodsNum--;
                 }
-              getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount: item.goodsNum}).then(response=>{
+              getAddCartData({userCode:this.userCode,goodsId:item.goodsId,goodsNum: item.goodsNum}).then(response=>{
                   let res = response.data;
                   if(res.flag == 'success'){
-                        this.$store.commit('updateCartCount',1)
+                    let num = 0;
+                    if(flag =='add'){
+                        num = 1;
+                    }else if(flag == 'minus'){
+                        num = -1;
+                    }
+                    this.$store.commit('updateCartCount',num)
+                
                   }
                   this.$toast({
                         message: res.info,
@@ -263,7 +242,6 @@
         },
         components: {
              RankHead,
-             GoodsList,
              Footer 
         }
     }
@@ -272,50 +250,54 @@
 @import "~common/stylus/variable.styl"
     
     .goods
-        width 6.4rem
-        display flex
         position absolute
-        top .8rem
-        // bottom .9rem
+        width 6.4rem
+        height 100%
         background #fff
-        bottom 0
-        overflow: hidden;
         .menu-wrapper
-            flex: 0 0 1.4rem;
+            position fixed
+            top .8rem
+            bottom 0
             width: 1.4rem;
             background: #f8f8f8;
-            overflow: hidden;
-            .menu-list
-                border-left 0.05rem solid $color-text
-                height .8rem
-                line-height .8rem
-                text-align center
-                color $color-text-d
-                font-size  $font-info
-                position relative
-                // border-bottom 1px solid #dddddd
-                i 
-                  height 100%  
-                  position absolute
-                  width 1px
-                  right 0
-                  top 0
-                  background #fff
-                  display none
-                &.current
-                  border-left-color $color-theme  
-                  background #fff
-                  i 
-                    display block
+            overflow-y:scroll;
+            overflow-x:hidden;
+            z-index 100
+            ul  
+                padding-bottom .2rem
+                .menu-list
+                    border-left 0.05rem solid $color-text
+                    height .8rem
+                    line-height .8rem
+                    text-align center
+                    color $color-text-d
+                    font-size  $font-info
+                    position relative
+                    // border-bottom 1px solid #dddddd
+                    i 
+                        height 100%  
+                        position absolute
+                        width 1px
+                        right 0
+                        top 0
+                        background #fff
+                        display none
+                    &.current
+                        border-left-color $color-theme  
+                        background #fff
+                        i 
+                            display block
                   
                  
                  
                  
         .goods-wrapper
-            flex: 1;  
+            padding-left: 1.4rem; 
             position relative  
-            
-
+            padding-top .8rem
+          
+            background #fff
+           
             ul
                 margin-left .2rem 
                 .goods-list
@@ -401,13 +383,13 @@
                 
 
            
-            .no-goods
-                display flex
-                justify-content center
-                height 100%
-                align-items center
-                font-size .2rem
-                color #666                   
+        .no-goods
+            display flex
+            justify-content center
+            height 100%
+            align-items center
+            font-size .2rem
+            color #666                   
 </style>
 
 

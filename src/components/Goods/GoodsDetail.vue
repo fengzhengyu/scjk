@@ -12,7 +12,7 @@
                      <Swiper :sliders=" goodsDetailPhotos" class="img-wrap"></Swiper>
                     <h1 class="goods-name">{{ goods.goodsName }}</h1>
                    
-                    <p class="buy-price" v-if="userCode">{{symbol}} <b>{{num}}</b> <span >{{str}}</span> </p>
+                    <p class="buy-price" v-if="goods.goodsProcurementPrice">{{symbol}} <b>{{num}}</b> <span >{{str}}</span> </p>
                    
                     <p class="info">{{goods.goodsRetailPrice}}</p>
                     <p class="info size">{{goods.goodsSpecification}}</p>
@@ -43,17 +43,20 @@
             <div class="shopCart border-top">
                
                 <div class="left">
+                   
                     <div class="logo-wrapper "  @click="$router.push({name: 'cart'})">
                         <div class="logo">
                             <i class="iconfont icon-gouwuche1-copy-copy"></i>
                         </div>
                         <div class="num" v-if="cartCount>0">{{cartCount}}</div>
                     </div>
+                     <div class="shop-wrap">店铺</div>
                 </div>
                 <div class="right">
-                   
+                    
                     <div class="cart-control-wrapper" v-show="goods.goodsNum>0" >
-                        <!--  -->
+                        <!--  -->   
+                            <div></div>
                                
                             <div class="cart-decrease icon-circle"  @click=" editCart('minus',goods)">
                                 <i class="iconfont icon-jian"></i>
@@ -162,16 +165,23 @@
                     }
                     item.goodsNum--;
                 }
-                getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount: item.goodsNum}).then(response=>{
+              
+                getAddCartData({userCode:this.userCode,goodsId:item.goodsId,goodsNum: item.goodsNum}).then(response=>{
                     let res = response.data;
                     if(res.flag == 'success'){
-                            this.$store.commit('updateCartCount',1)
+                        let num = 0;
+                        if(flag =='add'){
+                            num = 1;
+                        }else if(flag == 'minus'){
+                            num = -1;
+                        }
+                        this.$store.commit('updateCartCount',num)
                     }
                     this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });
+                        message: res.info,
+                        position:'middle',
+                        duration: 2000
+                    });
                 })
 
             },
@@ -386,14 +396,25 @@
     .left
         flex: 1;
         background: #fff;
+        .shop-wrap
+            width 1rem
+            background #fd7722
+           
+            height: 0.7rem;
+            text-align: center;
+            line-height: 0.7rem;
+            font-size: 0.24rem;
+            margin-left .1rem
+            
+            color: #fff
         .logo-wrapper
             width .95rem
             height .95rem
             background #f8f8f8
             border-radius 50%
             position absolute
-            top -.35rem
-            left .3rem
+            top -.25rem
+            left 1.5rem
             box-shadow  0px  -1px 2px #ddd
     
             padding: .1rem
@@ -412,9 +433,9 @@
                 top: 0;
                 right: 0;      
                 width .26rem
-                height .26rem
+                padding .06rem 0
                 background #ff0000  
-                line-height .26rem
+                line-height normal
                 text-align center
                 border-radius 50%
                 color #fff
@@ -429,7 +450,7 @@
             text-align center
             line-height .7rem
             font-size .24rem
-            color #ff3d00
+            color #fff
             background #fe8f32
             border-radius .4rem
             margin  0 auto

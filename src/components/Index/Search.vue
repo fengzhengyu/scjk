@@ -13,84 +13,59 @@
             </div>
             <div class="text" @click="goSearch">搜索</div>
         </div>
-        <div class="no-data" v-show="isShow">
+       
+        <div class="no-data" v-show="!isLoad">
             <div class="box">
                 请输入您要搜索的商品
             </div>
             
         </div>
-        <div class="goods">
-         
-                <ul class="load-more-wrap"
-                    v-infinite-scroll="loadMore"
-                    infinite-scroll-disabled="loading"
-                    infinite-scroll-distance="10"
-                 >
-                    <li class="goods-list" v-for="(item,index) in goodsList" :key="index">
-                        <router-link class="link" :to="{name:'id',params:{goodsId:item.goodsId}}">
-                            <div class="list-img">
-                                <img :src="item.goodsPhoto" alt="">
-                            </div>
-                            <div class="list-desc">
-                                <h3 class="title">{{item.goodsName}}</h3>
-                                <p>{{item.goodsSpecification}}</p>
-                                <p>{{item.goodsRetailPrice}}<!--<span class="price"> ￥150.00</span>--></p>
-                                <p> 
-                                    <span class="price" v-if="userCode">{{item.goodsProcurementPrice}}</span>  
-                                    <span class="show" v-else @click.prevent="show()">查看采购价</span>
-                                    <span class="repertory"> 库存:{{item.goodsInventory}}</span>
-                                    
-                                </p>
-                            </div>
-                        </router-link>
-                        
-                    </li>
-                    
-                </ul>
-                <div v-if="goodsList.length>0">
-                    <div class="ladding" v-if="!end ">
-                        <img src="../../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
-                    </div>
-                    <div class="ladding" v-else>
-                        您已经到底了
-                    </div>
-                </div >
-        
-            <router-view></router-view>
-        </div>  
+        <GoodsList :goodsList="goodsList" 
+            :loading="end"
+            v-if="isLoad"
+            v-infinite-scroll="loadMore"
+            infinite-scroll-disabled="loading"
+            infinite-scroll-distance="10"
+            
+            >
+        </GoodsList>
+   
        
     </div>
 </template>
 <script>
-     import { getIndexData } from 'common/api'
+import GoodsList from 'components/Index/GoodsList'
+    import { getIndexData } from 'common/api'
 export default {
     data() {
         return {
             keyword:'',
             goodsList: [],
-            isShow: true,
+            isLoad: false,
             page:1,
-            loading:false,//
+            loading:true,//
             end:false,//
+             
         }
     },
      created(){
            
-             this.userCode = this.getCookie('userCode')
+             this.userCode = this.$store.state.userCode;
                 
        
     },
      watch:{
       keyword(val){
         if(val == ''){
-          this.isShow = true;
+          this.isLoad= false;
           this.goodsList = [];
         }
       }
 
     },
     methods: {
-        async goSearch(flag){
+        async goSearch(){
+         
             if(this.keyword == ''){
                 return;
             }
@@ -99,46 +74,51 @@ export default {
                 spinnerType: 'fading-circle'
             });
             let {data: res} = await getIndexData({userCode:this.userCode,page:this.page,keyWord:this.keyword});
-             this.$indicator.close();   
+            console.log(res)
+            
+            //  if(res.info == '已到底部'){
+            //     this.goodsList = res.goodsList;
+            //     this.loading = true;
+            //     this.end = true;
+            //     this.isLoad = true;
+            //  }
+            this.$indicator.close();   
 
-            if(flag){
-                    this.goodsList = res.goodsList;
-                    if(res.info == '已到底部'){
-                        this.loading = true;
-                        this.end = true;
-                       
-                    }else{
-                          this.loading = false;
-                    }
+            if(res.info == '已到底部'){
+                this.goodsList = res.goodsList;
+                this.isLoad = true
+                this.end = true;
+                if(res.goodsList.length<=0){
+                    this.$toast({
+                        message: '关键字有误！',
+                        position:'middle',
+                        duration: 2000
+                    });
+                     this.isLoad = false
+                }
+                
             }else{
+
                 if(res.goodsList.length>0){
                     this.goodsList = res.goodsList;
-                    this.isShow = false;
+                    this.isLoad = true;
                     this.loading = false;
-                    // this.isLoad = true;
                    
-                    
-                    }else{
-                        this.goodsList = [];
-                        this.$toast({
-                            message: '关键字有误！',
-                            position:'middle',
-                            duration: 2000
-                        });
-                    }
                 
-                
-            }  
+                }
+            }
+           
            
              
              
         },
         //上啦加载
         loadMore(){
+           
             this.loading = true;
              setTimeout(()=>{
                     this.page++;
-                    this.goSearch(true)
+                    this.goSearch()
 
             },300)
         },
@@ -157,7 +137,10 @@ export default {
         goBack(){
            this.$router.back()
         }
-    }
+    },
+      components: {
+        GoodsList,
+      }
 }
 </script>
 <style lang="stylus" scoped>
@@ -170,7 +153,7 @@ export default {
         right 0
         bottom 0
         background #fff
-        overflow-y auto
+    
         .header  
             width 6.4rem
             overflow hidden

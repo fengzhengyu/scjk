@@ -12,7 +12,7 @@
                         <p class="text">{{item.goodsSpecification}}</p>
                         <p>{{item.goodsRetailPrice}}<!--<span class="price"> ￥150.00</span>--></p>
                         <p class="last"> 
-                            <span class="price" v-if="userCode">{{item.goodsProcurementPrice}}</span>  
+                            <span class="price" v-if="item.goodsProcurementPrice">{{item.goodsProcurementPrice}}</span>  
                         <!-- v-if="userCode" -->
                             <span class="repertory" @click.prevent="addCart(item)">
                                  <i class="iconfont icon-jiaru"></i>
@@ -33,6 +33,7 @@
                 您已经到底了
             </div>
         </div>
+        
   </div>  
 </template>
 <script>
@@ -54,13 +55,16 @@
             }
         },
         created(){
-          
+        
            
           
         },
         computed: {
             userCode(){               
                 return this.$store.state.userCode;
+            },
+            userLevel(){
+                return this.$store.state.userLevel;
             }
         },
         methods: {

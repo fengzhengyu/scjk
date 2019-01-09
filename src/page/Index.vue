@@ -66,7 +66,7 @@
         },
         methods: {
             async getAllData(flag){
-                //   console.log()
+               
                 // getIndexData({page:this.page,userCode:this.userCode}).then((res)=>{
                 //     console.log(res.data)
                 // },(err)=>console.log(err))
@@ -80,11 +80,7 @@
                     if(res.info == '已到底部'){
                         this.loading = true;
                         this.end = true;
-                        // this.$toast({
-                        //     message: '没有更多数据了',
-                        //     position:'middle',
-                        //     duration: 3000
-                        // });
+                        
                     }else{
                           this.loading = false;
                     }

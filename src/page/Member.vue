@@ -121,6 +121,7 @@
         methods: {
             async getUserMessage(){
                 let {data:res} = await getMemberData({userCode:this.userCode});
+                console.log(res)
                 if(res.flag == 'success'){
                     let data = res.data.userList;
                     this.photoImg = data.headPhoto;

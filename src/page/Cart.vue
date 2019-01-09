@@ -60,11 +60,10 @@
                 let {data:res} = await getCartData({userCode:this.userCode});
                 this.$indicator.close();
                  this.isLoad = true
+                 console.log(res)
                 if(res.flag == 'success'){
                     this.cartList  = res.data;
                    
-                }else{
-                     this.cartList = []
                 }
                 
             },

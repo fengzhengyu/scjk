@@ -40,6 +40,9 @@ export default new Router({
       path: '/index',
       name: 'index',
       component: Index,
+      meta: {
+        // keepAlive:true
+      }
       
     },
     {
@@ -207,5 +210,15 @@ export default new Router({
       component: Popularize
     },
     { path: '*', component: NotFoundComponent }
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+
+    // console.log(savedPosition);
+    if (savedPosition) {
+     
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  }
 })
