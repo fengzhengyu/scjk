@@ -23,6 +23,7 @@ export default {
              
         this.$store.commit('delUserInfo', '');
         this.$store.commit('initCartCount', 0)
+        this.$store.commit('getAddressItem',null)
         this.$router.go(-1)
       }
     }

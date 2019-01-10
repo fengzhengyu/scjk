@@ -6,7 +6,7 @@
         </div>
     
 
-        <CartList :deleteStatus="deleteFlag" v-show="userCode" :goodsList="cartList"  :isLoad="isLoad" :userCode="userCode" @deleteSucceed="getDeleteMsg"></CartList>  
+        <CartList :deleteStatus="deleteFlag" v-show="userCode" :cartList="cartList"  :isLoad="isLoad" :userCode="userCode" @deleteSucceed="getDeleteMsg"></CartList>  
         
 
         <div class="empty-cart" v-if="cartList.length<=0">
@@ -60,10 +60,12 @@
                 let {data:res} = await getCartData({userCode:this.userCode});
                 this.$indicator.close();
                  this.isLoad = true
-                 console.log(res)
+                //  console.log(res)
                 if(res.flag == 'success'){
                     this.cartList  = res.data;
                    
+                }else{
+                   this.cartList  = [];
                 }
                 
             },

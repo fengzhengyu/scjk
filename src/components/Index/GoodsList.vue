@@ -14,9 +14,9 @@
                         <p class="last"> 
                             <span class="price" v-if="item.goodsProcurementPrice">{{item.goodsProcurementPrice}}</span>  
                         <!-- v-if="userCode" -->
-                            <span class="repertory" @click.prevent="addCart(item)">
+                            <!-- <span class="repertory" @click.prevent="addCart(item)">
                                  <i class="iconfont icon-jiaru"></i>
-                            </span>
+                            </span> -->
                             
                         </p>
                     </div>

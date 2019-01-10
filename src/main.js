@@ -163,12 +163,7 @@ router.beforeEach((to, from,next) => {
   store.state.userCode = localStorage.getItem('key');//获取本地存储的token
   store.state.userLevel = localStorage.getItem('key2');
   store.state.cartCount = parseFloat(localStorage.getItem('num'));
-
-
-
- 
   
-
   if(to.meta.requireAuth){
     if(store.state.userCode !== null){
       next();

@@ -13,13 +13,13 @@
               <ul class="goods">
                   <li class="border-bottom" v-for="item in goodsList">
                       <div class="img">
-                          <img :src="item.goodsPhoto" >
+                          <img :src="item.goodsdata.goodsPhoto" >
                       </div>
                       <div class="info">
-                          <h3>{{item.goodsName}}</h3>
-                          <p>{{item.goodsSpecification}} </p>
-                          <p class="price">￥{{item.goodsPrice}}</p>
-                          <div>x{{item.goodsCount}}</div>
+                          <h3>{{item.goodsdata.goodsName}}</h3>
+                          <p>{{item.goodsdata.goodsSpecification}} </p>
+                          <p class="price">￥{{item.goodsdata.goodsProcurementPrice? item.goodsdata.goodsProcurementPrice:item.goodsdata.goodsRetailPrice}}</p>
+                          <div>x{{item.goodsdata.goodsNum}}</div>
                       </div>
                   </li>
                  
@@ -44,7 +44,7 @@
         created(){
             let goodsStr = sessionStorage.getItem('imgList');
             this.goodsList = JSON.parse(goodsStr);
-            console.log(  this.goodsList)
+         
         },
         computed: {
           
@@ -104,18 +104,23 @@
                         width 1.25rem
                         height 1.25rem
                         border 0.01rem solid #150d0f
+                        box-sizing border-box
                         img  
                             width 100%
                             height 100%
                     .info
                         flex 1
-                        padding .2rem
+                        padding .2rem .15rem .2rem  0
                         position relative
                         height 1.25rem
                         h3 
+                            width 100%
+                            overflow hidden
                             font-size .24rem
                             padding .1rem 0  
                             color #161616
+                            white-space nowrap
+                            text-overflow ellipsis
                         p 
                             font-size .2rem
                             padding-top .15rem

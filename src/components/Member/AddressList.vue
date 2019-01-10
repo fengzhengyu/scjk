@@ -67,7 +67,7 @@
     methods: {
         async getAddressList(){
             let {data:res} = await getAddressData({userCode: this.userCode});
-            console.log(res)
+            // console.log(res)
             this.addressList = res.data;
 
         },
@@ -75,7 +75,7 @@
             if(this.$route.query.id !='buy'){
                 return;
             }
-            console.log('buy')
+            // console.log('buy')
             this.$store.commit('getAddressItem',item)
             // EventBus.$emit('changeAddressMsg',item)
             this.$router.go(-1)

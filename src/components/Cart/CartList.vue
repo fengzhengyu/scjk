@@ -1,43 +1,34 @@
 <template>
 
 <div class="cart" :style="{'padding-bottom': paddingVal}">
-    <div class="cart-wrap" v-for="(item,index) in  cartList" :key="index">
-        <div class="shop">
-            <div class="check-btn list">
-                <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':item.checked}" @click=" selectedShop(item,item.shopList)"></i>
-            </div>
-            <div class="shop-icon list">
-                <i class="iconfont icon-guanzhudianpu"></i>
-            </div>
-            <div class="shop-name list">
-                <router-link :to="{name:'shop',params:{shopId:item.shopId}}" class="name">{{item.shopName}}</router-link>
-            </div>
-        </div>
-        <div class="group border-bottom" v-for="(goods,index) in item.shopList" :key="index">
+    <div class="cart-wrap" >
+       
+        <div class="group border-bottom" v-for="(goods,index) in cartList" :key="index">
             <div class="group-check" >
-                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':goods.checked}" @click="selectedProduct(goods,item.shopList,item)"></i>
+                    <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':goods.checked}" @click="selectedProduct(goods,cartList)"></i>
             </div>
             <div class="group-detail" >
-                <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsId}})">
-                    <img v-lazy="goods.goodsPhoto" :key="goods.goodsPhoto">
+                <div class="item-img" @click="$router.push({name:'id',params:{goodsId:goods.goodsdata.goodsId}})">
+                    <img v-lazy="goods.goodsdata.goodsPhoto" :key="goods.goodsdata.goodsPhoto">
+                   
                 </div>
                 <div class="item-info">
                     
-                    <p class="title">{{goods.goodsName}}</p>
+                    <p class="title">{{goods.goodsdata.goodsName}}</p>
                     <p class="specification">
-                        <span class="text">规格：{{goods.goodsSpecification}}</span>
+                        <span class="text">规格：{{ goods.goodsdata.goodsSpecification}}</span>
                         
                     </p>
                     
                         <div class="bottom">
-                        <p class="price">{{userLevel == 5? "零售价": "采购价"}}：￥{{goods.goodsPrice}} </p>
+                        <p class="price">价格：￥{{goods.goodsdata.goodsProcurementPrice? goods.goodsdata.goodsProcurementPrice:goods.goodsdata.goodsRetailPrice}} </p>
                             <div class="cart-control-wrapper"  >
                             <!--  -->
                         
                             <div class="cart-decrease icon-circle border"  @click=" editCart('minus',goods)">
                                 <i class="iconfont icon-jian"></i>
                                 </div>
-                            <div class="cart-count" >{{ goods.goodsCount }}</div> 
+                            <div class="cart-count" >{{ goods.goodsdata.goodsNum }}</div> 
                             <div class="cart-add icon-circle border" @click=" editCart('add',goods)" >
                                 <i class="iconfont icon-jiaru"></i>
                             </div>
@@ -51,7 +42,7 @@
         </div>
     </div>
 
-    <div class="footer-fiexd"  :class="{'fiexd':fiexdStatus}">
+    <div class="footer-fiexd"  :class="{'fiexd':fiexdStatus}" v-show="cartList.length>0">
         <div class="all-check" @click="checkAllFlag?checkAll(false):checkAll(true)">
             <i class="iconfont icon-weixuanzhong" :class="{'icon-xuanzhong':checkAllFlag}"></i>
             <span>全选</span>
@@ -59,10 +50,10 @@
         <div class="total">商品合计<span>￥{{countTotalPrice}}</span></div>
         
         
-        <div class="next-btn" @click="nextStep" v-show="!deleteStatus">去结算()</div>
+        <div class="next-btn" @click="nextStep" v-show="!deleteStatus">去结算({{countTotalNum}})</div>
         
         <div class="delete" v-show="deleteStatus" @click="deleteGoods">
-            删除()
+            删除({{countDelNum}})
         </div>
     </div>
 
@@ -73,10 +64,10 @@
     
 </template>
 <script>
-    import {getCartData , getCartCount, getCartPay , getCartDelete } from 'common/api'
+    import {getCartData , getAddCartData , getCartPay , getCartDelete } from 'common/api'
     export default {
         props: {
-            goodsList:{
+            cartList:{
                 type: Array
              },
             deleteStatus: {
@@ -94,15 +85,17 @@
             return {
                userLevel: '', 
                checkAllFlag: false,
-               orderArr: [],
-               orderStr: '',
-               selectAll: [],
+
+               checkedArr: [],
+              
                fiexdStatus: false,
                paddingVal: 0
             }
         },
         created(){
-          this.userLevel = this.getCookie('userLevel');
+        //   this.userLevel = this.getCookie('userLevel');
+      
+
         },
         mounted(){
             
@@ -114,59 +107,69 @@
         },
        
         computed:{
-            cartList(){
-                return this.goodsList;
+            // 计算商品总数
+           countTotalNum(){
+                let n = 0;
+                if(this.cartList.length>0){
+                    this.cartList.forEach((item,index)=>{
+                   
+                        if (item.checked) {
+                            
+                            n +=  parseInt(item.goodsdata.goodsNum);
+                        }
+                    
+                    })       
+                }
+               
+                return n;
             },
-            //计算总价
+          //计算总价
             countTotalPrice(){
                 let totalPrice = 0;
-                if(!this.cartList){
-                    return
+                if(this.cartList.length>0){
+                    this.cartList.forEach((item,index)=>{
+                   
+                        if (item.checked) {
+                            let price = item.goodsdata.goodsProcurementPrice?item.goodsdata.goodsProcurementPrice:item.goodsdata.goodsRetailPrice;
+                            totalPrice += price * parseInt(item.goodsdata.goodsNum);
+                        }
+                    
+                    })       
                 }
-                this.cartList.forEach((item,index)=>{
-                    if (item.checked) {
-                        item.shopList.forEach((ele,i)=>{
-                            if (ele.checked){
-                                totalPrice += ele.goodsPrice * ele.goodsCount
-                                
-                            }
-                        })
-                    }else{
-                        item.shopList.forEach((ele,i)=>{
-                            if (ele.checked){
-                                totalPrice += ele.goodsPrice * ele.goodsCount                              
-                            }           
-                        })
-                    }
-                  
-                })            
+                     
               
                 return totalPrice.toFixed(2);
+            },
+            // 计算删除数量
+            countDelNum(){
+                let i = 0;
+                this.cartList.forEach(item => {
+                    if(item.checked ){
+                        i++;
+                    }
+                });
+                
+                return i;
             }
         },
          methods:{
+            //  编辑购物车
             editCart(flag,item){
+                let numFlag = true;
                 if(flag == 'add'){
-                    item.goodsCount++;
+                    item.goodsdata.goodsNum++;
                 }else if(flag == 'minus'){
-                    if(item.goodsCount<=0){
+                
+                    if(item.goodsdata.goodsNum <= 1){
+                        item.goodsdata.goodsNum = 1;
                         return;
                     }
-                    item.goodsCount--;
+
+                    item.goodsdata.goodsNum--;
                     
                 }
-            //   getAddCartData({userCode:this.userCode,goodsId:item.goodsId,shopId:item.shopId,goodsCount: item.goodsCount}).then(response=>{
-            //       let res = response.data;
-            //       if(res.flag == 'success'){
-            //             this.$store.commit('updateCartCount',1)
-            //       }
-            //       this.$toast({
-            //             message: res.info,
-            //             position:'middle',
-            //             duration: 2000
-            //         });
-            //   });
-              getCartCount({userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount}).then(response=>{
+              
+                getAddCartData({userCode:this.userCode,goodsId:item.goodsdata.goodsId,goodsNum:item.goodsdata.goodsNum}).then(response=>{
                   let res = response.data;
                   if(res.flag == 'success'){
                        let num =0;
@@ -176,39 +179,19 @@
                             num = -1;
                         }
                     this.$store.commit('updateCartCount',num)
-                }else{
-                     console.log(res.infn)
-        
-                }
+                    }else{
+                        console.log(res.infn)
+            
+                    }
               });
+                
+             
                 
 
             },
-            //数量加减
-
-            async cheangeQuantity(item,status){
-                if(status>0){
-                    item.goodsCount++;
-                    if(item.goodsCount >= item.goodsInventory){
-                        item.goodsCount = item.goodsInventory;
-                    }
-
-                }else{
-                    item.goodsCount--;
-                    if(item.goodsCount < 1){
-                        item.goodsCount = 1
-                    }
-                }
-                let {data:res} = await getCartCount({userCode:this.userCode,orderId:item.orderId,goodsCount:item.goodsCount});
-                if(res.flag == 'success'){
-                  
-                }else{
-                     console.log(res.infn)
-        
-                }
-            },
+           
             //商品单选
-            selectedProduct(goods,goodsList,items){
+            selectedProduct(goods,goodsList){
              
                 if(typeof goods.checked == 'undefined'){
                     this.$set(goods,'checked',true)
@@ -217,14 +200,6 @@
                     goods.checked = !goods.checked;
                 }
 
-                items.checked = true;
-                goodsList.forEach((item,index)=>{
-                    
-                    if(!item.checked){
-                        items.checked = false;
-                    }
-                })
-                // console.log( goods.checked)
                  //长度不够全选取消
                 this.checkAllFlag = true;
                 this.cartList.forEach((item,index)=>{
@@ -233,32 +208,6 @@
                     }
                 })
               
-            },
-            //店铺选中及商品全选
-            selectedShop(list,items){
-                //店铺选中
-                if(typeof list.checked == 'undefined'){
-                    this.$set(list,'checked',true);
-                    
-                }else{
-                   list.checked = !list.checked;
-                }
-                //商品全选
-                items.forEach((item,index)=>{
-                    if(typeof item.checked == 'undefined'){
-                        this.$set(item,'checked',true);
-                    }else{
-                        item.checked = list.checked;
-                    }
-                })  
-                 //长度不够全选取消
-                this.checkAllFlag = true;
-                this.cartList.forEach((item,index)=>{
-                    if(!item.checked){
-                        this.checkAllFlag = false;
-                    }
-                })
-                
             },
             //全选
             checkAll(flag){
@@ -269,110 +218,81 @@
                     }else{
                         item.checked = this.checkAllFlag;
                     }
-                   item.shopList.forEach((item,index)=>{
-                        if(typeof item.checked == 'undefined'){
-                            this.$set(item,'checked',true);
-                        }else{
-                            item.checked = this.checkAllFlag
-                        }
-                    })  
+                  
                 })
             },
             //结账
             async nextStep(){
-                if(this.countTotalPrice<=0){
+                if(this.countTotalNum<=0){
                     this.$toast({
                         message: '请选择商品哦！',
                         position:'middle',
                         duration: 2000
                     });
                 }else{
-                    this.orderArr = [];
+             
+                   let goodsArr= []
                     this.cartList.forEach((item,index)=>{
                         if (item.checked) {
-                            item.shopList.forEach((ele,i)=>{
-                                if (ele.checked){
-                                   
-                                    this.orderArr.push(ele.orderId)             
-                                }
-                            })
+                            goodsArr.push(item);
                         }
                        
-                        else{
-                            item.shopList.forEach((ele,i)=>{
-                                if (ele.checked){
-                                    this.orderArr.push(ele.orderId)             
-                                }           
-                            })
-                        }
-                    
+
                     })            
-                    this.orderStr = this.orderArr.join(',')
-                    //结算数据
-                    let {data:res} = await getCartPay({userCode:this.userCode,orderId:this.orderStr});
-                    if(res.flag == 'success'){
-                        let goods =  JSON.stringify(res.data)
-                        sessionStorage.setItem('goods',goods)
-                        this.$router.push({
-                            name: 'order',
-                                query: {id:1}
-                        })
-                    }else{       
-                        this.$toast({
-                            message: res.info,
-                            position:'middle',
-                            duration: 2000
-                        });  
-                    }
+                   
+                    sessionStorage.setItem('goods', JSON.stringify(goodsArr))
+                    this.$router.push({
+                        name: 'order'
+                            
+                    })
                 }
             },
             //删除
             deleteGoods(){
                 
-                this.orderArr = []
-                this.cartList.forEach((item,index)=>{
-                    if (item.checked) {
-                        
-                        item.shopList.forEach((ele,i)=>{
-                            if (ele.checked){
-                                this.orderArr.push(ele.orderId)      
-                            }
-                        })
-                    }
-                    else{
-                        item.shopList.forEach((ele,i)=>{
-                            if (ele.checked){
-                                this.orderArr.push(ele.orderId)             
-                            }           
-                        })
-                    }
-                
-                })    
-                let  orderStr = this.orderArr.join(',');   
-                if(this.orderArr.length<=0){
+               
+
+                if(this.countDelNum<=0){
                     this.$toast({
                         message: '请选择删除的商品！',
                         position:'middle',
                         duration: 2000
                     });
                 }else{
-                    let msg =  `确定删除这${this.orderArr.length}个商品?`
+                    let arr = [];
+                    let delCount = 0;
+                    this.cartList.forEach((item,index)=>{
+                        if (item.checked) {
+
+                            arr.push(item.cartId) ;          
+                            delCount += parseInt(item.goodsdata.goodsNum )  ;
+                        
+                        }
+                    })            
+                    let arrStr = arr.join(',');
+
+
+                    let msg =  `确定删除这${arr.length}个商品?`;
+                  
+                   
                     this.$messagebox.confirm(msg).then(action => { 
-                       
-                        getCartDelete({userCode:this.userCode,orderId:orderStr}).then(res=>{
-                            if(res.data.flag == 'success'){                        
-                            this.$toast({
-                                message: res.data.info,
-                                position:'middle',
-                                duration: 2000
-                            });
-                            
-                            this.$emit('deleteSucceed')
-                          
+                         
+                        getCartDelete({userCode:this.userCode,cartId:arrStr}).then(response=>{
+                            let res = response.data;
+                            if(res.flag == 'success'){                        
+                                this.$toast({
+                                    message: '删除成功！',
+                                    position:'middle',
+                                    duration: 2000
+                                });
+                                
+                                this.$emit('deleteSucceed')
+                                let n = this.$store.state.cartCount -  delCount;
+                                this.$store.commit('initCartCount',n);
                                 
                             }else{       
                                 this.$toast({
-                                    message: res.data.info,
+                                    message: '删除失败！',
                                     position:'middle',
                                     duration: 2000
                                 });
@@ -489,6 +409,9 @@
                        padding  .05rem 0
                        color #474747
                    .specification
+                       text-overflow ellipsis
+                       white-space nowrap
+                       overflow hidden
                        font-size .18rem
                        color #9a9a9a
                        padding .1rem 0 .6rem 0
@@ -509,7 +432,8 @@
                                 right  0
                                 color #787878
                         .cart-control-wrapper
-                            flex 1
+                            flex 0 0 1.3rem
+                            width 1.3rem
                             font-size: 0;
                             text-align right
                             .cart-decrease, .cart-add

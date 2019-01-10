@@ -118,7 +118,7 @@
             async getData(){
                let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
              
-                console.log(res)
+                // console.log(res)
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
@@ -177,11 +177,11 @@
                         }
                         this.$store.commit('updateCartCount',num)
                     }
-                    this.$toast({
-                        message: res.info,
-                        position:'middle',
-                        duration: 2000
-                    });
+                    // this.$toast({
+                    //     message: res.info,
+                    //     position:'middle',
+                    //     duration: 2000
+                    // });
                 })
 
             },

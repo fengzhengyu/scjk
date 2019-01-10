@@ -184,6 +184,7 @@
                                        
               
              },
+            //  去详情页面
             goDetail(item){
                 this.$router.push({
                     name: 'id',
@@ -230,11 +231,11 @@
                     this.$store.commit('updateCartCount',num)
                 
                   }
-                  this.$toast({
-                        message: res.info,
-                        position:'middle',
-                        duration: 2000
-                    });
+                //   this.$toast({
+                //         message: res.info,
+                //         position:'middle',
+                //         duration: 2000
+                //     });
               })
 
             }

@@ -20,6 +20,7 @@ export default {
     right 0
     img
       width 100%
+     
     
 </style>
 

@@ -5,8 +5,8 @@
         </div>
         <div class="info-wrapper">
             <div class="info">
-                <div class="photo" @click="hanldePhoto" v-show="isLogin">
-                    <img :src="photoImg"  >
+                <div class="photo" v-show="isLogin">
+                    <img src="../common/img/account.png"  >
                 </div>
                 <div class="nickname" v-show="isLogin">
                     <p class="name">{{userName}}</p>

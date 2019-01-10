@@ -48,7 +48,7 @@
                 <div class="list" @click="goList">
                     <ul class="img-list">
                         <li v-for="item in newImgList">
-                            <img :src="item.goodsPhoto" >
+                            <img :src="item.goodsdata.goodsPhoto" >
                         </li>
                         
                     </ul>
@@ -66,7 +66,7 @@
                      <h2>配送费</h2>  
                      <p>单笔订单满199元免配送</p>
                   </div>
-                  <div class="price">+￥{{totalMoney>=199? 0:20}}</div>
+                  <div class="price">+￥{{postPrice}}</div>
                </div>
                <div class="next"></div>
             </div>
@@ -103,7 +103,7 @@
             
                 <div class="total">
                     <h2>应付金额 <span> ￥{{totalMoney}}</span>  </h2>
-                    <p>配送费 ￥{{totalMoney>=199? 0:20}}</p>
+                    <p>配送费 ￥{{postPrice}}</p>
                 </div>
                 <div class="next-btn"  @click="submitOrder">去支付</div>
           
@@ -117,18 +117,18 @@
     import OrderInvoice from 'components/Order/OrderInvoice'
     import Address from 'components/Order/Address'
     import AddressEdit from 'components/Order/AddressEdit'
-    import { submitOrderData , getAddressData   } from 'common/api'
+    import { getCartPay  , getAddressData   } from 'common/api'
     export default {
         
         data(){
             return {
                 userCode: '',
-                userLevel: '',
                 goodsList: [],
                 goodsIdArr: [],
-                orderIdArr:[],
-                shopArr: [],
+                cartArr:[],
                 imgList: [],
+                shopArr: [],
+               
                 invoiceType: '个人',
                 invoiceName: '',
                 taxpayerNumber: '',
@@ -136,6 +136,7 @@
                 count: '',
                 addressFlag: false,
                 addressData: null,
+                invoiceData: null,
                
                 active: '快递运输',
                 payType: '线下汇款'
@@ -144,10 +145,10 @@
         },
         created(){
             this.userCode = this.$store.state.userCode;
-            // this.userLevel = this.getCookie('userLevel');
+            
             let goodsStr = sessionStorage.getItem('goods');
             this.goodsList = JSON.parse(goodsStr);
-            // console.log( this.goodsList)
+        
             if(this.changeAddressData){
                 this.addressData = this.changeAddressData;
             }else{
@@ -164,30 +165,33 @@
         },
       
         computed: {
+            // 总价
             totalMoney(){
                 let totalPrice = 0;
                 
                 this.goodsList.forEach((item,index)=>{
+                    let price = item.goodsdata.goodsProcurementPrice?item.goodsdata.goodsProcurementPrice:item.goodsdata.goodsRetailPrice;
                    
-                    item.shopList.forEach((ele,i)=>{
-                        totalPrice += ele.goodsPrice * ele.goodsCount;
-                        this.goodsIdArr.push(ele.goodsId)
-                        this.imgList.push(ele)
-                        this.orderIdArr.push(ele.orderId)   
-                        this.shopArr.push(ele.shopId)
-                        this.count = ele.goodsCount
-                    })
+                    totalPrice += parseFloat(price) * parseFloat(item.goodsdata.goodsNum);
+                    this.goodsIdArr.push(item.goodsId)
+                    this.imgList.push(item)
+                    this.cartArr.push(item.cartId)   
+                    // // this.shopArr.push(ele.shopId)
+                    // this.count = item.goodsdata.goodsNum
+                   
 
                 })     
               
                 
                 return totalPrice.toFixed(2)
             },
+            // 选择地址
             changeAddressData(){
         
                 return this.$store.state.addressItem 
 
             },
+            // 页面最多显示4个商品
             newImgList(){
                 let arr = []
                 if(this.imgList.length>0){
@@ -197,14 +201,18 @@
                           arr = this.imgList;
                     }
                 }
+              
                  return arr 
                
             },
+            // 备注信息
             orderMark(){
                 return  sessionStorage.getItem('order_mark');
             },
+            // 发票类型显示
             invoiceInfo(){
                 let data =  JSON.parse(sessionStorage.getItem('invoice'));
+                this.invoiceData = data;
                 console.log(data)
                 if(data == null){
                     return data;
@@ -212,6 +220,10 @@
                 return data.type+' - '+data.details;
 
 
+            },
+            // 快递费
+            postPrice(){
+                return this.totalMoney>199? 0: 20;
             }
         },
        
@@ -223,18 +235,21 @@
                 let{data:res} = await getAddressData({userCode: this.userCode})
                     if(res.flag == 'success'){
                         this.addressData = res.data[0];
+                        
                     }
             },
+            // 去支付
             async submitOrder(){
                 
-                if(!this.invoiceName){
+                if( this.active == '快递运输' && !this.addressData){
                     this.$toast({
-                        message: '请填写发票信息！',
+                        message: '请填写地址！',
                         position:'middle',
                         duration: 2000
                     });
                     return   
                 };
+
                 //店铺id去重
                 let obj = {}
                 for(let i=0;i<this.shopArr.length;i++){
@@ -251,41 +266,40 @@
 
 
                 let goodsStr = this.goodsIdArr.join(',');
-                let orderStr = this.orderIdArr.join(',')
-                let shopStr = this.shopArr.join(',');
+                let cartStr = this.cartArr.join(',');
+                // let shopStr = this.shopArr.join(',');
                 let params = {}
-                if(this.$route.query.id == 0){
+               
+                let addressSelf = {
+                    addressRegion: '河南省南阳市',
+                    consigneeName: '王总',
+                    consigneePhone: '13015238110',
 
-                    params = {
-                        userCode:this.userCode,
-                        invoiceType:this.invoiceType,
-                        invoiceName:this.invoiceName,
-                        taxpayerNumber:this.taxpayerNumber,
-                        addressId:this.addressData.addressId,
-                        receiverType:this.active,
-                        goodsId:goodsStr,
-                        shopId:shopStr,
-                        goodsPriceTotal:this.totalMoney,
-                        goodsCount:this.count,
-                        payType: this.payType
-                    }
-
-                }else{
-                    params = {
-                        userCode:this.userCode,
-                        invoiceType:this.invoiceType,
-                        invoiceName:this.invoiceName,
-                        taxpayerNumber:this.taxpayerNumber,
-                        addressId:this.addressData.addressId,
-                        receiverType:this.active,  //收货方式
-                        orderId:orderStr,
-                        shopId:shopStr,
-                        goodsPriceTotal:this.totalMoney,
-                        payType: this.payType
-                    }
 
                 }
-               let {data:res} = await submitOrderData( params );
+                let data = {
+                    userCode:this.userCode,
+                    // 店铺id 
+                    shopId: '',
+                    // 微商id
+                    weChatId: '',
+                    cartId: cartStr ,  //购物车id
+                    goodsId: goodsStr, //商品id
+                    receiverType:this.active,  //快递方式
+                    address: this.active == '快递运输'?this.addressData:addressSelf,
+                    invoiceData: this.invoiceData, //发票信息
+                    orderMark: this.orderMark,  // 备注信息
+                    goodsPriceTotal:this.totalMoney, //商品总价
+                    postPrice: this.postPrice, //快递费
+
+
+                }
+                console.log(data)
+
+
+                return;
+               let {data:res} = await getCartPay( params );
+               console.log(res)
                if(res.flag == 'success'){
                     sessionStorage.setItem('goods',null)
                     this.$toast({
@@ -515,6 +529,7 @@
                             height .88rem
                             border 0.01rem solid #0c0406
                             margin-right 0.15rem
+                            box-sizing border-box
                             img
                                 width 100%
                                 height 100%
@@ -551,7 +566,8 @@
                         h2 
                             font-size .2rem
                             color #161616
-                        p
+                        p   
+                           
                             font-size .16rem
                             padding-top .1rem
                             color #9a9a9a
@@ -594,6 +610,7 @@
                     white-space nowrap
                     overflow hidden
                     text-overflow ellipsis
+                    line-height normal
 
             .next 
                 flex 0 0 .45rem

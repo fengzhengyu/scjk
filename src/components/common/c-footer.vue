@@ -19,27 +19,43 @@
   </footer>
 </template>
 <script>
+  import { getCartCount  } from 'common/api'
   export default {
     data(){
       return {
-        selected: ''
+        selected: '',
+       
       }
       
     },
     created() {
-     this.selected = this.$route.name;
-      
+      this.selected = this.$route.name;
+      this.getCartCountData();
     },
     computed:{
       cartCount(){
         return this.$store.state.cartCount;
-      }
+      },
+       userCode(){
+                return this.$store.state.userCode == null ? '': this.$store.state.userCode;
+            },
     },
     methods: {
       go(value){
         this.$router.push({
           name: value
         })
+      },
+      // 获取购物车总数量
+      async getCartCountData(){
+           let {data: res} = await getCartCount({userCode: this.userCode});
+  
+           if(res.flag == 'success'){
+
+             this.$store.commit('initCartCount',res.cartnum);
+           }
+          
+
       }
     }
   }

@@ -137,19 +137,7 @@ export let getGoodsDetailData = (data) => {
     }]
   })
 }
-// 加入购物车
 
-export let getAddCartData = (data) => {
-  return axios.post('Cart/addCart',data,{
-    transformRequest:[function(data){
-      let params = '';
-      for(let key in data){
-          params += key +'='+data[key]+'&'
-      }
-      return params
-    }]
-  })
-}
 // 从商品详情页立即购买
 export let getNowBuyData = (data) => {
   return axios.post('Order/orderPay',data,{
@@ -186,11 +174,10 @@ export let getShopData = (data) => {
     }]
   })
 }
+// 加入购物车
 
-// 购物车数据
-
-export let getCartData = (data) => {
-  return axios.post('Cart/index',data,{
+export let getAddCartData = (data) => {
+  return axios.post('Cart/addCart',data,{
     transformRequest:[function(data){
       let params = '';
       for(let key in data){
@@ -200,14 +187,27 @@ export let getCartData = (data) => {
     }]
   })
 }
-// 购物车数量加减
+// 购物车数据
 
-export let getCartCount = (data) => {
-  return axios.post('Cart/numberCart',data,{
+export let getCartData = (data) => {
+  return axios.post('Cart/index',data,{
     transformRequest:[function(data){
       let params = '';
       for(let key in data){
-          params += key +'='+data[key]+'&'
+          params += key +'='+data[key]+'&';
+      }
+      return params
+    }]
+  })
+}
+// 购物车总数量加减
+
+export let getCartCount = (data) => {
+  return axios.post('Cart/cartCount',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&';
       }
       return params
     }]
@@ -220,7 +220,7 @@ export let getCartPay = (data) => {
     transformRequest:[function(data){
       let params = '';
       for(let key in data){
-          params += key +'='+data[key]+'&'
+          params += key +'='+data[key]+'&';
       }
       return params
     }]

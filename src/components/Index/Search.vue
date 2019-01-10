@@ -74,7 +74,7 @@ export default {
                 spinnerType: 'fading-circle'
             });
             let {data: res} = await getIndexData({userCode:this.userCode,page:this.page,keyWord:this.keyword});
-            console.log(res)
+            // console.log(res)
             
             //  if(res.info == '已到底部'){
             //     this.goodsList = res.goodsList;

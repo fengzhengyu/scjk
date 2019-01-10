@@ -56,7 +56,7 @@
                         this.$store.commit('getUserCode', res.message.userCode);
                         this.$store.commit('getUserLevel',res.message.userLevel);
                        
-                        this.getCartCount();
+                      
                        
                    
             
@@ -91,12 +91,7 @@
                     name: 'register'
                 })
             },
-            getCartCount(){
-
-                let  cartNum = Math.floor(Math.random()*99 +1);
-                this.$store.commit('initCartCount',cartNum)
-
-            }
+           
         }
        
     }
