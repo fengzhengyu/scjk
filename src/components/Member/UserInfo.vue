@@ -5,7 +5,7 @@
             <div class="text" slot="text">个人信息</div> 
         </mHeader>
         <div class="info-wrapper">
-          <p class="name">18566669999</p>
+          <p class="name">{{ userCode }}</p>
           <p class="icon">
             <i class="iconfont icon-huiyuantongjibaobiao"></i>普通会员
           </p>
@@ -49,10 +49,14 @@ export default {
     },
     data(){
       return  {
+        userCode: '',
         otherPhone: '',
         nickname: '',
         email: ''
       }
+    },
+    created(){
+      this.userCode = this.$store.state.userCode;
     },
     methods: {
       regPhone(){
@@ -82,9 +86,9 @@ export default {
           email: this.email,
           userCode: this.$store.state.userCode
         }
-        console.log(  params )
+        // console.log(  params )
           // let {data:res} = await getMemberData( params);
-      
+       
       }
     }
 }

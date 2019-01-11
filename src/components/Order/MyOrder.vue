@@ -3,28 +3,28 @@
     <div class="my-order">
         <div class="header">
              <div class="member-header">
-                <div class="back" @click="$router.go(-1)">
+                <div class="back" @click="$router.push({path:'/member'})">
                 <i class="iconfont icon-fanhui2"></i>
                 </div>
                 <div class="text" >我的订单</div> 
             </div>
             <div class="tabs border-bottom">
-                <div class="tab-list active"  :class="{'active':$route.params.id ==1}" @click="goJump(1),getPayList()">
+                <div class="tab-list "  :class="{'active':$route.query.id == undefined}" @click="goJump()">
                     <span class="line">全部</span>
                 </div>
-                <div class="tab-list"  :class="{'active':$route.params.id == 2}" @click="goJump(2), getFinishData()">
+                <div class="tab-list"  :class="{'active':$route.query.id == 0 }" @click="goJump(0)">
                     <span class="line">待付款</span>
 
                 </div>
-                <div class="tab-list" :class="{'active':$route.params.id ==1}" @click="goJump(1),getPayList()">
+                <div class="tab-list" :class="{'active':$route.query.id == 1}" @click="goJump(1)">
                     <span class="line">待发货</span>
                 </div>
-                <div class="tab-list"  :class="{'active':$route.params.id == 2}" @click="goJump(2), getFinishData()">
+                <div class="tab-list"  :class="{'active':$route.query.id == 2}" @click="goJump(2)">
                     <span class="line">待收货</span>
 
                 </div>
                
-                <div class="tab-list"  :class="{'active':$route.params.id == 2}" @click="goJump(2), getFinishData()">
+                <div class="tab-list"  :class="{'active':$route.query.id == 3}" @click="goJump(3)">
                     <span class="line">已完成</span>
 
                 </div>
@@ -33,26 +33,54 @@
            
         </div>
         <div class="line-wrapper"></div>
-       <ul class="order-list" >
-           <li class="border-bottom" v-for="(item,index) in orderList">
+        <div 
+            
+            v-if="isLoad"
+            v-infinite-scroll="loadMore"
+            infinite-scroll-disabled="loading"
+            infinite-scroll-distance="10"
+        >
+             <ul class="order-list" >
+           <li class="border-bottom" v-for="(item,index) in orderList" :key="index" @click="goDetail(item)">
                <div class="img-wrap">
-                   <!-- <img :src="" > -->
+                   <img :src="item.goodsimg" >
                </div>
                <div class="desc-wrap">
-                   <h2 class="title">百瑞源宁夏枸杞子正宗头茬枸杞特枸...         </h2>
-                   <p class="num">商品共计 8件</p>
-                   <p class="time">2018-11-22 12:22            </p>
-                   <div class="status">
+                   <h2 class="title">{{item.goodsName}}</h2>
+                   <p class="num">商品共计{{item.goodsCount}}件</p>
+                   <p class="time">{{ item.addTime}}</p>
+                   
+                   <div class="status" v-if="item.orderStatus == 0">
+                       <span>未支付</span>
+                   </div>
+                   <div class="status" v-if="item.orderStatus == 1">
+                       <span>待发货</span>
+                   </div>
+                   <div class="status" v-if="item.orderStatus == 2">
+                       <span>待收货</span>
+                   </div>
+                   <div class="status" v-if="item.orderStatus == 3">
                        <span>已完成</span>
                    </div>
+                   
                </div>
            </li>
+            <div v-if="orderList.length>0" class="bottom-tip">
+                <div class="ladding" v-if="!end">
+                    <img src="../../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
+                </div>
+                <div class="ladding" v-else>
+                    您已经到底了
+                </div>
+            </div>
        </ul>
-        <!-- <div class="empty">
+        </div>
+      
+        <div class="empty" v-if="orderList.length<=0">
             <div class="bg"></div>
             <div class="text">你还没有相关订单！</div>
-            <div class="btn">去采购喽</div>
-        </div> -->
+            <div class="btn" @click="$router.push({path: '/'})">去采购喽</div>
+        </div>
         
     </div>
   </transition>  
@@ -63,6 +91,7 @@ import {getPayData , getConfirmOrder, delOrderData } from 'common/api'
 export default {
     data() {
         return {
+            active: '',
             userCode : '',
             orderList: [],
             page:1,
@@ -72,101 +101,83 @@ export default {
         }
     },
     created(){
-      
-        this.userCode = this.getCookie('userCode')
-          this.getPayList()
-        // if(this.userCode){
-        //     if(this.$route.params.id == 1){
-        //         this.getPayList()
-        //     }else{
-        //         this.getFinishData()
-        //     }
-        // }
+     
+        this.userCode = this.$store.state.userCode;
+        console.log(1)
+        this.getPayList();
+       
        
     },
     computed: {
       
     },
+    watch: {
+    $route(){
+        this.page =1;
+        this.orderList =[];
+        this.getPayList();
+        }
+    },
     methods: {
         goJump(id){
             this.$router.push({
                 name: 'myorder',
-                params: {id:id}
+               query: {id:id}
             })
         },
         //已支付
-        async getPayList(){
-            this.page =1;  
+        async getPayList(flag){
+          
          
-            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:1,page:this.page});
-           
+            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.query.id,page:this.page});
+          
             if(res.flag == 'success'){
-                this.orderList = res.orderList;
-                 console.log(this.orderList)
-                this.isLoad = true;
-                if(res.msg == '已到底部'){
-                    this.loading = true;
-                    this.end = true;
-                }else{
-                    this.loading = false;
-                }
+
+
+                  if(flag){
+                         this.orderList = res.orderList;
+                        if(res.msg == '已到底部'){
+                            this.loading = true;
+                            this.end = true;
+                            
+                        }else{
+                            this.loading = false;
+                            
+                        }
+
+                  }else{
+                        this.orderList = res.orderList;
+                        this.isLoad = true;
+                        this.loading = false;
+
+                  }
+            
                 
                
             }
 
         },
-        //已完成
-        async getFinishData(){
-            this.page =1;  
-            
-            let {data:res} = await  getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page});
-             if(res.flag == 'success'){
-                this.orderList = res.orderList;
-                this.isLoad = true;
-                if(res.msg == '已到底部'){
-                    this.loading = true;
-                    this.end = true;
-                }else{
-                    this.loading = false;
-                }
-            }
-        },
+       
         //上啦加载
         loadMore(){
-            this.loading = true;
-            alert(1)
-            setTimeout(()=>{
-                this.page++;
-               
-                getPayData({userCode: this.userCode,orderStatus:this.$route.params.id,page:this.page}).then((response)=>{
-                    let res = response.data;
-                    console.log(res)
-                    if(res.flag == 'success'){
-                        this.orderList = res.orderList;
-                    
-                        if(res.msg == '已到底部'){
-                            this.end = true;
-                            this.loading = true;
-                            
-                        }else{
-                            this.loading = false;
-                        }
-                    }
-                    
-                });
-               
+             this.loading = true;
+                setTimeout(()=>{
+                     this.page++;
+                     this.getPayList(true)
 
-
-            },300)
+                },300)
+           
 
         },
         
         //查看详情
-        goOrderDetail(goods){
-            this.$router.push({
-                name: 'orderdetail',
-                query: {order:goods.orderNumber,shopId:goods.shopId}
+        goDetail(order){
+           this.$router.push({
+                name: 'orderDetail',
+                query: {id:order.orderNumber}
+
             })
+           
         },
         //确认收货
         confirmOrder(item){
@@ -220,11 +231,11 @@ export default {
 .slide-enter, .slide-leave-to
     transform: translate3d(100%, 0, 0)
 .my-order
-    position absolute
+    position fixed
     top 0
     bottom 0
     width 6.4rem
-    margin 0 auto
+    overflow-y auto
     background #fff
     
     .header
@@ -321,7 +332,17 @@ export default {
                     text-align right
                     span 
                         padding-left .2rem
-
+        .bottom-tip
+            width 100%
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #000;
+            background: #fff;
+            font-size .18rem
+            .loading-hook
+                img 
+                    width .3rem
 
 
     

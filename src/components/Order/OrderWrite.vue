@@ -223,7 +223,7 @@
             },
             // 快递费
             postPrice(){
-                return this.totalMoney>199? 0: 20;
+                return this.totalMoney>=199? 0: 20;
             }
         },
        
@@ -235,7 +235,7 @@
                 let{data:res} = await getAddressData({userCode: this.userCode})
                     if(res.flag == 'success'){
                         this.addressData = res.data[0];
-                        
+                      
                     }
             },
             // 去支付
@@ -250,69 +250,69 @@
                     return   
                 };
 
-                //店铺id去重
-                let obj = {}
-                for(let i=0;i<this.shopArr.length;i++){
-                    let cur = this.shopArr[i];
-                    if(obj[cur] == cur){
-                        this.shopArr[i] = this.shopArr[this.shopArr.length-1];
-                        this.shopArr.length --;
-                        i--;
-                        continue;
-                    }
-                    obj[cur] =cur;
-                }
-                obj = null;
+                // //店铺id去重
+                // let obj = {}
+                // for(let i=0;i<this.shopArr.length;i++){
+                //     let cur = this.shopArr[i];
+                //     if(obj[cur] == cur){
+                //         this.shopArr[i] = this.shopArr[this.shopArr.length-1];
+                //         this.shopArr.length --;
+                //         i--;
+                //         continue;
+                //     }
+                //     obj[cur] =cur;
+                // }
+                // obj = null;
 
 
-                let goodsStr = this.goodsIdArr.join(',');
+                // 购物车id拼接
                 let cartStr = this.cartArr.join(',');
-                // let shopStr = this.shopArr.join(',');
-                let params = {}
-               
-                let addressSelf = {
-                    addressRegion: '河南省南阳市',
-                    consigneeName: '王总',
-                    consigneePhone: '13015238110',
+                
 
-
+                // 发票拼接
+                let str = '';
+                if(this.invoiceData && this.invoiceData.type == '个人'){
+                    str = this.invoiceData.type+'&'+ this.invoiceData.name+'&'+this.invoiceData.details; 
+                }else if( this.invoiceData && this.invoiceData.type == '公司'){
+                    if(this.invoiceData.companyType == 0){
+                         str = this.invoiceData.type+'&普票&'+ this.invoiceData.name+'&'+ this.invoiceData.number+'&'+this.invoiceData.details; 
+                    }else{
+                         str = this.invoiceData.type+'&专票&'+ this.invoiceData.name+'&'+ this.invoiceData.number+'&'+this.invoiceData.details
+                         +'&'+this.invoiceData.bank+'&'+this.invoiceData.account+'&'+this.invoiceData.address+'&'+this.invoiceData.phone; 
+                    }
+                   
                 }
-                let data = {
+              
+               
+    
+                let params = {
                     userCode:this.userCode,
                     // 店铺id 
                     shopId: '',
-                    // 微商id
-                    weChatId: '',
+                    // 分享id
+                    salesID: '',
                     cartId: cartStr ,  //购物车id
-                    goodsId: goodsStr, //商品id
-                    receiverType:this.active,  //快递方式
-                    address: this.active == '快递运输'?this.addressData:addressSelf,
-                    invoiceData: this.invoiceData, //发票信息
-                    orderMark: this.orderMark,  // 备注信息
-                    goodsPriceTotal:this.totalMoney, //商品总价
-                    postPrice: this.postPrice, //快递费
+
+                    receiverType:this.active == '快递运输'?1:0,  //快递方式
+
+                    addressId: this.active == '快递运输'?this.addressData.addressId:'',
+
+                    taxInfo: str, //发票信息
+
+                    remark: this.orderMark,  // 备注信息
+                    
 
 
                 }
-                console.log(data)
-
-
-                return;
+               
+               
                let {data:res} = await getCartPay( params );
                console.log(res)
+
                if(res.flag == 'success'){
-                    sessionStorage.setItem('goods',null)
-                    this.$toast({
-                        message: res.info,
-                        position:'middle',
-                        duration: 2000
-                    });   
-                    setTimeout(()=>{
-                        this.$router.push({
-                            name: 'myorder',
-                            params: {id:1}
-                        })
-                    },1000)  
+                   
+                 
+                window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+res.orderNumber+'&code='+this.userCode
                }else{
                     this.$toast({
                         message: res.info,
@@ -326,7 +326,7 @@
             // 
             goBack(){
                 this.$router.go(-1);
-                sessionStorage.clear();
+                // sessionStorage.clear();
             },
                        
             // 去地址页

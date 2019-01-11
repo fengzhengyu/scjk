@@ -10,7 +10,7 @@ import UserInfo from 'components/Member/UserInfo'
 import Setting from 'components/Member/Setting'
 import Password from 'components/Member/Password'
 import Collect from 'components/Member/Collect'
-import MyOrder from 'components/Member/MyOrder'
+
 import Goods from 'page/Goods.vue'
 import Shop from 'page/Shop.vue'
 import GoodsDetail from 'components/Goods/GoodsDetail'
@@ -18,6 +18,7 @@ import OrderWrite from 'components/Order/OrderWrite'
 import OrderMark from 'components/Order/OrderMark'
 import OrderGoods from 'components/Order/OrderGoods'
 import OrderInvoice from 'components/Order/OrderInvoice'
+import MyOrder from 'components/Order/MyOrder'
 
 import OrderDetail from 'components/Order/OrderDetail'
 import Login from 'components/Member/Login'
@@ -57,32 +58,9 @@ export default new Router({
       path: '/member',
       name: 'member',
       component: Member,
-      // children: [
-      //   {
-      //     path: 'pwd',
-      //     name: 'password',
-      //     component: Password
-      //   },
-      //   {
-      //     path: 'collect',
-      //     name: 'collect',
-      //     component: Collect
-      //   },
-      //   {
-      //     path: 'myorder/:id',
-      //     name: 'myorder',
-      //     component: MyOrder,
-      //     children: [
-      //       {
-      //         path: 'detail',
-      //         name: 'orderdetail',
-      //         component: OrderDetail
-      //       },
-      //     ]
-      //   }
-        
-      // ]
+    
     },
+    // 地址展示
     {
       path: '/member/address',
       name: 'address',
@@ -92,7 +70,7 @@ export default new Router({
       }
       
     },
-   
+  //  添加地址页面
     {
       path: '/member/addressAdd',
       name: 'addressAdd',
@@ -101,6 +79,7 @@ export default new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       }
     },
+    // 会员信息
     {
       path: '/member/user',
       name: 'user',
@@ -109,6 +88,7 @@ export default new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       }
     },
+    // 会员设置
     {
       path: '/member/setting',
       name: 'setting',
@@ -117,6 +97,7 @@ export default new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       }
     },
+    // 我的订单
     {
       path: '/myorder',
       name: 'myorder',
@@ -125,6 +106,7 @@ export default new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       }
     },
+    // 商品分类
     {
       // path: '/goods/:id',
       path: '/goods',
@@ -132,11 +114,13 @@ export default new Router({
       component: Goods,
       
     },
+    // 商品详情
     {
       path: '/goodsId/:goodsId',
       name: 'id',
       component: GoodsDetail
     },
+    // 提交订单页面
     {
       path: '/order',
       name: 'order',
@@ -146,6 +130,7 @@ export default new Router({
       }
            
     },
+    // 发票
     {
       path: '/order/invoice',
       name: 'orderInvoice',
@@ -157,6 +142,7 @@ export default new Router({
      
            
     },
+    // 备注
     {
       path: '/order/mark',
       name: 'orderMark',
@@ -167,6 +153,7 @@ export default new Router({
       }
            
     },
+    // 订单商品展示
     {
       path: '/order/goods',
       name: 'orderGoods',
@@ -176,12 +163,16 @@ export default new Router({
       }
            
     },
-    // {
-    //   path: '/order',
-    //   name: 'order',
-    //   component: OrderWrite
+    // 订单详情
+    {
+      path: '/order/detail',
+      name: 'orderDetail',
+      component: OrderDetail,
+      // meta: {
+      //   requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      // }
            
-    // },
+    },
 
     {
       path: '/shop/:shopId',

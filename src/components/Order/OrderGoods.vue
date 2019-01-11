@@ -19,7 +19,7 @@
                           <h3>{{item.goodsdata.goodsName}}</h3>
                           <p>{{item.goodsdata.goodsSpecification}} </p>
                           <p class="price">￥{{item.goodsdata.goodsProcurementPrice? item.goodsdata.goodsProcurementPrice:item.goodsdata.goodsRetailPrice}}</p>
-                          <div>x{{item.goodsdata.goodsNum}}</div>
+                          <div>x{{item.goodsNum}}</div>
                       </div>
                   </li>
                  

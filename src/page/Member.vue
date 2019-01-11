@@ -19,25 +19,25 @@
                 <div class="bar"></div>
             </div>
             <div class="order-nav">
-                <div class="list"  @click="goMyOrder(1)">
+                <div class="list"  @click="goMyOrder(0)">
                     <i class="iconfont icon-daifukuan"></i><br/>
                     待付款
                 </div>
-                <div class="list"  @click="goMyOrder(2)">
+                <div class="list"  @click="goMyOrder(1)">
                     <i class="iconfont icon-icon3"></i><br/>
                     待发货
                 </div>
-                <div class="list" @click="goCollect">
+                <div class="list" @click="goMyOrder(2)">
                     <i class="iconfont icon-hongjiuchengicondaishouhuo"></i><br/>
                     待收货
 
                 </div>
-                <div class="list" @click="goCollect">
+                <div class="list" @click="goMyOrder(3)">
                     <i class="iconfont icon-yishoukuan"></i><br/>
                     已完成
 
                 </div>
-                <div class="list last" @click="goCollect">
+                <div class="list last" @click="goMyOrder()">
                     <i class="iconfont icon-quanbudingdan"></i><br/>
                     全部订单
 
@@ -121,7 +121,7 @@
         methods: {
             async getUserMessage(){
                 let {data:res} = await getMemberData({userCode:this.userCode});
-                console.log(res)
+       
                 if(res.flag == 'success'){
                     let data = res.data.userList;
                     this.photoImg = data.headPhoto;
@@ -133,7 +133,8 @@
             },
             goMyOrder(id){
                this.$router.push({
-                        name: 'myorder'
+                        name: 'myorder',
+                        query:{id:id}
                     })
             },
             goCollect(){
@@ -169,6 +170,12 @@
                     })
             },
             goUser(){
+                 this.$toast({
+                        message: '该功能暂未开通！',
+                        position:'middle',
+                        duration: 2000
+                    });
+                return;
                   this.$router.push({
                         name: 'user'
                     })

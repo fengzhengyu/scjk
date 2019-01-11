@@ -220,7 +220,7 @@ export let getCartPay = (data) => {
     transformRequest:[function(data){
       let params = '';
       for(let key in data){
-          params += key +'='+data[key]+'&';
+        params += encodeURIComponent(key) +'='+ encodeURIComponent(data[key])+'&';
       }
       return params
     }]

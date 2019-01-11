@@ -41,7 +41,7 @@
             </ul>
            
            <div v-if="goodsList.length>0" class="bottom-tip">
-                <div class="ladding" v-if="!loading">
+                <div class="ladding" v-if="!end">
                     <img src="../common/img/loading-svg/loading-spinning-bubbles.svg"> &nbsp; 加载中...
                 </div>
                 <div class="ladding" v-else>

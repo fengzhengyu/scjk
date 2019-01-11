@@ -16,7 +16,17 @@
             </div>
              <div  v-show="type == 0">
                  <div class="column-list">
+                        <div class="title"><span><i class="iconfont icon-bitian2-5"></i></span>姓名</div>
+                        <div class="content">
+                            <div> 
+                                <input type="text" placeholder="个人姓名" v-model="userName">
+                            </div>
+                            
+                        </div>
+                    </div>
+                 <div class="column-list">
                     <div class="title"><span><i class="iconfont icon-bitian2-5"></i></span>发票内容</div>
+                    
                     <div class="content">
                         <div @click="details = 0"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':details == 0}"></i>商品项目</div>
                         <div @click="details = 1"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':details == 1}"></i>商品明细</div> 
@@ -144,6 +154,7 @@
         data(){
             return {
                 type: 2,
+                userName: '',
                 details : 1,
                 companyType: 0,
                 companyName: '', //抬头
@@ -177,6 +188,9 @@
                             this.details = 1;
                             break;
                     }
+                    if(hasValue.type == '个人'){
+                        this.userName =hasValue.name;
+                    }
 
                     if(hasValue.companyType != null){
                          
@@ -207,8 +221,17 @@
                 
 
                 if(this.type== 0){
+                    if(this.userName == '' || this.userName == null){
+                        this.$toast({
+                            message: '个人姓名不能为空',
+                            position:'middle',
+                            duration: 2000
+                        });
+                        return;
+                    }
                     let data = {
                         type: '个人',
+                        name: this.userName,
                         details: this.details == 0?'商品项目':'商品明细'
                     }
                     sessionStorage.setItem('invoice',JSON.stringify(data))
