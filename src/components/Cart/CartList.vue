@@ -223,6 +223,14 @@
             },
             //结账
             async nextStep(){
+                 if(this.$store.state.salesId){
+                    this.$toast({
+                        message: '您购买请联系您的店铺！',
+                        position:'middle',
+                        duration: 2000
+                    });
+                    return;
+                }
                 if(this.countTotalNum<=0){
                     this.$toast({
                         message: '请选择商品哦！',

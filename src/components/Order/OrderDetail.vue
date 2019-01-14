@@ -73,7 +73,7 @@
             <div class="next"><i class="iconfont icon-qianjin1"></i></div>
         </div>
          <div class="remark" >
-           {{ orderData.remark}}
+           {{ orderData.remark == 'null'? '未备注':  orderData.remark }}
            
         </div>
 

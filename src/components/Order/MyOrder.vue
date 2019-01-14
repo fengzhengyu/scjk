@@ -103,7 +103,6 @@ export default {
     created(){
      
         this.userCode = this.$store.state.userCode;
-        console.log(1)
         this.getPayList();
        
        
@@ -114,6 +113,7 @@ export default {
     watch: {
     $route(){
         this.page =1;
+        this.end = false;
         this.orderList =[];
         this.getPayList();
         }

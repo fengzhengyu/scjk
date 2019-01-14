@@ -5,7 +5,7 @@
         </div>
         <div class="info-wrapper">
             <div class="info">
-                <div class="photo" v-show="isLogin">
+                <div class="photo" v-show="isLogin ">
                     <img src="../common/img/account.png"  >
                 </div>
                 <div class="nickname" v-show="isLogin">
@@ -107,7 +107,7 @@
         created(){
            
              
-            if(this.userCode){
+            if(this.userCode || this.$store.state.salesId){
                 this.isLogin =true;
                 this.getUserMessage()
             }
@@ -120,14 +120,26 @@
         },
         methods: {
             async getUserMessage(){
-                let {data:res} = await getMemberData({userCode:this.userCode});
-       
+                let params = {};
+                if(this.$store.state.salesId){
+                    params = {salesId: this.$store.state.salesId};
+                }else{
+                     params ={userCode:this.userCode};
+                }
+                let {data:res} = await getMemberData(params);
+              
                 if(res.flag == 'success'){
-                    let data = res.data.userList;
-                    this.photoImg = data.headPhoto;
-                    this.phone =data.phoneOne;
-                    this.userName = data.userName;
-                    this.userLevelName = data.userLevelName;
+                    if(res.data){
+                         let data = res.data.userList;
+                        this.photoImg = data.headPhoto;
+                        this.phone =data.phoneOne;
+                        this.userName = data.userName;
+                        this.userLevelName = data.userLevelName;
+                    }else{
+                        this.userName = res.info.salesAcct;
+                        this.userLevelName = '合作微商';
+                    }
+                   
                 }
                
             },

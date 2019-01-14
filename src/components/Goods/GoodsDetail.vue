@@ -44,13 +44,13 @@
                
                 <div class="left">
                    
-                    <div class="logo-wrapper "  @click="$router.push({name: 'cart'})">
+                    <div class="logo-wrapper "  @click="$router.push({name: 'cart'})" :style="{left:(shopId?'1.5rem':'0.1rem')}">
                         <div class="logo">
                             <i class="iconfont icon-gouwuche1-copy-copy"></i>
                         </div>
                         <div class="num" v-if="cartCount>0">{{cartCount}}</div>
                     </div>
-                     <div class="shop-wrap">店铺</div>
+                     <div class="shop-wrap" v-if="shopId" @click="goShop">店铺</div>
                 </div>
                 <div class="right">
                     
@@ -85,7 +85,7 @@
             return {
                 goods: {},
                 goodsDetailPhotos: [],
-              
+                shopId: '',
                 goodsQuantity: 1,
                 active: false,
                 symbol: '',
@@ -98,7 +98,8 @@
                         text: 'Loading...',
                         spinnerType: 'fading-circle'
                     });
-        
+             this.shopId = localStorage.getItem('shopId');
+             sessionStorage.clear();
            this.getData();
         },
         computed: {
@@ -116,7 +117,15 @@
         },
         methods: {
             async getData(){
-               let {data:res} = await getGoodsDetailData({goodsId: this.$route.params.goodsId,userCode: this.userCode});
+
+                  let params = {}
+
+                if(this.$store.state.salesId){
+                       params= {goodsId: this.$route.params.goodsId,salesId:this.$store.state.salesId,userType:'sales'};
+                }else{
+                     params= {goodsId: this.$route.params.goodsId,userCode: this.userCode};
+                }
+               let {data:res} = await getGoodsDetailData( params);
              
                 // console.log(res)
                 if(res){
@@ -138,7 +147,16 @@
             },         
              // 加入购物车
             editCart(flag,item){
-                if(!this.userCode){
+               
+                if(this.$store.state.salesId){
+                    this.$toast({
+                        message: '您购买请联系您的店铺！',
+                        position:'middle',
+                        duration: 2000
+                    });
+                    return;
+                }
+                if(!this.userCode ){
                     this.$toast({
                         message: '请登录',
                         position:'middle',
@@ -219,45 +237,21 @@
                 }
 
             },
-            //去购物车
-            goCart(){
-                if(!this.userCode){
-                    this.$toast({
-                        message: '请登录',
-                        position: 'middle',
-                        duration: 2000
-                    });
-                    setTimeout(()=>{
-                        this.$router.push({
-                            name: 'login'
-                        });
-                    },500)
-                    return;
-                 }
-                 this.$router.push({
-                     name: 'cart'
-
-                 })
-            },
+            
             //去店铺
             goShop(){
-                if(!this.userCode){
-                    this.$toast({
-                        message: '请登录',
+                if(!this.shopId){
+                     this.$toast({
+                        message: '你没有权限',
                         position: 'middle',
                         duration: 2000
                     });
-                    setTimeout(()=>{
-                        this.$router.push({
-                            name: 'login'
-                        });
-                    },500)
                     return;
                  }
                 this.$router.push({
                     name:'shop',
                     params: {
-                        shopId:this.goods.shopId
+                        shopId:this.shopId
                     }
                 })
             },
@@ -367,7 +361,7 @@
         .info 
             padding .2rem .25rem
             overflow hidden
-            font-size .18rem
+            font-size .22rem
             line-height .24rem
             color #9a9a9a
             &.size

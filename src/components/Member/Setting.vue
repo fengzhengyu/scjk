@@ -18,12 +18,16 @@ export default {
    components: {
         mHeader
     },
+    created(){
+     
+    },
     methods: {
       quit(){
              
         this.$store.commit('delUserInfo', '');
         this.$store.commit('initCartCount', 0)
         this.$store.commit('getAddressItem',null)
+        localStorage.setItem('shopId',null);
         this.$router.go(-1)
       }
     }

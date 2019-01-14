@@ -62,7 +62,8 @@
                 text: 'Loading...',
                 spinnerType: 'fading-circle'
             });
-            this.getAllData()
+            this.getAllData();
+            sessionStorage.clear();
         },
         methods: {
             async getAllData(flag){
@@ -71,8 +72,16 @@
                 //     console.log(res.data)
                 // },(err)=>console.log(err))
                 // 以上写法一般，想要you逼格，用语法糖
+                let params = {}
 
-                let {data:res} = await getIndexData({page:this.page,userCode:this.userCode})  
+                if(this.$store.state.salesId){
+                       params= {page:this.page,salesId:this.$store.state.salesId,userType:'sales'}
+                }else{
+                     params= {page:this.page,userCode:this.userCode}
+                }
+
+
+                let {data:res} = await getIndexData(params)  
               
                 if(flag){
                    

@@ -11,7 +11,9 @@ export default new Vuex.Store({
     userCode: '',
     userLevel: '',
     cartCount: 0,
-    addressItem: null
+    addressItem: null,
+    salesId: '',
+
   },
  
   mutations: {
@@ -25,12 +27,18 @@ export default new Vuex.Store({
       localStorage.setItem('key2',value);
       state.userLevel = value
     },
+     // 保存微商登录状态
+    getSalesId(state,value){
+      localStorage.setItem('salesId',value);
+      state.salesId = value;
+    },
     // 退出登录状态
     delUserInfo(state,value){
       localStorage.clear();
       state.userCode =value;
       state.userLevel = value
-
+      state.salesId = value;
+     
     },
     //跟新购物车数量 
     updateCartCount(state,cartCount){

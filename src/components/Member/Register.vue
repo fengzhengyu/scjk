@@ -36,7 +36,7 @@
                     密码
                  </span>
                  <div class="content">
-                     <input type="password"  class="inp" v-model="userPass">
+                     <input type="password"  class="inp" v-model="userPass"  placeholder="密码">
                  </div>
             </div>
             <div class="text border-bottom" >
@@ -44,12 +44,12 @@
                     确认密码
                  </span>
                  <div class="content">
-                      <input type="password" class="inp" v-model="userPassTwo" >
+                      <input type="password" class="inp" v-model="userPassTwo"  placeholder="确认密码" >
                  </div>
             </div>
            
              <p class="btn-btn">
-                <span  @click="goRegister">注册</span>
+                <span  @click="goRegister"  @keyup.enter="goRegister">注册</span>
             </p>
             <p class="btn-btn"> 
                 <span class="btn " @click="$router.go(-1)">已有账号</span>
@@ -61,7 +61,7 @@
 </template>
 <script>
 import mHeader from 'components/Member/memberHead'
-import {getRegisterData} from 'common/api'
+import {getAccountCheck ,getUserCode , getRegisterData} from 'common/api'
     export default {
         components: {
             mHeader
@@ -74,12 +74,16 @@ import {getRegisterData} from 'common/api'
                 authCode: '',
                 userPass: '',
                 userPassTwo: '',
-                authFlag:false
+                authFlag:false,
+                phoneStatus: false
                
             }
         },
         mounted() {
            
+        },
+        computed:{
+          
         },
         methods: {
            async goRegister(){
@@ -93,26 +97,29 @@ import {getRegisterData} from 'common/api'
                }
         
                let invited = localStorage.getItem('temp');
-               let{data: res} = await getRegisterData({invitedBy: invited,user_name:this.userName,user_pass:this.userPass,companyName:this.nickname,gender:this.sex,age:this.age});
+            //    invitedBy: invited,
+               let{data: res} = await getRegisterData({user_name:this.userName,user_pass:this.userPass,yzm:this.authCode});
+               console.log(res)
                if(res.flag =='success'){
                    this.$toast({
                         message: '注册成功',
                         position: 'middle',
                         duration: 2000
                     });
+                  
                     let userCode = res.userInfo.userCode;
                     let userLevel = res.userInfo.userLevel;
-                    this.$store.commit('getUserInfo',userCode)
+                    this.$store.commit('getUserCode',userCode)
                     this.$store.commit('getUserLevel', userLevel )
-                   
-                    localStorage.setItem('temp','');
+                    
+                    // localStorage.setItem('temp','');
 
                     setTimeout(()=>{
                         this.$router.push({
                             name:'index'
                         });
                     },1000)
-               }else{
+                }else{
                     this.$toast({
                         message: res.info,
                         position: 'middle',
@@ -121,7 +128,7 @@ import {getRegisterData} from 'common/api'
                }
               
             },
-            getAuthCode(){
+            async getAuthCode(){
               let reg=/^1[34578]{1}\d{9}$/;
               if(this.userName == '') {
                 this.$toast({
@@ -139,18 +146,42 @@ import {getRegisterData} from 'common/api'
                 });
                 return;
               }
-              this.authFlag = true;
-              if(this.authFlag){
-                this.time = 60;
-                let timer = setInterval(()=>{
-                    this.time--;
-                    if(this.time<=0 ){
-                      this.authFlag = false;
-                      clearInterval(timer);
-                    }
-                },1000)
+               getAccountCheck({userName:this.userName}).then(response => {
+                    
+                   let res = response.data;
+                           console.log(res) 
+                    if(res.flag =='success'){
+                        
+                        getUserCode({userName: this.userName}).then(response => {
+                               let res = response.data;
+                               console.log(res)
+                            if(res.message.flag == 'success'){
+                                this.authFlag = true;
+                                if(this.authFlag){
+                                    this.time = 60;
+                                    let timer = setInterval(()=>{
+                                        this.time--;
+                                        if(this.time<=0 ){
+                                        this.authFlag = false;
+                                        clearInterval(timer);
+                                        }
+                                    },1000)
 
-              }
+                                }
+                            }
+
+                        });
+                        
+                    }else{
+                        this.$toast({
+                            message: res.info,
+                            position: 'middle',
+                            duration: 2000
+                            });
+                    }
+        
+
+                })
               
             }
             

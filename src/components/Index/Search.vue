@@ -73,7 +73,15 @@ export default {
                 text: 'Loading...',
                 spinnerType: 'fading-circle'
             });
-            let {data: res} = await getIndexData({userCode:this.userCode,page:this.page,keyWord:this.keyword});
+
+            let params = {}
+
+                if(this.$store.state.salesId){
+                       params= {page:this.page,keyWord:this.keyword,salesId:this.$store.state.salesId,userType:'sales'};
+                }else{
+                     params= {userCode:this.userCode,page:this.page,keyWord:this.keyword}
+                }
+            let {data: res} = await getIndexData(  params);
             // console.log(res)
             
             //  if(res.info == '已到底部'){

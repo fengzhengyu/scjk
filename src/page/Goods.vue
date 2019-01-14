@@ -87,7 +87,7 @@
             })
             this.getGoodsTypeList();
            
-         
+             sessionStorage.clear();
            
         },
         computed: {
@@ -132,9 +132,15 @@
                 
             },
             async getGoodsTypeList(flag){
+                let params = {}
+
+                if(this.$store.state.salesId){
+                       params= {typeId:this.active,salesId:this.$store.state.salesId,page:this.page,userType:'sales'};
+                }else{
+                     params= {typeId:this.active,userCode:this.userCode,page:this.page};
+                }
               
-                let {data:res} = await getGoodsTypeData({typeId:this.active,userCode:this.userCode,page:this.page});
-                console.log(res);
+                let {data:res} = await getGoodsTypeData(params);
                 if(flag){
                   
                      this.goodsList = res.typeGoodsList;
@@ -193,7 +199,14 @@
             },
             // 加入购物车
             editCart(flag,item){
-
+                if(this.$store.state.salesId){
+                    this.$toast({
+                        message: '您购买请联系您的店铺！',
+                        position:'middle',
+                        duration: 2000
+                    });
+                    return;
+                }
                 if(!this.userCode){
                     this.$toast({
                         message: '请先登录',

@@ -213,7 +213,7 @@
             invoiceInfo(){
                 let data =  JSON.parse(sessionStorage.getItem('invoice'));
                 this.invoiceData = data;
-                console.log(data)
+             
                 if(data == null){
                     return data;
                 }
@@ -307,12 +307,10 @@
                
                
                let {data:res} = await getCartPay( params );
-               console.log(res)
+              
 
                if(res.flag == 'success'){
-                   
-                 
-                window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+res.orderNumber+'&code='+this.userCode
+                     window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+res.orderNumber
                }else{
                     this.$toast({
                         message: res.info,
@@ -327,6 +325,7 @@
             goBack(){
                 this.$router.go(-1);
                 // sessionStorage.clear();
+                
             },
                        
             // 去地址页
@@ -347,13 +346,7 @@
                 })
                 
             },
-            //    得到发票信息
-            getSaveMsg(data){
-                this.invoiceFlag = data.boole;
-                this.invoiceType = data.type;
-                this.invoiceName = data.name;
-                this.taxpayerNumber = data.number;
-            },
+            
             // 去商品目录页面
             goList(){
                 sessionStorage.setItem('imgList',JSON.stringify(this.imgList))

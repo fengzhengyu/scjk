@@ -38,8 +38,30 @@ export let getRegisterData = (data) =>{
   })
 }
 
+// 判断账号是否存在接口
+export let getAccountCheck = (data) =>{
+  return axios.post('user/accountCheck',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
 // 验证码接口
-
+export let getUserCode = (data) => {
+  return axios.post('Register/Sendmsg',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
 // 会员页信息接口
 export let getMemberData = (data) => {
   return axios.post('User/index',data,{

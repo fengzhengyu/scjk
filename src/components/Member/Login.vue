@@ -42,22 +42,37 @@
             }
         },
         created() {
-            
+            if(this.$store.state.salesId || this.$store.state.userCode){
+                 this.$router.push({
+                        name: 'index'
+                    });
+            }
         },
         methods: {
            
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,userPass:this.userPass,loginType:this.type});     
-                    console.log(res)
+
                     if(res.message.flag == 'success'){
-                        let userCode = res.message.userCode;
-                        let userLevel = res.message.userLevel;
-                        this.$store.commit('getUserCode', res.message.userCode);
-                        this.$store.commit('getUserLevel',res.message.userLevel);
+
                        
+
+                        if(this.type == 1){
+                             // 注册会员信息
+                            let userCode = res.message.userCode;
+                            let userLevel = res.message.userLevel;
+                            this.$store.commit('getUserCode', res.message.userCode);
+                            this.$store.commit('getUserLevel',res.message.userLevel);
+                       
+                        }else{
+                            // 微商信息
+                            this.$store.commit('getSalesId',res.message.salesId)
+                            localStorage.setItem('shopId',res.message.shopId);
+                        }
+                        
                       
-                       
+                    
                    
             
                         this.$toast({
@@ -102,10 +117,10 @@
         width 6.4rem
         
         background #fff
-        position fixed
-        top 0
-        bottom 0
-        overflow-y scroll
+        // position fixed
+        // top 0
+        // bottom 0
+        // overflow-y scroll
         .header 
             position relative
             height 4.5rem
@@ -185,7 +200,7 @@
                     color #1cb727
         .login-btn
             text-align center
-            padding  .4rem 0
+            padding  .4rem 0 .8rem  0
             span 
                 display inline-block
                 width 3.2rem
