@@ -11,7 +11,8 @@
             </div>
             <p>
                 <i class="iconfont icon-wode"></i>
-                <input type="text"  pattern="[0-9]*"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11" oninput="if(value.length>11)value=value.slice(0,11)" >
+                <input type="text"  pattern="[0-9]*"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11"  >
+                <!-- pattern="[0-9]*"oninput="if(value.length>11)value=value.slice(0,11)" -->
             </p>
             <p>
                 <i class="iconfont icon-mima"></i>
@@ -71,16 +72,6 @@
                             localStorage.setItem('shopId',res.message.shopId);
                         }
                         
-                      
-                    
-                   
-            
-                        this.$toast({
-                            message: res.message.info,
-                            position: 'middle',
-                            duration: 2000
-                        });
-                       
                         if(this.$route.query.redirect){
                         
                              this.$router.push({
@@ -117,10 +108,10 @@
         width 6.4rem
         
         background #fff
-        // position fixed
-        // top 0
-        // bottom 0
-        // overflow-y scroll
+        position absolute
+        top 0
+        bottom 0
+        overflow-y scroll
         .header 
             position relative
             height 4.5rem

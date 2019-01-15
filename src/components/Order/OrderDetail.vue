@@ -14,7 +14,7 @@
                 <div class="status" v-if="orderData.orderStatus == 2">订单待收货</div>
                 <div class="status" v-if="orderData.orderStatus == 3">订单已完成</div>
                 <div class="text">感谢您的支持，期待再次光临</div>
-                <div class="text2">如有售后问题请致电平台客服：<a href="tel:13015238110">13015238110</a></div>
+                <!-- <div class="text2">如有售后问题请致电平台客服：<a href="tel:13015238110">13015238110</a></div> -->
             </div>
         </div>
         <div class="fill-wrap"></div>
@@ -161,7 +161,7 @@
         methods: {
             async getDetailData(){
                let {data: res} = await getOrderDetail({userCode:this.userCode,orderNumber:this.$route.query.id});
-                console.log(res)
+                // console.log(res)
                 if(res.flag == 'success'){
                      this.orderData = res.data.orderData;
                      this.goodsList =  res.data.orderData.goodsdata;
@@ -175,10 +175,18 @@
                
             },
             goBack(){
-                // this.$router.push({
-                //     name: 'order'
-                // })
-                this.$router.go(-1)
+                if(typeof this.$route.query.flag == 'undefined' ){
+                    this.$router.go(-1)
+                  
+                }else{
+                  
+                    this.$router.push({
+                        name: 'myorder',
+                        query: {id:this.orderData.orderStatus}
+                    });
+                   
+                }
+                
             },
             goList(){
                    

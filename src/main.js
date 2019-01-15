@@ -112,6 +112,45 @@ let setShare = function(title, desc, imgUrl, sharelink,link){
             // console.log(JSON.stringify(res))
           }
         })
+        //分享到QQ
+        wx.onMenuShareQQ({
+          title: title, // 分享标题
+          link: sharelink, // 分享链接
+          imgUrl: imgUrl, // 分享图标
+          desc: desc, // 分享描述
+          success: function () {
+              // 用户确认分享后执行的回调函数
+          },
+          cancel: function () {
+              // 用户取消分享后执行的回调函数
+          }
+        })
+        //分享到微博
+        wx.onMenuShareWeibo({
+            title: title, // 分享标题
+            link: sharelink, // 分享链接
+            imgUrl: imgUrl, // 分享图标
+            desc: desc, // 分享描述
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        })
+        //分享到QQ空间
+        wx.onMenuShareQZone({
+            title: title, // 分享标题
+            link: sharelink, // 分享链接
+            imgUrl: imgUrl, // 分享图标
+            desc: desc, // 分享描述
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        })
       })
     })
     .catch(err => {
@@ -130,11 +169,50 @@ Vue.prototype.$setShare = setShare;
 
 // 购物车 第一次今日缓存，其余刷新
 router.beforeEach((to, from,next) => {
-                  
+  if (!store.state.shareUrl) {
+    store.commit('setShareUrl', document.URL)
+  }             
+ 
   store.state.userCode = localStorage.getItem('key');//获取本地存储的token
   store.state.userLevel = localStorage.getItem('key2');
   store.state.cartCount = parseFloat(localStorage.getItem('num'));
   store.state.salesId = localStorage.getItem('salesId');
+
+  let  u = navigator.userAgent;
+  let sharelink = '';
+
+  if(!!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)){
+    sharelink = encodeURIComponent(store.state.shareUrl.split('#')[0])
+  }else{
+    sharelink =  encodeURIComponent(location.href.split('#')[0]);
+  }
+
+
+  let shareState = '';
+    if(to.name =='id'){
+      shareState = false;
+       
+    }else if(to.name =='shop'){
+
+      shareState = false;
+     
+    }else if(to.name =='goods'){
+      shareState = false;
+      
+    }else if(to.name =='index'){
+      shareState = false;
+      
+    }else{
+      shareState = true;
+    }
+  
+    if(shareState){
+      setTimeout(()=> {
+        let imgUrl = 'http://www.scjksm.com'+require('./common/img/logo.png');
+      
+        setShare('聚康供采平台', '供应商与采购商的理想平台', imgUrl, location.href,sharelink)
+      },300)
+    }
   
   if(to.meta.requireAuth){
     if(store.state.userCode !== null || store.state.salesId ){
@@ -180,16 +258,6 @@ router.beforeEach((to, from,next) => {
     
   // }
 
-
-})
-router.afterEach(function (to,from) {
- 
-    if(to.name !=='id' || to.name !=='shop'){
-
-    setTimeout(()=> {
-      setShare('聚康供采平台', '供应商与采购商的理想平台', require('./common/img/logo.png'), location.href, encodeURIComponent(location.href.split('#')[0]))
-    },1000)
-    }
 
 })
 

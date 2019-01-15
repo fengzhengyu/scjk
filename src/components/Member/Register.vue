@@ -26,7 +26,7 @@
                      验证码
                  </span>
                  <div class="content">
-                    <input type="text"  placeholder="验证码" class="auth" v-model="authCode">
+                    <input type="number" placeholder="验证码" pattern="[0-9]*" class="auth" v-model="authCode" >
                     <span v-if="!authFlag" class="auth-wrap" @click="getAuthCode">发送验证码</span>
                     <span v-if="authFlag"   class="auth-wrap">{{time+ 's后获取'}}</span>
                  </div>
@@ -82,8 +82,12 @@ import {getAccountCheck ,getUserCode , getRegisterData} from 'common/api'
         mounted() {
            
         },
-        computed:{
-          
+        watch:{
+          'userName'(){
+              if(this.userName>11){
+                  this.authFlag =false;
+              }
+          }
         },
         methods: {
            async goRegister(){
@@ -96,23 +100,22 @@ import {getAccountCheck ,getUserCode , getRegisterData} from 'common/api'
                    return;
                }
         
-               let invited = localStorage.getItem('temp');
-            //    invitedBy: invited,
+         
                let{data: res} = await getRegisterData({user_name:this.userName,user_pass:this.userPass,yzm:this.authCode});
-               console.log(res)
+            //    console.log(res)
                if(res.flag =='success'){
-                   this.$toast({
-                        message: '注册成功',
-                        position: 'middle',
-                        duration: 2000
-                    });
+                //    this.$toast({
+                //         message: '注册成功',
+                //         position: 'middle',
+                //         duration: 2000
+                //     });
                   
                     let userCode = res.userInfo.userCode;
                     let userLevel = res.userInfo.userLevel;
                     this.$store.commit('getUserCode',userCode)
                     this.$store.commit('getUserLevel', userLevel )
                     
-                    // localStorage.setItem('temp','');
+                    
 
                     setTimeout(()=>{
                         this.$router.push({
@@ -149,12 +152,12 @@ import {getAccountCheck ,getUserCode , getRegisterData} from 'common/api'
                getAccountCheck({userName:this.userName}).then(response => {
                     
                    let res = response.data;
-                           console.log(res) 
+                       
                     if(res.flag =='success'){
                         
                         getUserCode({userName: this.userName}).then(response => {
                                let res = response.data;
-                               console.log(res)
+                           
                             if(res.message.flag == 'success'){
                                 this.authFlag = true;
                                 if(this.authFlag){

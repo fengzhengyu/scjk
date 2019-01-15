@@ -27,7 +27,8 @@ export default {
         this.$store.commit('delUserInfo', '');
         this.$store.commit('initCartCount', 0)
         this.$store.commit('getAddressItem',null)
-        localStorage.setItem('shopId',null);
+        localStorage.setItem('shopId','');
+
         this.$router.go(-1)
       }
     }

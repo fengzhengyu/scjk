@@ -1,7 +1,7 @@
 <template>
 
-<div class="cart" :style="{'padding-bottom': paddingVal}">
-    <div class="cart-wrap" >
+<div class="cart" >
+    <div class="cart-wrap"  :style="{'padding-bottom': paddingVal}">
        
         <div class="group border-bottom" v-for="(goods,index) in cartList" :key="index">
             <div class="group-check" >
@@ -326,7 +326,7 @@
 
                   if(cartH >parentH && scrollTop>0){
                       this.fiexdStatus = true;
-                      this.paddingVal = '.8rem';
+                      this.paddingVal = '1.8rem';
                   }else{
                      this.fiexdStatus = false; 
                      this.paddingVal = 0

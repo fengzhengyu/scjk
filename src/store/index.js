@@ -13,6 +13,7 @@ export default new Vuex.Store({
     cartCount: 0,
     addressItem: null,
     salesId: '',
+    shareUrl : ''
 
   },
  
@@ -53,6 +54,10 @@ export default new Vuex.Store({
     },
     getAddressItem(state,value){
       state.addressItem = value;
+    },
+    // 分享url
+    setShareUrl(state,url){
+      state.shareUrl = url;
     }
   }
 })

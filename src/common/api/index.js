@@ -235,7 +235,7 @@ export let getCartCount = (data) => {
     }]
   })
 }
-// 购物车结算
+// 订单结算
 
 export let getCartPay = (data) => {
   return axios.post('Cart/cartPay',data,{

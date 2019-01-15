@@ -13,7 +13,11 @@
                         <i class="iconfont icon-peisong1"></i>
                         <span>物流配送</span>
                     </div>
-                    <div class="right" :class="{'active': active=='上门自提'}"  @click="active='上门自提'">
+                    <div class="right" :class="{'active': active=='上门自提'}"  @click="$toast({
+                        message: '暂不支持！',
+                        position:'middle',
+                        duration: 2000
+                    })">
                          <i class="iconfont icon-mendianzitiicon"></i>
                          <span>上门自提</span>
                     </div>
@@ -283,14 +287,17 @@
                    
                 }
               
-               
+                // 获取 shop id，salesID
+                let salesid = localStorage.getItem('temp1');
+                let shopid = localStorage.getItem('temp2');
+              
     
                 let params = {
                     userCode:this.userCode,
                     // 店铺id 
-                    shopId: '',
+                    shopId: shopid,
                     // 分享id
-                    salesID: '',
+                    salesId: salesid,
                     cartId: cartStr ,  //购物车id
 
                     receiverType:this.active == '快递运输'?1:0,  //快递方式
@@ -305,10 +312,9 @@
 
                 }
                
-               
+             
                let {data:res} = await getCartPay( params );
-              
-
+            
                if(res.flag == 'success'){
                      window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+res.orderNumber
                }else{
@@ -323,8 +329,18 @@
             },
             // 
             goBack(){
-                this.$router.go(-1);
+
+              
+            
                 // sessionStorage.clear();
+                if(typeof this.$route.query.flag == 'undefined' ){
+                   this.$router.go(-1)
+                }else{
+                    
+                    this.$router.push({
+                        name: 'cart',
+                    });
+                }
                 
             },
                        

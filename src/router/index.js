@@ -195,11 +195,11 @@ export default new Router({
       name: 'search',
       component: Search
     },
-    {
-      path: '/popularize',
-      name: 'popularize',
-      component: Popularize
-    },
+    // {
+    //   path: '/popularize',
+    //   name: 'popularize',
+    //   component: Popularize
+    // },
     { path: '*', component: NotFoundComponent }
   ],
   scrollBehavior (to, from, savedPosition) {

@@ -5,6 +5,7 @@
                 <div class="back"  @click="$router.go(-1)">
                     <i class="iconfont icon-fanhui2"></i>
                 </div>
+                <div class="back-go"  @click="$router.push({path: '/'})"> <i class="iconfont icon-zhuye"></i> </div>
             </div>
             <div class="detail" >
                <div ref="detailWrapper" class="detailWrapper">
@@ -44,18 +45,18 @@
                
                 <div class="left">
                    
-                    <div class="logo-wrapper "  @click="$router.push({name: 'cart'})" :style="{left:(shopId?'1.5rem':'0.1rem')}">
+                    <div class="logo-wrapper "  @click="$router.push({name: 'cart'})" :style="{left:(shopId &&shopId != 'null' && shopId != ''?'1.5rem':'0.1rem')}">
                         <div class="logo">
                             <i class="iconfont icon-gouwuche1-copy-copy"></i>
                         </div>
                         <div class="num" v-if="cartCount>0">{{cartCount}}</div>
                     </div>
-                     <div class="shop-wrap" v-if="shopId" @click="goShop">店铺</div>
+                     <div class="shop-wrap" v-if=" shopId &&shopId != 'null' && shopId != ''" @click="goShop">店铺</div>
                 </div>
                 <div class="right">
                     
                     <div class="cart-control-wrapper" v-show="goods.goodsNum>0" >
-                        <!--  -->   
+                      
                             <div></div>
                                
                             <div class="cart-decrease icon-circle"  @click=" editCart('minus',goods)">
@@ -78,7 +79,8 @@
 </template>
 <script>
     import BScroll from 'better-scroll'
-    import { getGoodsDetailData, getAddCartData , getNowBuyData, getCollectData } from 'common/api'
+    import wx from 'weixin-js-sdk'
+    import { getGoodsDetailData, getAddCartData , getNowBuyData, getCollectData ,getShareData} from 'common/api'
     import Swiper from 'components/common/Swiper'
     export default {
         data() {
@@ -98,9 +100,30 @@
                         text: 'Loading...',
                         spinnerType: 'fading-circle'
                     });
-             this.shopId = localStorage.getItem('shopId');
-             sessionStorage.clear();
+            this.shopId = localStorage.getItem('shopId');
+            sessionStorage.clear();
+        
            this.getData();
+
+            String.prototype.queryURLParameter = function(){
+                var obj = {},
+                reg = /([^?=&#]+)=([^?=&#]+)/g;
+                this.replace(reg,function(){
+                    var key = arguments[1],
+                    value = arguments[2];
+                    obj[key] = value;
+                })
+                return obj;
+            }
+             // 是分享出来的标识，存起来
+            let obj = location.href.queryURLParameter();
+            if( obj['a']  !== undefined){
+                this.temp1 = obj.a;
+                this.temp2 = obj.b;
+                localStorage.setItem('temp1',this.temp1);
+                localStorage.setItem('temp2',this.temp2);
+            }
+        
         },
         computed: {
             userCode(){
@@ -110,12 +133,127 @@
                 return this.$store.state.cartCount;
             }
         },
+        watch: {
+            $route(){
+            
+               this.getData(); //当路由改变时 重新请求签名
+            }
+        },
         mounted(){
              this.$nextTick(() => {
-                  
+             
+               
+            
+            
+                // this.$setShare( this.goods.goodsName , this.goods.goodsSpecification, this.goodsDetailPhotos[0], url,sharelink)
               })      
         },
         methods: {
+            async getWeChatShare(){
+              
+                let  u = navigator.userAgent;
+                let sharelink = '';
+                if(!!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)){
+                    sharelink = encodeURIComponent(this.$store.state.shareUrl.split('#')[0])
+                }else{
+                    sharelink =  encodeURIComponent(location.href.split('#')[0]);
+                }
+                let {data: res} = await getShareData({url:sharelink}); //
+                if(res &&res.flag == 'success'){
+                
+                   if( this.shopId && this.shopId != '' && this.shopId != 'null' ){
+                        this.url = location.href.split('?')[0]+'?a='+this.$store.state.salesId+'&b='+this.shopId;
+                    }else{
+                        this.url = location.href.split('?')[0];
+                    } 
+                   let data =res.data;
+
+                    wx.config({
+                        debug:false,
+                        appId: data.appId, 
+                        timestamp: data.timestamp,
+                        nonceStr:  data.nonceStr,
+                        signature: data.signature,
+                        jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareQZone','onMenuShareWeibo']
+                        //  'chooseImage','uploadImage','startRecord', 'stopRecord', 'onVoiceRecordEnd', 'playVoice', 'pauseVoice', 'stopVoice'
+
+                        // 所有要调用的 API 都要加到这个列表中
+                    });
+                    wx.ready(() => {
+                        //分享给朋友
+                            // console.log(this.link)
+                        wx.onMenuShareAppMessage({
+                        title: this.goods.goodsName, // 分享标题
+                        link:   this.url , // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        desc: this.goods.goodsSpecification, // 分享描述
+                        imgUrl: this.goodsDetailPhotos[0], // 分享图标
+                        //type: '', // 分享类型,music、video或link，不填默认为link
+                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                        })
+
+                        //分享到朋友圈
+                        wx.onMenuShareTimeline({
+                            title: this.goods.goodsName, // 分享标题
+                            link:   this.url , // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            imgUrl: this.goodsDetailPhotos[0], // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                        })
+                        //分享到QQ
+                        wx.onMenuShareQQ({
+                            title: this.goods.goodsName, // 分享标题
+                            link:   this.url , // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            desc: this.goods.goodsSpecification, // 分享描述
+                            imgUrl: this.goodsDetailPhotos[0], // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                        })
+                        //分享到微博
+                        wx.onMenuShareWeibo({
+                            title: this.goods.goodsName, // 分享标题
+                            link:   this.url , // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            desc: this.goods.goodsSpecification, // 分享描述
+                            imgUrl: this.goodsDetailPhotos[0], // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                        })
+                        //分享到QQ空间
+                        wx.onMenuShareQZone({
+                            title: this.goods.goodsName, // 分享标题
+                            link:   this.url , // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            desc: this.goods.goodsSpecification, // 分享描述
+                            imgUrl: this.goodsDetailPhotos[0], // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                        })
+                    })
+                }else{
+                    console.log(res)
+                }
+            },
             async getData(){
 
                   let params = {}
@@ -126,8 +264,7 @@
                      params= {goodsId: this.$route.params.goodsId,userCode: this.userCode};
                 }
                let {data:res} = await getGoodsDetailData( params);
-             
-                // console.log(res)
+            
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
@@ -137,8 +274,9 @@
                     this.str = this.goods.goodsProcurementPrice.substring(0,3)
                     }
                    
-                 
-                    this.$indicator.close()
+
+                    this.$indicator.close();
+                    this.getWeChatShare();
                 }else{
                     
                 }
@@ -278,7 +416,7 @@
                 });
             }
         },
-       
+      
         components: {
             Swiper
         }
@@ -311,6 +449,16 @@
         i 
             color #fff
             font-size .3rem
+    .back-go
+        position absolute
+        right 0
+        top 0
+        padding  .25rem .2rem 0 .2rem
+        i   
+          
+            color #898889
+            font-size .46rem
+
 .detail
    
     width 6.4rem
