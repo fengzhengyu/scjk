@@ -20,7 +20,9 @@
             </p>
             <div class="register">
                 <span class="reg" @click="signIn">快速注册</span>
-                <span>找回密码</span>
+                <span @click="$router.push({
+                    name:'password'
+                })">找回密码</span>
             </div>
         </div>
         <div class="login-btn">

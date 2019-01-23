@@ -105,6 +105,7 @@
         $route(){
             this.page =1;
             this.goodsList =[];
+            this.end = false;
             this.getGoodsTypeList()
             }
         },

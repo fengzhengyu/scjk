@@ -51,7 +51,9 @@
                    <p class="time">{{ item.addTime}}</p>
                    
                    <div class="status" v-if="item.orderStatus == 0">
-                       <span>未支付</span>
+                     
+                        <span class="pay" @click.stop="goPayPage(item)">去支付</span>
+                     
                    </div>
                    <div class="status" v-if="item.orderStatus == 1">
                        <span>待发货</span>
@@ -178,6 +180,10 @@ export default {
 
             })
            
+        },
+        // 去支付
+        goPayPage(item){
+             window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+item.orderNumber
         },
         //确认收货
         confirmOrder(item){
@@ -330,8 +336,16 @@ export default {
                     font-size .22rem
                     color #202020    
                     text-align right
+                 
                     span 
+                        line-height normal
                         padding-left .2rem
+                    .pay 
+                        background #f60
+                        color #fff
+                        padding 0.1rem .2rem
+                        border-radius .3rem
+                        font-weight normal
         .bottom-tip
             width 100%
             height: 40px;

@@ -414,6 +414,6 @@
                     color: red;
         .expressage
             margin  .2rem 0
-            color #fff;
+            color #f3f4f6;
 
 </style>

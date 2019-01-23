@@ -41,13 +41,14 @@
                      <h2>配送费</h2>  
                      <p>单笔订单满199元免配送</p>
                   </div>
-                  <div class="price">+￥{{ orderData.goodsPriceTotal>=199?0:20}}</div>
+                  <div class="price" v-if="  orderData.salesId == '0' || orderData.salesId ==null">+￥{{ orderData.goodsPriceTotal>=199?0:20}}</div>
+                    <div class="price" v-else>+￥0</div>
                </div>
                <div class="next"></div>
               
             </div>
-             <div class="price-wrap">实付￥<span>{{ orderData.goodsPriceTotal}}</span></div>
-            
+             <div class="price-wrap" v-if=" orderData.salesId == '0' ||  orderData.salesId ==null">实付￥<span>{{ orderData.goodsPriceTotal>=199?orderData.goodsPriceTotal:(parseFloat(orderData.goodsPriceTotal)+20).toFixed(2)}}</span></div>
+             <div class="price-wrap" v-else>实付￥<span>{{ orderData.goodsPriceTotal}}</span></div>
         </div>
         <div class="invoice-wrap column-list">
             <div class="text-wrap" >
@@ -133,13 +134,16 @@
                 taxInfo: '不需要',
                 isShow: false,
                 addressData: [],
-                postPrice: ''
+                postPrice: '',
+                salesState:''
 
              }
          },
           created(){
              this.userCode = this.$store.state.userCode;
 
+            //   // 是否是微商分享，微商分享没邮费 false 为是
+            // this.salesState = localStorage.getItem('temp1') == null || localStorage.getItem('temp1') == 'null' ?true:false;
            
             this.getDetailData()
         },

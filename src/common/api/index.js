@@ -62,6 +62,32 @@ export let getUserCode = (data) => {
     }]
   })
 }
+// 找回密码验证码接口
+export let getPassCode = (data) => {
+  return axios.post('user/Sendmsg',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+// 找回密码验证码接口
+export let getSavePass = (data) => {
+  return axios.post('user/savepass',data,{
+    transformRequest:[function(data){
+      let params = '';
+      for(let key in data){
+          params += key +'='+data[key]+'&'
+      }
+      return params
+    }]
+  })
+}
+
+
 // 会员页信息接口
 export let getMemberData = (data) => {
   return axios.post('User/index',data,{

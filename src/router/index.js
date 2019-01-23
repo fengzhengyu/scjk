@@ -23,6 +23,7 @@ import MyOrder from 'components/Order/MyOrder'
 import OrderDetail from 'components/Order/OrderDetail'
 import Login from 'components/Member/Login'
 import Register from 'components/Member/Register'
+
 import Search from 'components/Index/Search'
 import  NotFoundComponent from 'page/NotFoundComponent'
 import Popularize from 'components/Member/Popularize'
@@ -189,6 +190,11 @@ export default new Router({
       path: '/register',
       name: 'register',
       component: Register
+    },
+    {
+      path: '/password',
+      name: 'password',
+      component: Password
     },
     {
       path: '/search',

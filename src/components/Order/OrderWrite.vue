@@ -70,7 +70,8 @@
                      <h2>配送费</h2>  
                      <p>单笔订单满199元免配送</p>
                   </div>
-                  <div class="price">+￥{{postPrice}}</div>
+                  <div class="price" v-if="salesState ">+￥{{postPrice}} </div>
+                   <div class="price" v-else>+￥0  </div>
                </div>
                <div class="next"></div>
             </div>
@@ -107,7 +108,8 @@
             
                 <div class="total">
                     <h2>应付金额 <span> ￥{{totalMoney}}</span>  </h2>
-                    <p>配送费 ￥{{postPrice}}</p>
+                    <p  v-if="salesState ">配送费 ￥{{postPrice}}</p>
+                     <p  v-else>配送费 ￥0</p>
                 </div>
                 <div class="next-btn"  @click="submitOrder">去支付</div>
           
@@ -143,13 +145,14 @@
                 invoiceData: null,
                
                 active: '快递运输',
-                payType: '线下汇款'
+                payType: '线下汇款',
+                salesState: ''
               
             }
         },
         created(){
             this.userCode = this.$store.state.userCode;
-            
+            // 购买商品
             let goodsStr = sessionStorage.getItem('goods');
             this.goodsList = JSON.parse(goodsStr);
         
@@ -158,7 +161,10 @@
             }else{
                  this.getAddressData();     
             }
-            
+
+            // 是否是微商分享，微商分享没邮费 false 为是
+            this.salesState = localStorage.getItem('temp1') == null || localStorage.getItem('temp1') == 'null' ?true:false;
+           
         
         },
         mounted(){
@@ -311,8 +317,7 @@
 
 
                 }
-               
-             
+            
                let {data:res} = await getCartPay( params );
             
                if(res.flag == 'success'){
