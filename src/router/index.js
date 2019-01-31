@@ -43,7 +43,7 @@ export default new Router({
       name: 'index',
       component: Index,
       meta: {
-        // keepAlive:true
+        keepAlive: true
       }
       
     },
@@ -113,6 +113,9 @@ export default new Router({
       path: '/goods',
       name: 'goods',
       component: Goods,
+      // meta: {
+      //   keepAlive: true
+      // }
       
     },
     // 商品详情
@@ -212,7 +215,7 @@ export default new Router({
 
     // console.log(savedPosition);
     if (savedPosition) {
-     
+    
       return savedPosition
     } else {
       return { x: 0, y: 0 }

@@ -15,6 +15,7 @@
             </GoodsList>
          
          <Footer></Footer>
+         <GoTop @goRefresh="getGoTop"></GoTop>
     </div>
 </template>
 <script>
@@ -26,14 +27,15 @@
     import Classify from 'components/Index/Classify'
     import GoodsList from 'components/Index/GoodsList'
     import Footer from 'components/common/c-footer'
-
+     import GoTop from 'components/common/GoTop'
+     let routerLeave =  false;
     export default {
         components: {
             Header,
             Swiper,
             Classify,
             GoodsList,
-           
+           GoTop,
             Footer
         },
         data(){
@@ -73,6 +75,10 @@
             sessionStorage.clear();
         },
         methods: {
+            getGoTop(){
+                console.log('触发了')
+                 this.$router.go(0);
+            },
             async getWeChatShare(){
               
                 let  u = navigator.userAgent;
@@ -223,6 +229,7 @@
 
             },
             loadMore(){
+                if(routerLeave) return;
                 this.loading = true;
                 setTimeout(()=>{
                      this.page++;
@@ -234,7 +241,19 @@
              }
 
         },
-        
+        // 缓存后，进入详情页面，滚动条事件不销毁。以下方法解决 滚动条事件不销毁
+         beforeRouteEnter(to, from, next) {
+            routerLeave = false;
+           
+            next();
+        },
+        beforeRouteLeave(to, from, next) {
+          
+            routerLeave = true;
+           
+            next();
+        }
+
     }
     
 </script>

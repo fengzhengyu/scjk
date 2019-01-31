@@ -60,6 +60,8 @@
     import wx from 'weixin-js-sdk'
     import GoodsList from 'components/Index/GoodsList.vue'
     import Footer from 'components/common/c-footer'
+
+    // let routerLeave =  false;
     export default {
         data() {
             return {
@@ -103,6 +105,7 @@
         },
          watch: {
         $route(){
+
             this.page =1;
             this.goodsList =[];
             this.end = false;
@@ -292,6 +295,8 @@
             },
                //上拉刷新
             loadMore(){
+                // 缓存后 页面滚动条重复加载问题
+                // if(routerLeave) return;
                 this.loading = true;
                 setTimeout(()=>{
                      this.page++;
@@ -365,6 +370,20 @@
             }
 
         },
+        // 缓存后，进入详情页面，滚动条事件不销毁。以下方法解决 滚动条事件不销毁
+        // beforeRouteEnter(to, from, next) {
+        //     routerLeave = false;
+        
+        //     next();
+        // },
+        // beforeRouteLeave(to, from, next) {
+          
+        //     routerLeave = true;
+          
+        //     next();
+        // }
+        // ,
+
         components: {
              RankHead,
              Footer 

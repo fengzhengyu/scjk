@@ -38,6 +38,7 @@
 </template>
 <script>
  import { getAddCartData } from 'common/api'
+
     export default {
         props: {
             goodsList:{

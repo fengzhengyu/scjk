@@ -11,7 +11,7 @@
             </div>
             <p>
                 <i class="iconfont icon-wode"></i>
-                <input type="text"  pattern="[0-9]*"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11"  >
+                <input type="text"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11"  >
                 <!-- pattern="[0-9]*"oninput="if(value.length>11)value=value.slice(0,11)" -->
             </p>
             <p>
