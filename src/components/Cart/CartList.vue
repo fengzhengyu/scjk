@@ -21,7 +21,7 @@
                     </p>
                     
                         <div class="bottom">
-                        <p class="price">价格：￥{{goods.goodsdata.goodsProcurementPrice? goods.goodsdata.goodsProcurementPrice:goods.goodsdata.goodsRetailPrice}} </p>
+                        <p class="price">价格：￥{{goods.goodsdata.goodsProcurementPrice? goods.goodsdata.goodsProcurementPrice:(goods.goodsdata.goodsTradePrice?goods.goodsdata.goodsTradePrice:goods.goodsdata.goodsRetailPrice) }} </p>
                             <div class="cart-control-wrapper"  >
                             <!--  -->
                         

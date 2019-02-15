@@ -5,13 +5,17 @@
         </div>
         <div class="login-wrap">
              <div class="content">
-                <div @click="type = 1"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==1}"></i>会员入口</div>
-                <div @click="type = 2"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==2}"></i>微商入口</div> 
+                <div @click="type = 5"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==5}"></i>会员入口</div>
+             
+                 <div @click="type = 1"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==1}"></i>开户入口</div>
+                <div @click="type = 2"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==2}"></i>批发入口</div> 
+                   <div @click="type = 201"> <i class="iconfont icon-weixuanzhong " :class="{'icon-xuanzhong':type==201}"></i>微商入口</div> 
+
 
             </div>
             <p>
                 <i class="iconfont icon-wode"></i>
-                <input type="text"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11"  >
+                <input type="text"  placeholder="会员账号/邮箱/手机号" v-model="userName" maxlength="11"   @focus="inputFocus" ref="inpDom">
                 <!-- pattern="[0-9]*"oninput="if(value.length>11)value=value.slice(0,11)" -->
             </p>
             <p>
@@ -41,7 +45,7 @@
                 userName: '',
                 userPass: '',
                 routerName: '',
-                type: 1
+                type: 5
             }
         },
         created() {
@@ -56,12 +60,12 @@
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,userPass:this.userPass,loginType:this.type});     
-
+                    console.log(res)
                     if(res.message.flag == 'success'){
 
                        
-
-                        if(this.type == 1){
+                        if(this.type != 201){
+                            
                              // 注册会员信息
                             let userCode = res.message.userCode;
                             let userLevel = res.message.userLevel;
@@ -99,6 +103,12 @@
                     name: 'register'
                 })
             },
+            inputFocus(){
+                setTimeout(()=>{  
+                    this.$refs.inpDom.scrollIntoView(true);
+                    this.$refs.inpDom.scrollIntoViewIfNeeded(); 
+                }, 500)
+            }
            
         }
        
@@ -113,7 +123,7 @@
         position absolute
         top 0
         bottom 0
-        overflow-y scroll
+        overflow-y auto
         .header 
             position relative
             height 4.5rem
@@ -126,7 +136,7 @@
                 left .3rem
         .login-wrap
             background #fff
-            padding 0 .7rem
+            // padding 0 .7rem
             .content 
                 flex 1    
                 display flex
@@ -135,18 +145,18 @@
                
                 div 
                     flex 1
-                    font-size .26rem
+                    font-size .22rem
                     color #858585
-                    // text-align center
+                    text-align center
                     i 
-                        font-size .36rem
+                        font-size .3rem
                         vertical-align middle
                         color #a2a2a2
                         &.icon-xuanzhong
                             color #ff6600
            
             p 
-                margin .3rem 0
+                margin .3rem 0.5rem
                 background #e6e6e6
                 border-radius .5rem
                 padding 0.22rem 0

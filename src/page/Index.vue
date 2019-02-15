@@ -75,8 +75,8 @@
             sessionStorage.clear();
         },
         methods: {
+            // 刷新
             getGoTop(){
-                console.log('触发了')
                  this.$router.go(0);
             },
             async getWeChatShare(){
@@ -203,7 +203,9 @@
                 }
 
 
-                let {data:res} = await getIndexData(params)  
+                let {data:res} = await getIndexData(params)  ;
+               
+
                 this.getWeChatShare();
                 if(flag){
                    
@@ -244,13 +246,10 @@
         // 缓存后，进入详情页面，滚动条事件不销毁。以下方法解决 滚动条事件不销毁
          beforeRouteEnter(to, from, next) {
             routerLeave = false;
-           
             next();
         },
         beforeRouteLeave(to, from, next) {
-          
             routerLeave = true;
-           
             next();
         }
 

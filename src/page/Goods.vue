@@ -22,7 +22,8 @@
                     <div class="content">
                         <h2 class="title">{{item.goodsName}}</h2>
                         <p class="norms">{{item.goodsSpecification}}</p>
-                        <p class="price">{{item.goodsRetailPrice}} </p>
+                        <p class="price">{{item.goodsRetailPrice}}  </p>
+                        <p class="price" v-if="item.goodsTradePrice" :class="{'buy-pirce':item.goodsProcurementPrice &&item.goodsProcurementPrice.length>0?false:true}"> <span >{{item.goodsTradePrice}}</span></p>
                         <p class="buy-pirce" v-if="item.goodsProcurementPrice">{{item.goodsProcurementPrice}}</p>
                         <div class="cart-control-wrapper" @click.stop="">
                             
@@ -254,6 +255,7 @@
                 }
               
                 let {data:res} = await getGoodsTypeData(params);
+                
                 this.getWeChatShare();
                 if(flag){
                   
@@ -446,8 +448,8 @@
                 margin-left .2rem 
                 .goods-list
                     padding .25rem 0
-                    display: flex;
-                  
+                    display flex;
+                    align-items center
                     .img
                         flex 0 0 1.15rem
                         margin-right .2rem
@@ -481,6 +483,8 @@
                             white-space: nowrap
                             &.buy-pirce
                                 color $color-theme 
+                            &.sale 
+                                color $color-highlight
                         .cart-control-wrapper
                             position absolute
                             right  0

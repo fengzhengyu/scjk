@@ -94,6 +94,7 @@ import {getPassCode ,  getSavePass } from 'common/api'
          
                let{data: res} = await  getSavePass({user_name:this.userName,user_pass:this.userPass,yzm:this.authCode});
         
+             
                if(res.flag =='success'){
                    this.$toast({
                         message: res.info,
@@ -101,9 +102,6 @@ import {getPassCode ,  getSavePass } from 'common/api'
                         duration: 2000
                     });
                   
-                   
-                    
-                    
 
                     setTimeout(()=>{
                         this.$router.push({

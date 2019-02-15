@@ -127,7 +127,7 @@
                      params ={userCode:this.userCode};
                 }
                 let {data:res} = await getMemberData(params);
-              
+            //   console.log(res)
                 if(res.flag == 'success'){
                     if(res.data){
                          let data = res.data.userList;

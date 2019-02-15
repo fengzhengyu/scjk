@@ -14,9 +14,9 @@
                     <h1 class="goods-name">{{ goods.goodsName }}</h1>
                    
                     <p class="buy-price" v-if="goods.goodsProcurementPrice">{{symbol}} <b>{{num}}</b> <span >{{str}}</span> </p>
-                   
-                    <p class="info">{{goods.goodsRetailPrice}}</p>
-                    <p class="info size">{{goods.goodsSpecification}}</p>
+                    <p   v-if="goods.goodsTradePrice" :class="{'sale': goods.goodsProcurementPrice&&goods.goodsProcurementPrice.length>0?false:true}"> {{goods.goodsTradePrice}}</p>
+                    <p >{{goods.goodsRetailPrice}}</p>
+                    <p >{{goods.goodsSpecification}}</p>
                     <!-- <div class="mumber">
                         数量
                         <div class="box">
@@ -264,7 +264,7 @@
                      params= {goodsId: this.$route.params.goodsId,userCode: this.userCode};
                 }
                let {data:res} = await getGoodsDetailData( params);
-            
+           
                 if(res){
                     this.goodsDetailPhotos = res.goodsDetailPhotos;
                     this.goods =  res.goodsDetail[0];
@@ -481,12 +481,15 @@
             color #474747
             font-size .28rem
             font-weight bold
+        p 
+            padding .2rem  .25rem    0 .25rem
+            overflow hidden
+            font-size .22rem
+            line-height .24rem
+            color #9a9a9a     
         .buy-price
             padding 0 .25rem
-            font-size .22rem
-            color #ff3d00
-            
-            
+            color #ff3d00            
             b 
                 font-size .34rem
                 display inline-block
@@ -505,15 +508,10 @@
                 border-radius .05rem
                 font-size .16rem
 
-              
-        .info 
-            padding .2rem .25rem
-            overflow hidden
-            font-size .22rem
-            line-height .24rem
-            color #9a9a9a
-            &.size
-                font-size .22rem
+        .sale 
+            color #ff3d00
+           
+        
             
         .desc-tit
             padding .2rem .25rem

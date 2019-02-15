@@ -11,8 +11,9 @@
                         <h3 class="title">{{item.goodsName}}</h3>
                         <p class="text">{{item.goodsSpecification}}</p>
                         <p>{{item.goodsRetailPrice}}<!--<span class="price"> ￥150.00</span>--></p>
-                        <p class="last"> 
-                            <span class="price" v-if="item.goodsProcurementPrice">{{item.goodsProcurementPrice}}</span>  
+                        <p  v-if="item.goodsTradePrice" :class="{'sale':item.goodsProcurementPrice &&item.goodsProcurementPrice.length>0?false:true}">{{ item.goodsTradePrice }}</p>
+                        <p class="last" v-if="item.goodsProcurementPrice"> 
+                            <span class="price" >{{item.goodsProcurementPrice}}</span>  
                         <!-- v-if="userCode" -->
                             <!-- <span class="repertory" @click.prevent="addCart(item)">
                                  <i class="iconfont icon-jiaru"></i>
@@ -174,8 +175,10 @@
                       white-space nowrap
                       overflow hidden
                    &.last
-                    padding-top .2rem
-                    margin-bottom .1rem
+                      padding-top .2rem
+                      margin-bottom .1rem
+                   &.sale 
+                     color #ff6600
                    .show
                        background #ff6600
                        color $color-text
