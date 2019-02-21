@@ -173,7 +173,7 @@
             async getShopList(flag){
                 let {data:res} = await getShopData({shopId:this.$route.params.shopId,salesId:this.$store.state.salesId,page:this.page,userType:'sales'})
                
-                console.log(res)
+                // console.log(res)
                 if(res.flag == 'success'){
 
                     if(flag){

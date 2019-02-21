@@ -4,15 +4,15 @@
          <Swiper :sliders = "sliders"></Swiper>
          <Classify :goodsTypeList="goodsTypeList"></Classify>   
         
-            <GoodsList :goodsList="goodsList" 
-                :loading="end"
-                v-if="isLoad"
-                v-infinite-scroll="loadMore"
-                infinite-scroll-disabled="loading"
-                infinite-scroll-distance="10"
-               
-                >
-            </GoodsList>
+        <GoodsList :goodsList="goodsList" 
+            :loading="end"
+            v-if="isLoad"
+            v-infinite-scroll="loadMore"
+            infinite-scroll-disabled="loading"
+            infinite-scroll-distance="10"
+            
+            >
+        </GoodsList>
          
          <Footer></Footer>
          <GoTop @goRefresh="getGoTop"></GoTop>
@@ -204,7 +204,7 @@
 
 
                 let {data:res} = await getIndexData(params)  ;
-               
+                // console.log(res)
 
                 this.getWeChatShare();
                 if(flag){
@@ -220,7 +220,7 @@
                 }else{
                     this.goodsTypeList = res.goodsTypeList
                     this.goodsList = res.goodsList;
-                    this.sliders = res.carouselList.length>0? res.carouselList: [require('../components/Index/banner.png')]; 
+                    this.sliders = res.carouselList.length>0? res.carouselList: [{carouselUrl:'javascript:;',carouselPhoto:require('../components/Index/banner.png')}]; 
                     this.isLoad = true;
                     this.loading = false;
                     this.$indicator.close();

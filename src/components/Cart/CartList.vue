@@ -248,7 +248,7 @@
 
                     })            
                    
-                    sessionStorage.setItem('goods', JSON.stringify(goodsArr))
+                    sessionStorage.setItem('goods', JSON.stringify(goodsArr));
                     this.$router.push({
                         name: 'order'
                             

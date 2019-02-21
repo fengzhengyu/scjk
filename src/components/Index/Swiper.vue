@@ -1,7 +1,8 @@
 <template>
    <swiper :options="swiperOption">
     <swiper-slide v-for="(slide, index) in sliders" :key="index">
-      <img :src="slide" >
+      <a :href="slide.carouselUrl" target="_blank">  <img :src="slide.carouselPhoto" ></a>
+    
     </swiper-slide>
     <div class="swiper-pagination" slot="pagination"></div>
   </swiper>
@@ -18,8 +19,9 @@
       data() {
         return {
             swiperOption: {
-              loop : true,
-              autoplay:true,
+              loop: false,
+              autoplay :true,
+              speed: 1000,
               pagination: {
                 el: '.swiper-pagination'
               }

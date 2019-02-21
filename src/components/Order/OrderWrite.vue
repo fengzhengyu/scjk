@@ -51,7 +51,7 @@
             <div class="goods">
                 <div class="list" @click="goList">
                     <ul class="img-list">
-                        <li v-for="item in newImgList">
+                        <li v-for="(item,index) in newImgList" :key="index">
                             <img :src="item.goodsdata.goodsPhoto" >
                         </li>
                         

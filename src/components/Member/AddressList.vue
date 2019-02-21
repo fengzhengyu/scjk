@@ -96,16 +96,7 @@
     beforeDestroy(){
             EventBus.$emit('changeEditAddressMsg',this.addressItem)
     },
-    // beforeRouteLeave (to, from , next) {
-    //     console.log(to)
-    //     console.log(from)
-    //     if(to.name == 'member'){
-    //         alert('ok')
-    //     }else{
-    //         next()
-    //     }
-       
-    // },
+    
     components: {
         mHeader
     }

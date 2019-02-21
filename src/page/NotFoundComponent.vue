@@ -10,7 +10,7 @@ export default {
 </script>
 <style lang="stylus" scoped>
   .not-found
-    background #fff
+    background #313050
     width 6.4rem
     margin 0 auto 
     position absolute

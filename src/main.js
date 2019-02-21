@@ -19,7 +19,7 @@ if ('addEventListener' in document) {
 }
 
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 // 图片懒加载
 Vue.use(VueLazyload, {
