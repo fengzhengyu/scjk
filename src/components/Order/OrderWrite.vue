@@ -321,7 +321,9 @@
                let {data:res} = await getCartPay( params );
             
                if(res.flag == 'success'){
-                     window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+res.orderNumber
+                 
+                     window.location = 'http://www.scjksm.com/scjkSvn/Home/Weixinpay/pay?out_trade_no='+res.orderNumber;
+                       
                }else{
                     this.$toast({
                         message: res.info,

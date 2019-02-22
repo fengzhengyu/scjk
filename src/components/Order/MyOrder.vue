@@ -183,7 +183,8 @@ export default {
         },
         // 去支付
         goPayPage(item){
-             window.location = 'http://www.scjksm.com/scjkceshi/Home/Weixinpay/pay?out_trade_no='+item.orderNumber
+
+             window.location = 'http://www.scjksm.com/scjkSvn/Home/Weixinpay/pay?out_trade_no='+item.orderNumber
         },
         //确认收货
         confirmOrder(item){
