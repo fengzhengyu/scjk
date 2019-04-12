@@ -85,31 +85,15 @@
     created(){
       // 初始化三级联动
        this.pickerInit();
+    },
 
-      // 接受编辑信息 
-      // but ,接受的参数是打印多次的，因为不会自动销毁事件，需要手动消除，在beforeDestroy组件销毁前移除事件
-      // EventBus.$on('changeEditAddressMsg',this.getEditAddressMsg)
-    },
-    watch: {
-      // 暂无用
-    //   'getEditdata'(val){
-        
-    //    if(val.name){ //有值 说明点编辑进入的 
-    //   //  console.log(this.$refs.addressSlot)
-    //     this.getProvinceArr(val.province)
-    //     this.getCityArr(val.province,val.city)
-    //     this.getCountyArr(val.province,val.city,val.county)
-    //    }
-    //   },
-      
-    },
     computed: {
       // 徐动态创建数据
       myAddressSlots(){
         let slots =  [
           {
             flex: 1,
-            defaultIndex: 1,    
+           
             values: this.getProvinceArr(),  //省份数组Object.keys(myaddress)
             className: 'slot1',
             textAlign: 'left'
@@ -159,10 +143,13 @@
          
       },
       onMyAddressChange(picker, values) {
-        if(values[0]) {
-              picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
-              picker.setSlotValues(2, this.getCountyArr(values[0]["name"],values[1]["name"]));
-        }
+     
+        if(values[0].name) {
+          
+         picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
+         picker.setSlotValues(2, this.getCountyArr(values[0]["name"],values[1]["name"]));
+        } 
+
       },
     
       getProvinceArr(provinceName){
@@ -237,26 +224,17 @@
           this.defaultStatus = this.getEditdata.addressStatus == 0 ? true:false;
           this.address = this.getEditdata.addressRegion ;
           this.addressDetail =  this.getEditdata.addressDetail;
-           // this.province= data.province;
-          // this.city = data.city;
-          // this.county = data.county;
+         
         
       },
       // 取消三级联动
       changenAddressCancel(){
         this.popupVisible =false;
-        if(this.getEditdata.name){
-
-        }else{
-          this.myAddressSlots[0].defaultIndex = 0;
-        }
+     
       },
       //确定三级联动
        changenAddressConfirm(){
          let vals =this.$refs.addressSlot.getValues();
-        //  this.myAddressProvince = vals[0].name;
-        //  this.myAddressCity = vals[1].name;
-        //  this.myAddresscounty = vals[2].name;
          this.address = vals[0].name+' '+vals[1].name+' '+vals[2].name;
           this.popupVisible =false;
 
@@ -350,10 +328,6 @@
           }
 　　　　});   
 　　},
-    // 在beforeDestroy组件销毁前移除事件
-    beforeDestroy () {
-       EventBus.$off('changeEditAddressMsg');
-    },
     components: {
         mHeader
     }

@@ -82,7 +82,7 @@
         created(){
          
             this.active = this.$route.query.id || 1;
-
+    
             this.getTypeName();
             this.$indicator.open({
                 text: 'Loading...',
@@ -274,7 +274,11 @@
                         this.loading = false;     
                         this.isLoad = true;
                        
-                        
+                         if(res.msg == '已到底部'){
+                                this.loading = true;
+                                this.end = true;
+                            
+                            }
                     }else{
                         this.isLoadEnd = true;
                     }
@@ -291,7 +295,7 @@
                 this.$router.push({
                      name:'goods',
                         query: {
-                            id: id
+                            id: id  
                         }
                 })
             },

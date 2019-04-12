@@ -8,6 +8,8 @@ import AddressList from 'components/Member/AddressList'
 import AddressAdd from 'components/Member/AddressAdd'
 import UserInfo from 'components/Member/UserInfo'
 import Setting from 'components/Member/Setting'
+import ShareList from 'components/Member/ShareList'
+import ShareDetail from 'components/Member/ShareDetail'
 import Password from 'components/Member/Password'
 import Collect from 'components/Member/Collect'
 
@@ -80,6 +82,7 @@ export default new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       }
     },
+   
     // 会员信息
     {
       path: '/member/user',
@@ -97,6 +100,21 @@ export default new Router({
       meta: {
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       }
+      
+    },
+     //  微商分享列表页面 shareDetail
+     {
+      path: '/member/share',
+      name: 'share',
+      component: ShareList
+     
+    },
+    // 微商分享详情 shareDetail
+    {
+      path: '/member/shareDetail',
+      name: 'shareDetail',
+      component: ShareDetail
+     
     },
     // 我的订单
     {
@@ -213,7 +231,6 @@ export default new Router({
   ],
   scrollBehavior (to, from, savedPosition) {
 
-    // console.log(savedPosition);
     if (savedPosition) {
     
       return savedPosition

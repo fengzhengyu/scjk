@@ -175,8 +175,8 @@
       onMyAddressChange(picker, values) {
         if(values[0]) {
         
-              picker.setSlotValues(1, this.getCityArr(values[0]["name"]));
-              picker.setSlotValues(2, this.getCountyArr(values[0]["name"],values[1]["name"]));
+              picker.setSlotValue(1, this.getCityArr(values[0]["name"]));
+              picker.setSlotValue(2, this.getCountyArr(values[0]["name"],values[1]["name"]));
            
         }
        

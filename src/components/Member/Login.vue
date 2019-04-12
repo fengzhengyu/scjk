@@ -60,7 +60,7 @@
             async goLogin(){
                 this.routerName = sessionStorage.getItem('routerName')
                 let {data: res} = await getLoginData({userName:this.userName,userPass:this.userPass,loginType:this.type});     
-                    console.log(res)
+                    // console.log(res)
                     if(res.message.flag == 'success'){
 
                        
