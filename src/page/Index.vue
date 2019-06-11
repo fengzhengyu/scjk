@@ -53,12 +53,12 @@
 
             }
         },
-         watch: {
-            $route(){
+        //  watch: {
+        //     $route(){
             
-               this.getAllData(); //当路由改变时 重新请求签名
-            }
-        },
+        //     //    this.getAllData(); //当路由改变时 重新请求签名
+        //     }
+        // },
         computed:{
              userCode(){               
                 return this.$store.state.userCode;

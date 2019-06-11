@@ -133,12 +133,12 @@
                 return this.$store.state.cartCount;
             }
         },
-        watch: {
-            $route(){
+        // watch: {
+        //     $route(){
             
-               this.getData(); //当路由改变时 重新请求签名
-            }
-        },
+        //        this.getData(); //当路由改变时 重新请求签名
+        //     }
+        // },
         mounted(){
              this.$nextTick(() => {
              
@@ -419,7 +419,13 @@
       
         components: {
             Swiper
-        }
+        },
+        beforeRouteLeave (to, from, next) {  
+            if (to.name == 'goods') {
+            to.meta.isUseCache = true; 
+            }  
+            next();
+        },
       
     }
 </script>

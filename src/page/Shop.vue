@@ -54,12 +54,12 @@
                 })
             }
         },
-         watch: {
-            $route(){
+        //  watch: {
+        //     $route(){
             
-                this.getShopList(); //当路由改变时 重新请求签名
-            }
-        },
+        //         this.getShopList(); //当路由改变时 重新请求签名
+        //     }
+        // },
         methods: {
              async getWeChatShare(){
               

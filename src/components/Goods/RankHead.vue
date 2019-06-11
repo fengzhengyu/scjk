@@ -1,6 +1,6 @@
 <template>
   <div class="rank-header">
-    <div class="back" @click="$router.push({path: '/'})">
+    <div class="back" @click="$router.go(-1)">
       <i class="iconfont icon-fanhui2"></i>
     </div>
     <div class="search" @click="$router.push({name: 'search'})">

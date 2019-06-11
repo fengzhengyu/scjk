@@ -51,6 +51,7 @@ export default {
                 text: 'Loading...',
                 spinnerType: 'fading-circle'
             });
+           
              this.goSearch()
        
     },

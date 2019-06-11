@@ -132,9 +132,10 @@ export default new Router({
       path: '/goods',
       name: 'goods',
       component: Goods,
-      // meta: {
-      //   keepAlive: true
-      // }
+      meta: {
+        keepAlive: true,
+        isUseCache: false,
+      }
       
     },
     // 商品详情
