@@ -132,7 +132,7 @@ import {getAccountCheck ,getUserCode , getRegisterData} from 'common/api'
               
             },
             async getAuthCode(){
-              let reg=/^1[34578]{1}\d{9}$/;
+              let reg=/^1[3456789]{1}\d{9}$/;
               if(this.userName == '') {
                 this.$toast({
                   message: '手机号不能为空',
@@ -237,6 +237,7 @@ import {getAccountCheck ,getUserCode , getRegisterData} from 'common/api'
                         font-size .24rem
                     .auth
                         flex 1
+                        font-size .24rem
                     .auth-wrap
                         flex 0 0 1.3rem
                         text-align center
