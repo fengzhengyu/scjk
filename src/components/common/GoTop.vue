@@ -18,7 +18,7 @@
         props:{
             step:{   //此数据是控制动画快慢的
                 type:Number,
-                default:50  
+                default:10
             }
         },
         data(){
@@ -87,7 +87,7 @@
             line-height: 40px;
             text-align: center;
             font-family: "黑体";
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(9,9,9,0.4);
             color: #fff;
             z-index: 888;
             margin-top:1px;
@@ -97,7 +97,7 @@
             font-size: 28px;
         }
         .scroll>div:hover{
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(9,9,9,0.4);
         }
         .show{
             display: block;
